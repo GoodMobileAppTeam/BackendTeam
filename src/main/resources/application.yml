@@ -5,16 +5,27 @@ server:
     max-swallow-size: -1
 
 spring:
+
+  config:
+    import: optional:file:.env[.properties]
+
   servlet:
     multipart:
       max-file-size: 30MB
       max-request-size: 50MB
 
   datasource:
-    url: ${DB_URL}
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
+    url: ${MYSQL_URL}
+    username: ${MYSQL_USERNAME}
+    password: ${MYSQL_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
+
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
+      password: ${REDIS_PASSWORD}
+
   sql:
     init:
       mode: never
@@ -33,10 +44,10 @@ spring:
         default_batch_fetch_size: 1000
 
   jwt:
-    secret: e253645a97f98c5ac9d94c7cb6fe47adef76834f1ebf312d9617564096f443ad
-    access-token-expire-time: 7200000
-    refresh-token-expire-time: 172800000
+    secret: ${SECRET_TOKEN}
+    access-token-expire-time: ${ACCESS_TIME}
+    refresh-token-expire-time: ${REFRESH_TIME}
 
-  #CORS 설정
-  cors:
-    allowed-origins: "http://localhost:3000"
+#CORS 설정
+cors:
+  allowed-origins: "http://localhost:3000"
