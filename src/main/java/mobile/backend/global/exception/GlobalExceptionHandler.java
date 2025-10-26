@@ -3,17 +3,25 @@ package mobile.backend.global.exception;
 import jakarta.validation.ConstraintViolationException;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
-import mobile.backend.global.adapter.in.web.response.BaseResponse;
+import mobile.backend.global.exception.model.BaseErrorCode;
+import mobile.backend.global.response.BaseResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.View;
 
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+  private final View error;
+
+  public GlobalExceptionHandler(View error) {
+    this.error = error;
+  }
 
   // 커스텀 예외
   @ExceptionHandler(CustomException.class)

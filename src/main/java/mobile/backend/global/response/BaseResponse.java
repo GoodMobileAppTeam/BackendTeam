@@ -1,4 +1,4 @@
-package mobile.backend.global.adapter.in.web.response;
+package mobile.backend.global.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
@@ -14,6 +14,9 @@ public class BaseResponse<T> {
   @Schema(description = "요청 성공 여부", example = "true")
   private boolean success;
 
+  @Schema(description = "HTTP 상태 코드", example = "200")
+  private int code;
+
   @Schema(description = "응답 메시지", example = "요청이 성공적으로 처리되었습니다.")
   private String message;
 
@@ -21,15 +24,15 @@ public class BaseResponse<T> {
   private T data;
 
   public static <T> BaseResponse<T> success(T data) {
-    return new BaseResponse<>(true, "요청이 성공적으로 처리되었습니다.", data);
+    return new BaseResponse<>(true, 200, "요청이 성공적으로 처리되었습니다.", data);
   }
 
   public static <T> BaseResponse<T> success(String message, T data) {
-    return new BaseResponse<>(true, message, data);
+    return new BaseResponse<>(true, 200, message, data);
   }
 
   public static <T> BaseResponse<T> error(int code, String message) {
-    return new BaseResponse<>(false, message, null);
+    return new BaseResponse<>(false, code, message, null);
   }
 
 }

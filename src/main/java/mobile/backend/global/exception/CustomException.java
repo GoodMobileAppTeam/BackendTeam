@@ -1,6 +1,7 @@
 package mobile.backend.global.exception;
 
 import lombok.Getter;
+import mobile.backend.global.exception.model.BaseErrorCode;
 
 @Getter
 public class CustomException extends RuntimeException {
