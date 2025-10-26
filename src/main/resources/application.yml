@@ -23,6 +23,11 @@ spring:
     init:
       mode: never
 
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
+
   jpa:
     hibernate:
       ddl-auto: update
@@ -41,6 +46,19 @@ spring:
     access-token-expire-time: 7200000
     refresh-token-expire-time: 172800000
 
-  #CORS 설정
-  cors:
-    allowed-origins: "http://localhost:3000"
+
+
+# S3
+cloud:
+  aws:
+    s3:
+      bucket: ${CLOUD_AWS_S3_BUCKET}
+      path:
+        profile: profile
+    region:
+      static-region: ${CLOUD_AWS_REGION_STATIC}
+    stack:
+      auto: false
+    credentials:
+      access-key: ${AWS_ACCESS_KEY_ID}
+      secret-key: ${AWS_SECRET_ACCESS_KEY}

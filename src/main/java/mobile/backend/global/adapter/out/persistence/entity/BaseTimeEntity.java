@@ -1,4 +1,4 @@
-package mobile.backend.global.common;
+package mobile.backend.global.adapter.out.persistence.entity;
 
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;

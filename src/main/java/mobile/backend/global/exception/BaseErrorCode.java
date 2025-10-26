@@ -1,10 +1,8 @@
-package mobile.backend.global.exception.model;
+package mobile.backend.global.exception;
 
 import org.springframework.http.HttpStatus;
 
 public interface BaseErrorCode {
-
-  String getCode();
 
   String getMessage();
 
@@ -12,6 +10,10 @@ public interface BaseErrorCode {
 
   default int getStatusValue() {
     return getStatus().value();
+  }
+
+  default String getCode() {
+    return ((Enum<?>) this).name();
   }
 
 }
