@@ -1,4 +1,15 @@
 services:
+  services:
+    my-server:
+      build: .
+      ports:
+        - 8080:8080
+      depends_on:
+        my-db:
+          condition: service_healthy
+        my-cache-server:
+          condition: service_healthy
+
   mysql:
     image: mysql:8.0 # 생성이미지:버전
     container_name: mysql
