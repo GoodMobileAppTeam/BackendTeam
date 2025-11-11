@@ -31,19 +31,19 @@ jobs:
         run: ./gradlew clean bootJar -x test
 
       # ⚙️ 5. (임시 비활성화) 환경변수 파일 생성
-      # - name: Generate .env file
-      #   run: |
-      #     cat <<EOF > .env
-      #     # MYSQL_URL=jdbc:mysql://mysql:3306/${{ secrets.DOCKER_MYSQL_DATABASE }}
-      #     # MYSQL_USERNAME=${{ secrets.DOCKER_MYSQL_USERNAME }}
-      #     # MYSQL_PASSWORD=${{ secrets.DOCKER_MYSQL_PASSWORD }}
-      #     # REDIS_HOST=${{ secrets.REDIS_HOST }}
-      #     # REDIS_PORT=${{ secrets.REDIS_PORT }}
-      #     # AWS_REGION=${{ secrets.AWS_REGION }}
-      #     # AWS_ACCESS_KEY=${{ secrets.AWS_ACCESS_KEY }}
-      #     # AWS_SECRET_KEY=${{ secrets.AWS_SECRET_KEY }}
-      #     EOF
-      #   shell: bash
+      - name: Generate .env file
+        run: |
+          cat <<EOF > .env
+          # MYSQL_URL=jdbc:mysql://mysql:3306/${{ secrets.DOCKER_MYSQL_DATABASE }}
+          # MYSQL_USERNAME=${{ secrets.DOCKER_MYSQL_USERNAME }}
+          # MYSQL_PASSWORD=${{ secrets.DOCKER_MYSQL_PASSWORD }}
+          # REDIS_HOST=${{ secrets.REDIS_HOST }}
+          # REDIS_PORT=${{ secrets.REDIS_PORT }}
+          # AWS_REGION=${{ secrets.AWS_REGION }}
+          # AWS_ACCESS_KEY=${{ secrets.AWS_ACCESS_KEY }}
+          # AWS_SECRET_KEY=${{ secrets.AWS_SECRET_KEY }}
+          EOF
+        shell: bash
 
       # ✅ 6. Docker 이미지 빌드 (local용 Dockerfile)
       - name: Build Docker Image
@@ -57,17 +57,30 @@ jobs:
       - name: Push Docker Image to Docker Hub
         run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/goodmobileappteam:latest
 
-  # ⚙️ (미사용) AWS CD 단계 — 추후 AWS 연결 후 활성화 예정
-  # aws-deploy:
-  #   runs-on: ubuntu-latest
-  #   needs: build-and-push
-  #   steps:
-  #     - name: Deploy to AWS EC2
-  #       uses: appleboy/ssh-action@v0.1.10
-  #       with:
-  #         host: ${{ secrets.EC2_HOST }}
-  #         username: ${{ secrets.EC2_USER }}
-  #         key: ${{ secrets.EC2_SSH_KEY }}
-  #         port: ${{ secrets.EC2_SSH_PORT }}
-  #       script: |
-  #         echo "AWS CD 단계는 추후 활성화 예정입니다."
+deploy-to-ec2:
+  runs-on: ubuntu-latest
+  needs: build-and-push
+
+  steps:
+    - name: 🚀 Deploy to EC2 via SSH
+      uses: appleboy/ssh-action@v0.1.10
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ${{ secrets.EC2_USER }}
+        key: ${{ secrets.EC2_SSH_KEY }}
+        port: ${{ secrets.EC2_SSH_PORT }}
+        script: |
+          cd /home/ubuntu/app  # EC2 내 프로젝트 경로
+          echo "✅ Pull latest Docker image"
+          sudo docker-compose pull
+
+          echo "🧹 Stop old containers"
+          sudo docker-compose down
+
+          echo "🚀 Start new containers"
+          sudo docker-compose up -d --build
+
+          echo "🧩 Check running containers"
+          sudo docker ps
+
+          echo "✅ Deployment completed successfully!"
