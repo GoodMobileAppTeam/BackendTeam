@@ -20,7 +20,7 @@ RUN rm -rf build/libs/*.jar && \
 RUN ls -lh build/libs/
 
 #Find the generated bootJar file dynamically and copy it to /app.jar
-RUN JAR_FILE=$(ls build/libs/*-back-*.jar | tail -n 1) && cp "$JAR_FILE" /app.jar
+RUN JAR_FILE=$(ls build/libs/*-SNAPSHOT.jar | grep -v plain | tail -n 1) && cp "$JAR_FILE" /app.jar
 
 #Expose application port
 EXPOSE 8080
