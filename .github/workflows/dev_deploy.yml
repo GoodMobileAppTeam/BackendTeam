@@ -70,7 +70,7 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           port: ${{ secrets.EC2_SSH_PORT }}
           script: |
-            cd /home/ubuntu/app  # EC2 내 프로젝트 경로
+            cd /home/ubuntu  # EC2 내 프로젝트 경로
             echo "✅ Pull latest Docker image"
             sudo docker-compose pull
 
