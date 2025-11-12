@@ -71,7 +71,7 @@ jobs:
           port: ${{ secrets.EC2_SSH_PORT }}
           script: |
 #            ✅ EC2 내부에 .env 생성
-            cat <<EOF > /home/ubuntu/backend.env
+            cat <<EOF > /home/ubuntu/backend/.env
             DOCKER_MYSQL_PASSWORD=${{ secrets.DOCKER_MYSQL_PASSWORD }}
             DOCKER_MYSQL_DATABASE=${{ secrets.DOCKER_MYSQL_DATABASE }}
             DOCKER_MYSQL_CHARSET=${{ secrets.DOCKER_MYSQL_CHARSET }}
