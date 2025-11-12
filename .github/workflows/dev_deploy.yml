@@ -70,7 +70,7 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           port: ${{ secrets.EC2_SSH_PORT }}
           script: |
-#            ✅ EC2 내부에 .env 생성
+            echo "✅ EC2 내부에 .env 생성"
             cat <<EOF > /home/ubuntu/backend/.env
             DOCKER_MYSQL_PASSWORD=${{ secrets.DOCKER_MYSQL_PASSWORD }}
             DOCKER_MYSQL_DATABASE=${{ secrets.DOCKER_MYSQL_DATABASE }}
@@ -80,7 +80,7 @@ jobs:
             DOCKER_TZ=${{ secrets.DOCKER_TZ }}
             EOF
           
-            cd /home/ubuntu/backend  # EC2 내 프로젝트 경로
+            cd /home/ubuntu/backend  
             echo "✅ Pull latest Docker image"
             sudo docker-compose pull
 
