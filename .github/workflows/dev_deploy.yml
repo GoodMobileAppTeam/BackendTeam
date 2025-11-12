@@ -68,18 +68,7 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
-          port: ${{ secrets.EC2_SSH_PORT }}
           script: |
-            echo "✅ EC2 내부에 .env 생성"
-            cat <<EOF > /home/ubuntu/backend/.env
-            DOCKER_MYSQL_PASSWORD=${{ secrets.DOCKER_MYSQL_PASSWORD }}
-            DOCKER_MYSQL_DATABASE=${{ secrets.DOCKER_MYSQL_DATABASE }}
-            DOCKER_MYSQL_CHARSET=${{ secrets.DOCKER_MYSQL_CHARSET }}
-            DOCKER_MYSQL_COLLATION=${{ secrets.DOCKER_MYSQL_COLLATION }}
-            DOCKER_REDIS_PASSWORD=${{ secrets.DOCKER_REDIS_PASSWORD }}
-            DOCKER_TZ=${{ secrets.DOCKER_TZ }}
-            EOF
-          
             cd /home/ubuntu/backend  
             echo "✅ Pull latest Docker image"
             sudo docker-compose pull
@@ -94,3 +83,4 @@ jobs:
             sudo docker ps
 
             echo "✅ Deployment completed successfully!"
+          port: ${{ secrets.EC2_SSH_PORT }}
