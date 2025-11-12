@@ -77,7 +77,7 @@ jobs:
             sudo docker-compose down
 
             echo "🚀 Start new containers"
-            sudo docker-compose up -d --build
+            sudo docker-compose up -d 
 
             echo "🧩 Check running containers"
             sudo docker ps
