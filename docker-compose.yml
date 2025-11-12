@@ -1,8 +1,7 @@
 services:
   my-server:
-    build:
-      context: .
-      dockerfile: docker/Dockerfile
+    image: mins8578/goodmobileappteam:latest
+    container_name: my-server
     ports:
       - 8080:8080
     depends_on:
