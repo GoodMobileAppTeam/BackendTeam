@@ -70,6 +70,16 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           port: ${{ secrets.EC2_SSH_PORT }}
           script: |
+            # ✅ EC2 내부에 .env 생성
+            cat <<EOF > /home/ubuntu/.env
+            DOCKER_MYSQL_PASSWORD=${{ secrets.DOCKER_MYSQL_PASSWORD }}
+            DOCKER_MYSQL_DATABASE=${{ secrets.DOCKER_MYSQL_DATABASE }}
+            DOCKER_MYSQL_CHARSET=${{ secrets.DOCKER_MYSQL_CHARSET }}
+            DOCKER_MYSQL_COLLATION=${{ secrets.DOCKER_MYSQL_COLLATION }}
+            DOCKER_REDIS_PASSWORD=${{ secrets.DOCKER_REDIS_PASSWORD }}
+            DOCKER_TZ=${{ secrets.DOCKER_TZ }}
+            EOF
+          
             cd /home/ubuntu  # EC2 내 프로젝트 경로
             echo "✅ Pull latest Docker image"
             sudo docker-compose pull

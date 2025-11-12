@@ -4,9 +4,9 @@ services:
     ports:
       - 8080:8080
     depends_on:
-      my-db:
+      mysql:
         condition: service_healthy
-      my-cache-server:
+      redis:
         condition: service_healthy
 
   mysql:
