@@ -72,8 +72,6 @@ jobs:
             cd /home/ubuntu/backend  
             git fetch --all
             git reset --hard origin/main
-            echo "✅ Pull latest Docker image"
-            sudo docker-compose pull
 
             echo "🧹 Stop old containers"
             sudo docker-compose down
