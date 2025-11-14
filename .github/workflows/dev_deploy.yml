@@ -44,6 +44,8 @@ jobs:
           AWS_REGION=${{ secrets.AWS_REGION }}
           AWS_ACCESS_KEY=${{ secrets.AWS_ACCESS_KEY }}
           AWS_SECRET_KEY=${{ secrets.AWS_SECRET_KEY }}
+          EOF
+
       # 6. Docker 이미지 빌드 (local용 Dockerfile)
       - name: Build Docker Image
         run: docker build -f docker/Dockerfile -t ${{ secrets.DOCKERHUB_USERNAME }}/goodmobileappteam:latest .
