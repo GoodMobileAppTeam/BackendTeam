@@ -25,8 +25,6 @@ services:
       #=== 환경 변수 ===#
       MYSQL_ROOT_PASSWORD: ${DOCKER_MYSQL_PASSWORD} # root 계정 비밀번호 설정
       MYSQL_DATABASE: ${DOCKER_MYSQL_DATABASE} # 데이터베이스 생성 이름
-      MYSQL_CHARSET: ${DOCKER_MYSQL_CHARSET} # 인코딩 문자
-      MYSQL_COLLATION: ${DOCKER_MYSQL_COLLATION} # 대조 문자
       TZ: ${DOCKER_TZ} # 타임존 설정
 
   redis:
@@ -35,8 +33,13 @@ services:
     restart: always
     ports:
       - "16379:6379"
-    volumes:
-      - ./db/redis/data:/data
     command: [ "redis-server", "--requirepass", "${DOCKER_REDIS_PASSWORD}" ]
     environment:
       TZ: ${DOCKER_TZ}
+    volumes:
+      - ./db/redis/data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${DOCKER_REDIS_PASSWORD}", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
