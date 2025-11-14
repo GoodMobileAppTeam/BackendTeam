@@ -10,12 +10,12 @@ spring:
     username: ${AWS_MYSQL_USERNAME}
     password: ${AWS_MYSQL_PASSWORD}
 
-  data:
-    redis:
-      host: ${AWS_REDIS_HOST}
-      port: ${AWS_REDIS_PORT}
-      usessl: false
-      password: ""
+#  data:
+#    redis:
+#      host: ${AWS_REDIS_HOST}
+#      port: ${AWS_REDIS_PORT}
+#      usessl: false
+#      password: ""
 
   jpa:
     hibernate:
