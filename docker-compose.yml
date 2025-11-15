@@ -1,7 +1,7 @@
 services:
   my-server:
-    image: mins8578/goodmobileappteam:latest
     container_name: my-server
+    build: .
     ports:
       - 8080:8080
     env_file:

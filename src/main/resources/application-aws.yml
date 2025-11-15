@@ -1,8 +1,22 @@
-spring:
+server:
   config:
     activate:
       on-profile: aws
-#    import: optional:file:.env[.properties] 추후 aws 환경 변수 연결 시 활성화
+  servlet:
+    context-path: /api
+  tomcat:
+    max-swallow-size: -1
+
+spring:
+
+  config:
+    import: optional:file:.env[.properties]
+
+  servlet:
+    multipart:
+      max-file-size: 30MB
+      max-request-size: 50MB
+
 
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -25,12 +39,21 @@ spring:
         show_sql: true
         format_sql: true
 
-aws:
-  ses:
-    access-key: ${AWS_ACCESS_KEY}
-    secret-key: ${AWS_SECRET_KEY}
-    send-mail-from: ${ADMIN_EMAIL}
-  region: ${AWS_REGION}
+#S3
+cloud:
+  aws:
+    s3:
+      bucket: ${AWS_S3_BUCKET}
+      path:
+        profile: profile
+        record: record
+    region:
+      static-region: ap-northeast-2
+    stack:
+      auto: false
+    credentials:
+      access-key: ${AWS_ACCESS_KEY}
+      secret-key: ${AWS_SECRET_KEY}
 
 logging:
   level:
