@@ -100,8 +100,16 @@ jobs:
             cd $APP_DIR
 
             echo "=== Generate .env for AWS ==="
-            echo "${{ secrets.AWS_ENV }}" > .env
-            chmod 600 .env
+            cat <<EOF > .env
+            SPRING_PROFILES_ACTIVE=aws
+            AWS_MYSQL_URL=${{ secrets.AWS_MYSQL_URL }}
+            AWS_MYSQL_USERNAME=${{ secrets.AWS_MYSQL_USERNAME }}
+            AWS_MYSQL_PASSWORD=${{ secrets.AWS_MYSQL_PASSWORD }}
+            AWS_REGION=${{ secrets.AWS_REGION }}
+            AWS_ACCESS_KEY=${{ secrets.AWS_ACCESS_KEY }}
+            AWS_SECRET_KEY=${{ secrets.AWS_SECRET_KEY }}
+            ADMIN_EMAIL=${{ secrets.ADMIN_EMAIL }}
+            EOF
 
             echo "=== Docker login & pull image ==="
             echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
