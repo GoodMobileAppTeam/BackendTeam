@@ -17,6 +17,7 @@ public class UserService implements UserCommandUserCase, UserQueryUseCase {
   private final UserRepository userRepository;
 
   @Override
+  @Transactional
   public User join(UserCreateCommand command) {
     return null;
   }
