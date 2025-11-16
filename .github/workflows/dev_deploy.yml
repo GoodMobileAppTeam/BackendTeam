@@ -1,73 +1,129 @@
-# 민석님 프로젝트용 CI 초기 세팅 (AWS, DB 주석 처리 버전)
-name: CI - Docker Build and Push
+name: CI/CD - Build, Push, Deploy
 
 on:
   push:
     branches:
       - main
+      - dev
+  pull_request:
+    branches:
+      - dev
+      - main
 
 jobs:
-  build-and-push:
+  # 1) 공통 빌드 (bootJar)
+  build:
     runs-on: ubuntu-latest
 
     steps:
-      # ✅ 1. 코드 체크아웃
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # ✅ 2. JDK 21 세팅
       - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '21'
 
-      # ✅ 3. Gradle 실행 권한 부여
       - name: Grant execute permission for Gradle
         run: chmod +x gradlew
 
-      # ✅ 4. Gradle 빌드 (테스트는 제외)
-      - name: Build with Gradle (bootJar)
-        run: ./gradlew clean bootJar -x test
+      - name: Build Spring Boot Jar (without tests)
+        run: ./gradlew clean bootJar -x test -Duser.language=ko -Duser.country=KR
 
-      # ⚙️ 5. (임시 비활성화) 환경변수 파일 생성
-      # - name: Generate .env file
-      #   run: |
-      #     cat <<EOF > .env
-      #     # MYSQL_URL=jdbc:mysql://mysql:3306/${{ secrets.DOCKER_MYSQL_DATABASE }}
-      #     # MYSQL_USERNAME=${{ secrets.DOCKER_MYSQL_USERNAME }}
-      #     # MYSQL_PASSWORD=${{ secrets.DOCKER_MYSQL_PASSWORD }}
-      #     # REDIS_HOST=${{ secrets.REDIS_HOST }}
-      #     # REDIS_PORT=${{ secrets.REDIS_PORT }}
-      #     # AWS_REGION=${{ secrets.AWS_REGION }}
-      #     # AWS_ACCESS_KEY=${{ secrets.AWS_ACCESS_KEY }}
-      #     # AWS_SECRET_KEY=${{ secrets.AWS_SECRET_KEY }}
-      #     EOF
-      #   shell: bash
+      - name: Upload jar as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-jar
+          path: build/libs/*-SNAPSHOT.jar
 
-      # ✅ 6. Docker 이미지 빌드 (local용 Dockerfile)
-      - name: Build Docker Image
-        run: docker build -f docker/Dockerfile.local -t ${{ secrets.DOCKERHUB_USERNAME }}/goodmobileappteam:latest .
+  # 2) Docker 이미지 빌드 & 푸시
+  docker-build-and-push:
+    runs-on: ubuntu-latest
+    needs: build
 
-      # ✅ 7. Docker Hub 로그인
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download jar artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: app-jar
+          path: build/libs
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
       - name: Login to Docker Hub
-        run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
 
-      # ✅ 8. Docker Hub로 푸시
-      - name: Push Docker Image to Docker Hub
-        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/goodmobileappteam:latest
+      # 로컬용 이미지(단일 Dockerfile)
+      - name: Build LOCAL Docker Image
+        run: |
+          docker build \
+            -f Dockerfile \
+            -t ${{ secrets.DOCKERHUB_USERNAME }}/goodmobileappteam:latest-local .
 
-  # ⚙️ (미사용) AWS CD 단계 — 추후 AWS 연결 후 활성화 예정
-  # aws-deploy:
-  #   runs-on: ubuntu-latest
-  #   needs: build-and-push
-  #   steps:
-  #     - name: Deploy to AWS EC2
-  #       uses: appleboy/ssh-action@v0.1.10
-  #       with:
-  #         host: ${{ secrets.EC2_HOST }}
-  #         username: ${{ secrets.EC2_USER }}
-  #         key: ${{ secrets.EC2_SSH_KEY }}
-  #         port: ${{ secrets.EC2_SSH_PORT }}
-  #       script: |
-  #         echo "AWS CD 단계는 추후 활성화 예정입니다."
+      - name: Push LOCAL Docker Image
+        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/goodmobileappteam:latest-local
+
+      # 운영용 이미지(main 브랜치에서만)
+      - name: Build AWS Docker Image
+        if: github.ref == 'refs/heads/main'
+        run: |
+          docker build \
+            -f Dockerfile \
+            -t ${{ secrets.DOCKERHUB_USERNAME }}/goodmobileappteam:latest-aws .
+
+      - name: Push AWS Docker Image
+        if: github.ref == 'refs/heads/main'
+        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/goodmobileappteam:latest-aws
+
+  # 3) main에 푸시될 때만 EC2 배포
+  deploy-to-ec2:
+    runs-on: ubuntu-latest
+    needs: docker-build-and-push
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Deploy to AWS EC2 via SSH
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          port: ${{ secrets.EC2_SSH_PORT }}
+          script: |
+            APP_DIR=/home/${{ secrets.EC2_USER }}/backend
+            mkdir -p $APP_DIR
+            cd $APP_DIR
+
+            echo "=== Generate .env for AWS ==="
+            cat <<EOF > .env
+            SPRING_PROFILES_ACTIVE=aws
+            AWS_MYSQL_URL=${{ secrets.AWS_MYSQL_URL }}
+            AWS_MYSQL_USERNAME=${{ secrets.AWS_MYSQL_USERNAME }}
+            AWS_MYSQL_PASSWORD=${{ secrets.AWS_MYSQL_PASSWORD }}
+            AWS_REGION=${{ secrets.AWS_REGION }}
+            AWS_ACCESS_KEY=${{ secrets.AWS_ACCESS_KEY }}
+            AWS_SECRET_KEY=${{ secrets.AWS_SECRET_KEY }}
+            ADMIN_EMAIL=${{ secrets.ADMIN_EMAIL }}
+            EOF
+
+            echo "=== Docker login & pull image ==="
+            echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/goodmobileappteam:latest-aws
+
+            echo "=== Stop & remove old container ==="
+            docker stop my-server || true
+            docker rm my-server || true
+            docker image prune -af || true
+
+            echo "=== Run new container ==="
+            docker run -d --name my-server \
+              --env-file .env \
+              -p 8080:8080 \
+              ${{ secrets.DOCKERHUB_USERNAME }}/goodmobileappteam:latest-aws
+
+            docker ps
