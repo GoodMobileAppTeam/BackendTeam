@@ -42,9 +42,9 @@ spring:
         default_batch_fetch_size: 1000
 
   jwt:
-    secret: e253645a97f98c5ac9d94c7cb6fe47adef76834f1ebf312d9617564096f443ad
-    access-token-expire-time: 7200000
-    refresh-token-expire-time: 172800000
+    secret: ${JWT_SECRET}
+    access-token-expire-time: ${JWT_ACCESS_TOKEN_EXPIRE_TIME}
+    refresh-token-expire-time: ${JWT_REFRESH_TOKEN_EXPIRE_TIME}
 
 
 
