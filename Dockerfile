@@ -15,4 +15,4 @@ COPY build/libs/*-SNAPSHOT.jar app.jar
 EXPOSE 8080
 
 # 기본 active profile = local
-ENTRYPOINT ["java", "-Dspring.profiles.active=local", "-jar", "app.jar"]
+ENTRYPOINT ["java", "-jar", "app/app.jar"]
