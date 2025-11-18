@@ -106,6 +106,9 @@ jobs:
 
             echo "=== Docker login ==="
             echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+            
+            echo "=== Stop & remove old containers with same names(새로 컨테이너 추가하면 여기도 추가해주기) ==="
+            docker rm -f my-server redis || true
           
             echo "=== Stop & remove old containers and images (compose) ==="
             docker compose down --rmi all || true
