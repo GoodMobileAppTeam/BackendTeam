@@ -1,7 +1,9 @@
 services:
   my-server:
     container_name: my-server
-    build: .
+    build:
+      context: .          # 현재 디렉토리 기준
+      dockerfile: Dockerfile.local  # 여기서 어떤 Dockerfile 쓸지 명시
     ports:
       - 8080:8080
     env_file:
