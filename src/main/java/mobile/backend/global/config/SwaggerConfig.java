@@ -35,7 +35,7 @@ public class SwaggerConfig {
                         .type(SecurityScheme.Type.HTTP)
                         .scheme("bearer")
                         .bearerFormat("JWT")))
-        .info(new Info().title("Swagger API 명세서").version("1.0").description("api 명세서"));
+        .info(new Info().title("Record Swagger API 명세서").version("1.0").description("Record api 명세서"));
   }
 
   @Bean
