@@ -32,7 +32,7 @@ jobs:
           name: app-jar
           path: build/libs/*-SNAPSHOT.jar
 
-  # 2) Docker 이미지 빌드 & 푸시
+  # 2) Docker 운영용 이미지 빌드 & 푸시
   docker-build-and-push:
     runs-on: ubuntu-latest
     needs: build
@@ -41,6 +41,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      #jar artifact를 받아서 build/libs에 넣어줌
       - name: Download jar artifact
         uses: actions/download-artifact@v4
         with:
@@ -53,22 +54,12 @@ jobs:
       - name: Login to Docker Hub
         run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
 
-      # 로컬용 이미지(단일 Dockerfile)
-      - name: Build LOCAL Docker Image
-        run: |
-          docker build \
-            -f Dockerfile \
-            -t ${{ secrets.DOCKERHUB_USERNAME }}/goodmobileappteam:latest-local .
-
-      - name: Push LOCAL Docker Image
-        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/goodmobileappteam:latest-local
-
-      # 운영용 이미지(main 브랜치에서만)
+      # 운영용 이미지(main 브랜치일때만)
       - name: Build AWS Docker Image
         if: github.ref == 'refs/heads/main'
         run: |
           docker build \
-            -f Dockerfile \
+            -f Dockerfile.prod \
             -t ${{ secrets.DOCKERHUB_USERNAME }}/goodmobileappteam:latest-aws .
 
       - name: Push AWS Docker Image
@@ -103,22 +94,27 @@ jobs:
             AWS_REGION=${{ secrets.AWS_REGION }}
             AWS_ACCESS_KEY=${{ secrets.AWS_ACCESS_KEY }}
             AWS_SECRET_KEY=${{ secrets.AWS_SECRET_KEY }}
-            ADMIN_EMAIL=${{ secrets.ADMIN_EMAIL }}
+            JWT_SECRET=${{ secrets.JWT_SECRET }}
+            JWT_ACCESS_TOKEN_EXPIRE_TIME=${{ secrets.JWT_ACCESS_TOKEN_EXPIRE_TIME }}
+            JWT_REFRESH_TOKEN_EXPIRE_TIME=${{ secrets.JWT_REFRESH_TOKEN_EXPIRE_TIME }}
+            EOF
+            
+            echo "=== Generate docker-compose.yml from Secret ==="
+            cat <<EOF > docker-compose.yml
+            ${{ secrets.DOCKER_COMPOSE_PROD }}
             EOF
 
-            echo "=== Docker login & pull image ==="
+            echo "=== Docker login ==="
             echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+          
+            echo "=== Stop & remove old containers and images (compose) ==="
+            docker compose down --rmi all || true
+            
+            echo "=== Pull latest server image ==="
             docker pull ${{ secrets.DOCKERHUB_USERNAME }}/goodmobileappteam:latest-aws
 
-            echo "=== Stop & remove old container ==="
-            docker stop my-server || true
-            docker rm my-server || true
-            docker image prune -af || true
+            echo "=== Start new containers with docker compose ==="
+            docker compose up -d
 
-            echo "=== Run new container ==="
-            docker run -d --name my-server \
-              --env-file .env \
-              -p 8080:8080 \
-              ${{ secrets.DOCKERHUB_USERNAME }}/goodmobileappteam:latest-aws
-
+            echo "=== Current containers ==="
             docker ps
