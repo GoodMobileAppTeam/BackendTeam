@@ -27,6 +27,7 @@ spring:
     redis:
       host: ${REDIS_HOST}
       port: ${REDIS_PORT}
+      password: ${REDIS_PASSWORD}
 
   jpa:
     hibernate:
@@ -46,6 +47,16 @@ spring:
     access-token-expire-time: ${JWT_ACCESS_TOKEN_EXPIRE_TIME}
     refresh-token-expire-time: ${JWT_REFRESH_TOKEN_EXPIRE_TIME}
 
+  # Google OAuth2 설정 추가
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${GOOGLE_CLIENT_ID}
+          #kakao:
+          # client-id: ${KAKAO_CLIENT_ID}
+
 
 
 #S3
@@ -63,3 +74,4 @@ cloud:
     credentials:
       access-key: ${AWS_ACCESS_KEY}
       secret-key: ${AWS_SECRET_KEY}
+
