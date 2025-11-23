@@ -11,9 +11,8 @@ import mobile.backend.auth.domain.command.SocialLoginCommand;
 public class SocialLoginRequest {
     private String socialToken;
     private String provider;
-    private String socialId;
 
     public SocialLoginCommand toCommand() {
-        return SocialLoginCommand.of(socialToken, provider, socialId);
+        return SocialLoginCommand.of(socialToken, provider);
     }
 }

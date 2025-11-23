@@ -40,28 +40,23 @@ public class AuthService implements SocialLoginUseCase, RefreshTokenUseCase, Log
     @Transactional
     public TokenPair execute(SocialLoginCommand command) {
         // 파라미터 검증
-        if (command.getSocialToken() == null || command.getSocialId() == null || command.getProvider() == null) {
+        if (command.getSocialToken() == null || command.getProvider() == null) {
             throw new CustomException(AuthErrorCode.INVALID_PARAMETER);
         }
 
         // 1. 소셜 토큰 검증 및 소셜 ID 추출
-        String validatedSocialId = validateSocialToken(command.getSocialToken(), command.getProvider());
+        String socialId = validateSocialToken(command.getSocialToken(), command.getProvider());
 
-        // 2. 클라이언트가 보낸 socialId와 검증된 socialId 비교
-        if (!validatedSocialId.equals(command.getSocialId())) {
-            throw new CustomException(AuthErrorCode.INVALID_SOCIAL_TOKEN);
-        }
-
-        // 3. DB에서 사용자 조회 또는 생성
+        // 2. DB에서 사용자 조회 또는 생성
         UserEntity user = userJpaRepository
-                .findBySocialIdAndSocialType(command.getSocialId(), command.getProvider())
-                .orElseGet(() -> createNewUser(command.getSocialId(), command.getProvider()));
+                .findBySocialIdAndSocialType(socialId, command.getProvider())
+                .orElseGet(() -> createNewUser(socialId, command.getProvider()));
 
-        // 4. JWT 토큰 생성
+        // 3. JWT 토큰 생성
         String accessToken = jwtProvider.generateAccessToken(user.getId());
         String refreshToken = jwtProvider.generateRefreshToken(user.getId());
 
-        // 5. RefreshToken 저장 (기존 토큰이 있으면 덮어쓰기)
+        // 4. RefreshToken 저장 (기존 토큰이 있으면 덮어쓰기)
         saveRefreshToken(user.getId(), refreshToken);
 
         return TokenPair.of(user.getId(), accessToken, refreshToken);
