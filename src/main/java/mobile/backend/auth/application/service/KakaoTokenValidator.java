@@ -32,7 +32,7 @@ public class KakaoTokenValidator implements SocialTokenValidator {
     @Override
     public String validateAndGetSocialId(String accessToken) {
         // ===== 테스트용: 실제 검증 건너뛰기 =====
-        //log.info("🧪 TEST MODE: Skipping Kakao token validation");
+        //log.info("TEST MODE: Skipping Kakao token validation");
         //return "kakao_test_user_67890";
 
 
