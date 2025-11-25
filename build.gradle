@@ -60,6 +60,9 @@ dependencies {
 	//S3 설정
 	implementation 'io.awspring.cloud:spring-cloud-aws-starter-s3:3.4.0'
 
+	// 타임리프 설정
+	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+
 }
 
 tasks.named('test') {
