@@ -9,7 +9,8 @@ public record CreateVideoEditCommand(
         String videoUrl,
         byte[] thumbnailData,
         String thumbnailFileName,
-        LocalDate saveTime
+        LocalDate saveTime,
+        String description
 ) {
     public CreateVideoEditCommand {
         if (albumId == null) throw new IllegalArgumentException("albumId는 필수입니다.");
@@ -21,6 +22,9 @@ public record CreateVideoEditCommand(
         if (saveTime == null) throw new IllegalArgumentException("saveTime은 필수입니다.");
         if (thumbnailData == null || thumbnailData.length == 0) {
             throw new IllegalArgumentException("썸네일 데이터는 필수입니다.");
+        }
+        if (thumbnailData.length > 500) {
+            throw new IllegalArgumentException("description이 500자를 초과합니다");
         }
     }
 }

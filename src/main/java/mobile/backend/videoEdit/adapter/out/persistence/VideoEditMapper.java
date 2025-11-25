@@ -18,7 +18,8 @@ public class VideoEditMapper {
                 entity.getVideoUrl(),
                 entity.getSaveTime(),
                 Boolean.TRUE.equals(entity.getIsBookMark()),
-                entity.getThumbnailUrl()
+                entity.getThumbnailUrl(),
+                entity.getDescription()
         );
 
     }
@@ -34,7 +35,8 @@ public class VideoEditMapper {
                 domain.getVideoUrl(),
                 domain.getSaveTime(),
                 domain.isBookMarked(),
-                domain.getThumbnailUrl()
+                domain.getThumbnailUrl(),
+                domain.getDescription()
         );
     }
 }

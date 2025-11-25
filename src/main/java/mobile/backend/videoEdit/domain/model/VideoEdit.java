@@ -3,7 +3,6 @@ package mobile.backend.videoEdit.domain.model;
 import lombok.Getter;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Getter
 public class VideoEdit {
@@ -15,12 +14,13 @@ public class VideoEdit {
     private final LocalDate saveTime;
     private boolean isBookMarked;
     private String thumbnailUrl;
+    private String description;
 
     private static final int MAX_DURATION_SECONDS = 60;
 
     private VideoEdit(Long id, Long albumId, Long userId, Integer duration,
                       String videoUrl, LocalDate saveTime,
-                      boolean isBookMarked, String thumbnailUrl) {
+                      boolean isBookMarked, String thumbnailUrl, String description) {
         this.id = id;
         this.albumId = albumId;
         this.userId = userId;
@@ -29,17 +29,18 @@ public class VideoEdit {
         this.saveTime = saveTime;
         this.isBookMarked = isBookMarked;
         this.thumbnailUrl = thumbnailUrl;
+        this.description = description;
     }
 
     // 새 영상 생성용 팩토리 메서드
     public static VideoEdit create(Long albumId, Long userId, Integer duration,
-                                   String videoUrl, LocalDate saveTime, String thumbnailUrl) {
+                                   String videoUrl, LocalDate saveTime, String thumbnailUrl, String description) {
         validateDuration(duration);
 
 
         return new VideoEdit(
                 null, albumId, userId, duration, videoUrl,
-                saveTime, false, thumbnailUrl
+                saveTime, false, thumbnailUrl, description
         );
     }
 
@@ -47,9 +48,9 @@ public class VideoEdit {
     public static VideoEdit reconstitute(Long id, Long albumId, Long userId,
                                          Integer duration, String videoUrl,
                                          LocalDate saveTime,
-                                         boolean isBookMarked, String thumbnailUrl) {
+                                         boolean isBookMarked, String thumbnailUrl, String description) {
         return new VideoEdit(id, albumId, userId, duration, videoUrl,
-                saveTime, isBookMarked, thumbnailUrl);
+                saveTime, isBookMarked, thumbnailUrl, description);
     }
 
     private static void validateDuration(Integer duration) {
