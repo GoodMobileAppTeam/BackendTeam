@@ -46,9 +46,12 @@ public class SecurityConfig {
                     // Swagger 경로 인증 허용
                     .requestMatchers("/swagger-ui/**", "/v3/api-docs/**")
                     .permitAll()
+                    // admin 경로 전부 허용
+                    .requestMatchers("/admin/**").permitAll()
                     // 인증 없이 허용할 경로
                     .requestMatchers("/users/sign-up", "/auth/login", "/users/nickname/check")
                     .permitAll()
+                    .requestMatchers(HttpMethod.GET, "/api/v1/notices").permitAll()     // 공지 리스트
 
                     // 그 외 모든 요청은 모두 인증 필요
                     .anyRequest()
