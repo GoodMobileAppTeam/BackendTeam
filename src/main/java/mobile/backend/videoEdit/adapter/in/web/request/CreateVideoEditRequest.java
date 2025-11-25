@@ -5,6 +5,7 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.Size;
 
 import java.time.LocalDate;
 
@@ -23,5 +24,8 @@ public record CreateVideoEditRequest(
 
         @NotNull(message = "저장 시간은 필수입니다.")
         @JsonFormat(pattern = "yyyy-MM-dd")
-        LocalDate saveTime
+        LocalDate saveTime,
+
+        @Size(max=500, message = "설명은 500자 이내입니다")
+        String description
 ) {}

@@ -12,7 +12,6 @@ import lombok.NoArgsConstructor;
 import mobile.backend.global.adapter.out.persistence.entity.BaseTimeEntity;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "video_edit")
@@ -45,8 +44,11 @@ public class VideoEditEntity extends BaseTimeEntity {
     @Column(name = "thumbnail_url")
     private String thumbnailUrl;
 
+    @Column(name = "description", length = 500)
+    private String description;
+
     private VideoEditEntity(Long id, Long albumId, Long userId, Integer duration,
-                            String videoUrl, LocalDate saveTime,
+                            String videoUrl, LocalDate saveTime,String description,
                             Boolean isBookMark, String thumbnailUrl) {
         this.id = id;
         this.albumId = albumId;
@@ -56,13 +58,14 @@ public class VideoEditEntity extends BaseTimeEntity {
         this.saveTime = saveTime;
         this.isBookMark = isBookMark;
         this.thumbnailUrl = thumbnailUrl;
+        this.description = description;
     }
 
     public static VideoEditEntity from(Long id, Long albumId, Long userId, Integer duration,
                                        String videoUrl,
                                        LocalDate saveTime, Boolean isBookMark,
-                                       String thumbnailUrl) {
+                                       String thumbnailUrl, String description) {
         return new VideoEditEntity(id, albumId, userId, duration, videoUrl,
-                saveTime, isBookMark, thumbnailUrl);
+                saveTime, description, isBookMark, thumbnailUrl);
     }
 }

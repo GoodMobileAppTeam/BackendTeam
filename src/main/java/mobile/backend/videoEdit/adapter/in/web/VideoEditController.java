@@ -50,7 +50,8 @@ public class VideoEditController {
                 request.videoUrl(),
                 thumbnail.getBytes(),
                 thumbnail.getOriginalFilename(),
-                request.saveTime()
+                request.saveTime(),
+                request.description()
         );
 
         VideoEdit created = createVideoEditUseCase.create(command);
