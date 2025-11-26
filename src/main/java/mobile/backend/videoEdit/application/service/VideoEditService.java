@@ -1,6 +1,8 @@
 package mobile.backend.videoEdit.application.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import mobile.backend.global.exception.CustomException;
 import mobile.backend.videoEdit.application.port.in.CreateVideoEditUseCase;
 import mobile.backend.videoEdit.application.port.in.DeleteVideoEditUseCase;
 import mobile.backend.videoEdit.application.port.in.GetVideoEditUseCase;
@@ -12,12 +14,12 @@ import mobile.backend.videoEdit.domain.command.CreateVideoEditCommand;
 import mobile.backend.videoEdit.domain.command.UpdateVideoEditCommand;
 import mobile.backend.videoEdit.domain.command.VideoEditSearchCriteria;
 import mobile.backend.videoEdit.domain.model.VideoEdit;
-import mobile.backend.videoEdit.exception.VideoEditAccessDeniedException;
-import mobile.backend.videoEdit.exception.VideoEditNotFoundException;
+import mobile.backend.videoEdit.exception.VideoErrorCode;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -101,11 +103,17 @@ public class VideoEditService implements
         VideoEdit videoEdit = findVideoEditOrThrow(id);
         validateOwnership(videoEdit, userId);
 
-        if (videoEdit.getThumbnailUrl() != null) {
-            fileStoragePort.delete(videoEdit.getThumbnailUrl());
-        }
+        try {
+            if (videoEdit.getThumbnailUrl() != null) {
+                fileStoragePort.delete(videoEdit.getThumbnailUrl());
+            }
 
-        videoEditRepository.delete(videoEdit);
+            videoEditRepository.delete(videoEdit);
+
+        } catch (Exception e) {
+            log.error("영상 삭제 중 오류 발생: {}", e.getMessage(), e);
+            throw new CustomException(VideoErrorCode.FILE_STORAGE_ERROR);
+        }
     }
 
     @Override
@@ -120,12 +128,12 @@ public class VideoEditService implements
 
     private VideoEdit findVideoEditOrThrow(Long id) {
         return videoEditRepository.findById(id)
-                .orElseThrow(() -> new VideoEditNotFoundException(id));
+                .orElseThrow(() -> new CustomException(VideoErrorCode.VIDEO_NOT_FOUND));
     }
 
     private void validateOwnership(VideoEdit videoEdit, Long userId) {
         if (!videoEdit.isOwnedBy(userId)) {
-            throw new VideoEditAccessDeniedException(videoEdit.getId(), userId);
+            throw new CustomException(VideoErrorCode.VIDEO_ACCESS_DENIED);
         }
     }
 }

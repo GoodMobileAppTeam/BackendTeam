@@ -3,8 +3,9 @@ package mobile.backend.videoEdit.adapter.out.persistence;
 import lombok.RequiredArgsConstructor;
 
 import lombok.extern.slf4j.Slf4j;
+import mobile.backend.global.exception.CustomException;
 import mobile.backend.videoEdit.application.port.out.FileStoragePort;
-import mobile.backend.videoEdit.exception.FileStorageException;
+import mobile.backend.videoEdit.exception.VideoErrorCode;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import software.amazon.awssdk.core.sync.RequestBody;
@@ -49,7 +50,7 @@ public class S3FileStorageAdapter implements FileStoragePort {
 
         } catch (Exception e) {
             log.error("S3 업로드 실패: {}", fileName, e);
-            throw new FileStorageException("파일 업로드에 실패했습니다.", e);
+            throw new CustomException(VideoErrorCode.FILE_STORAGE_ERROR);
         }
     }
 
