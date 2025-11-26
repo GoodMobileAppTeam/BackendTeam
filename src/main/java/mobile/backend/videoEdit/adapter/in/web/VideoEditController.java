@@ -1,5 +1,13 @@
 package mobile.backend.videoEdit.adapter.in.web;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import mobile.backend.global.adapter.in.web.response.BaseResponse;
@@ -7,17 +15,12 @@ import mobile.backend.videoEdit.adapter.in.web.request.CreateVideoEditRequest;
 import mobile.backend.videoEdit.adapter.in.web.request.VideoEditSearchRequest;
 import mobile.backend.videoEdit.adapter.in.web.response.VideoEditPageResponse;
 import mobile.backend.videoEdit.adapter.in.web.response.VideoEditResponse;
-import mobile.backend.videoEdit.application.port.in.CreateVideoEditUseCase;
-import mobile.backend.videoEdit.application.port.in.DeleteVideoEditUseCase;
-import mobile.backend.videoEdit.application.port.in.GetVideoEditUseCase;
-import mobile.backend.videoEdit.application.port.in.ToggleBookmarkUseCase;
-import mobile.backend.videoEdit.application.port.in.UpdateVideoEditUseCase;
+import mobile.backend.videoEdit.application.port.in.*;
 import mobile.backend.videoEdit.domain.command.CreateVideoEditCommand;
 import mobile.backend.videoEdit.domain.command.UpdateVideoEditCommand;
 import mobile.backend.videoEdit.domain.command.VideoEditSearchCriteria;
 import mobile.backend.videoEdit.domain.model.VideoEdit;
 import org.springframework.data.domain.Page;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +29,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 
+@Tag(name = "Video Edit", description = "영상 편집 관리 API")
 @RestController
 @RequestMapping("/v1/videos")
 @RequiredArgsConstructor
@@ -37,10 +41,57 @@ public class VideoEditController {
     private final DeleteVideoEditUseCase deleteVideoEditUseCase;
     private final ToggleBookmarkUseCase toggleBookmarkUseCase;
 
+    @Operation(
+            summary = "영상 등록",
+            description = "새로운 영상을 등록합니다. 영상 정보(JSON)와 썸네일 이미지를 함께 전송해야 합니다. " +
+                    "영상 길이는 최대 60초까지 가능합니다."
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "201",
+                    description = "영상 등록 성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = VideoEditResponse.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "잘못된 요청 (유효성 검증 실패, 영상 길이 초과 등)",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(
+                                    value = "{\"success\": false, \"message\": \"영상 길이는 60초를 초과할 수 없습니다.\", \"data\": null}"
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "서버 오류 (파일 업로드 실패 등)",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(
+                                    value = "{\"success\": false, \"message\": \"파일 처리 중 오류가 발생했습니다.\", \"data\": null}"
+                            )
+                    )
+            )
+    })
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<BaseResponse<VideoEditResponse>> create(
+            @Parameter(description = "사용자 ID (추후 JWT 토큰으로 대체 예정)", required = true, example = "1")
             @RequestHeader("X-User-Id") Long userId,
+
+            @Parameter(
+                    description = "영상 정보 (JSON 파일 또는 JSON 문자열)",
+                    required = true,
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = CreateVideoEditRequest.class)
+                    )
+            )
             @Valid @RequestPart("request") CreateVideoEditRequest request,
+
+            @Parameter(description = "썸네일 이미지 파일 (JPG, PNG 등)", required = true)
             @RequestPart("thumbnail") MultipartFile thumbnail) throws IOException {
 
         CreateVideoEditCommand command = new CreateVideoEditCommand(
@@ -60,18 +111,82 @@ public class VideoEditController {
                 .body(BaseResponse.success("영상이 등록되었습니다.", VideoEditResponse.from(created)));
     }
 
+    @Operation(
+            summary = "영상 단건 조회",
+            description = "영상 ID로 특정 영상의 상세 정보를 조회합니다. 본인이 등록한 영상만 조회 가능합니다."
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "조회 성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = VideoEditResponse.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "접근 권한 없음 (다른 사용자의 영상)",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(
+                                    value = "{\"success\": false, \"message\": \"해당 영상에 대한 접근 권한이 없습니다.\", \"data\": null}"
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "영상을 찾을 수 없음",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(
+                                    value = "{\"success\": false, \"message\": \"영상 편집 정보를 찾을 수 없습니다.\", \"data\": null}"
+                            )
+                    )
+            )
+    })
     @GetMapping("/{id}")
     public ResponseEntity<BaseResponse<VideoEditResponse>> getById(
+            @Parameter(description = "영상 ID", required = true, example = "1")
             @PathVariable Long id,
+
+            @Parameter(description = "사용자 ID (추후 JWT 토큰으로 대체 예정)", required = true, example = "1")
             @RequestHeader("X-User-Id") Long userId) {
 
         VideoEdit videoEdit = getVideoEditUseCase.getById(id, userId);
         return ResponseEntity.ok(BaseResponse.success(VideoEditResponse.from(videoEdit)));
     }
 
+    @Operation(
+            summary = "영상 목록 조회",
+            description = "조건에 맞는 영상 목록을 조회합니다. 년/월 필터링, 북마크 필터링, 페이징을 지원합니다. " +
+                    "필터를 지정하지 않으면 전체 영상을 최신순으로 조회합니다."
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "조회 성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = VideoEditPageResponse.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "잘못된 요청 (유효하지 않은 년/월 값 등)",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(
+                                    value = "{\"success\": false, \"message\": \"월은 1~12 사이여야 합니다.\", \"data\": null}"
+                            )
+                    )
+            )
+    })
     @GetMapping
     public ResponseEntity<BaseResponse<VideoEditPageResponse>> search(
+            @Parameter(description = "사용자 ID (추후 JWT 토큰으로 대체 예정)", required = true, example = "1")
             @RequestHeader("X-User-Id") Long userId,
+
             @Valid @ModelAttribute VideoEditSearchRequest request) {
 
         VideoEditSearchCriteria criteria = VideoEditSearchCriteria.of(
@@ -87,20 +202,88 @@ public class VideoEditController {
         return ResponseEntity.ok(BaseResponse.success(VideoEditPageResponse.from(result)));
     }
 
+    @Operation(
+            summary = "북마크한 영상 목록 조회",
+            description = "사용자가 북마크한 영상 목록을 페이징하여 조회합니다."
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "조회 성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = VideoEditPageResponse.class)
+                    )
+            )
+    })
     @GetMapping("/bookmarks")
     public ResponseEntity<BaseResponse<VideoEditPageResponse>> getBookmarked(
+            @Parameter(description = "사용자 ID (추후 JWT 토큰으로 대체 예정)", required = true, example = "1")
             @RequestHeader("X-User-Id") Long userId,
+
+            @Parameter(description = "페이지 번호 (0부터 시작)", example = "0")
             @RequestParam(defaultValue = "0") int page,
+
+            @Parameter(description = "페이지 크기 (최대 100)", example = "20")
             @RequestParam(defaultValue = "20") int size) {
 
         Page<VideoEdit> result = getVideoEditUseCase.getBookmarkedVideos(userId, page, size);
         return ResponseEntity.ok(BaseResponse.success(VideoEditPageResponse.from(result)));
     }
 
+    @Operation(
+            summary = "썸네일 수정",
+            description = "영상의 썸네일 이미지를 변경합니다. 기존 썸네일은 S3에서 삭제됩니다."
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "썸네일 수정 성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = VideoEditResponse.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "접근 권한 없음",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(
+                                    value = "{\"success\": false, \"message\": \"해당 영상에 대한 접근 권한이 없습니다.\", \"data\": null}"
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "영상을 찾을 수 없음",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(
+                                    value = "{\"success\": false, \"message\": \"영상 편집 정보를 찾을 수 없습니다.\", \"data\": null}"
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "파일 처리 중 오류",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(
+                                    value = "{\"success\": false, \"message\": \"파일 처리 중 오류가 발생했습니다.\", \"data\": null}"
+                            )
+                    )
+            )
+    })
     @PatchMapping(value = "/{id}/thumbnail", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<BaseResponse<VideoEditResponse>> updateThumbnail(
+            @Parameter(description = "영상 ID", required = true, example = "1")
             @PathVariable Long id,
+
+            @Parameter(description = "사용자 ID (추후 JWT 토큰으로 대체 예정)", required = true, example = "1")
             @RequestHeader("X-User-Id") Long userId,
+
+            @Parameter(description = "새 썸네일 이미지 파일", required = true)
             @RequestPart("thumbnail") MultipartFile thumbnail) throws IOException {
 
         UpdateVideoEditCommand command = new UpdateVideoEditCommand(
@@ -116,9 +299,46 @@ public class VideoEditController {
         );
     }
 
+    @Operation(
+            summary = "북마크 토글",
+            description = "영상의 북마크 상태를 변경합니다. 북마크되어 있으면 해제하고, 해제되어 있으면 추가합니다."
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "북마크 토글 성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = VideoEditResponse.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "접근 권한 없음",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(
+                                    value = "{\"success\": false, \"message\": \"해당 영상에 대한 접근 권한이 없습니다.\", \"data\": null}"
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "영상을 찾을 수 없음",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(
+                                    value = "{\"success\": false, \"message\": \"영상 편집 정보를 찾을 수 없습니다.\", \"data\": null}"
+                            )
+                    )
+            )
+    })
     @PatchMapping("/{id}/bookmark")
     public ResponseEntity<BaseResponse<VideoEditResponse>> toggleBookmark(
+            @Parameter(description = "영상 ID", required = true, example = "1")
             @PathVariable Long id,
+
+            @Parameter(description = "사용자 ID (추후 JWT 토큰으로 대체 예정)", required = true, example = "1")
             @RequestHeader("X-User-Id") Long userId) {
 
         VideoEdit updated = toggleBookmarkUseCase.toggle(id, userId);
@@ -126,9 +346,48 @@ public class VideoEditController {
         return ResponseEntity.ok(BaseResponse.success(message, VideoEditResponse.from(updated)));
     }
 
+    @Operation(
+            summary = "영상 삭제",
+            description = "영상을 삭제합니다. 영상과 함께 S3에 저장된 썸네일도 함께 삭제됩니다."
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "삭제 성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(
+                                    value = "{\"success\": true, \"message\": \"영상이 삭제되었습니다.\", \"data\": null}"
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "접근 권한 없음",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(
+                                    value = "{\"success\": false, \"message\": \"해당 영상에 대한 접근 권한이 없습니다.\", \"data\": null}"
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "영상을 찾을 수 없음",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(
+                                    value = "{\"success\": false, \"message\": \"영상 편집 정보를 찾을 수 없습니다.\", \"data\": null}"
+                            )
+                    )
+            )
+    })
     @DeleteMapping("/{id}")
     public ResponseEntity<BaseResponse<Void>> delete(
+            @Parameter(description = "영상 ID", required = true, example = "1")
             @PathVariable Long id,
+
+            @Parameter(description = "사용자 ID (추후 JWT 토큰으로 대체 예정)", required = true, example = "1")
             @RequestHeader("X-User-Id") Long userId) {
 
         deleteVideoEditUseCase.delete(id, userId);
