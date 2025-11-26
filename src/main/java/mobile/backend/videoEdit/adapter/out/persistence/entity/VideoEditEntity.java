@@ -48,8 +48,8 @@ public class VideoEditEntity extends BaseTimeEntity {
     private String description;
 
     private VideoEditEntity(Long id, Long albumId, Long userId, Integer duration,
-                            String videoUrl, LocalDate saveTime,String description,
-                            Boolean isBookMark, String thumbnailUrl) {
+                            String videoUrl, LocalDate saveTime,
+                            Boolean isBookMark, String thumbnailUrl, String description) {
         this.id = id;
         this.albumId = albumId;
         this.userId = userId;
@@ -66,6 +66,6 @@ public class VideoEditEntity extends BaseTimeEntity {
                                        LocalDate saveTime, Boolean isBookMark,
                                        String thumbnailUrl, String description) {
         return new VideoEditEntity(id, albumId, userId, duration, videoUrl,
-                saveTime, description, isBookMark, thumbnailUrl);
+                saveTime, isBookMark, thumbnailUrl, description);
     }
 }
