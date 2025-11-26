@@ -2,9 +2,9 @@ package mobile.backend.videoEdit.adapter.in.web;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import mobile.backend.global.adapter.in.web.response.BaseResponse;
 import mobile.backend.videoEdit.adapter.in.web.request.CreateVideoEditRequest;
 import mobile.backend.videoEdit.adapter.in.web.request.VideoEditSearchRequest;
-import mobile.backend.videoEdit.adapter.in.web.response.ApiResponse;
 import mobile.backend.videoEdit.adapter.in.web.response.VideoEditPageResponse;
 import mobile.backend.videoEdit.adapter.in.web.response.VideoEditResponse;
 import mobile.backend.videoEdit.application.port.in.CreateVideoEditUseCase;
@@ -38,7 +38,7 @@ public class VideoEditController {
     private final ToggleBookmarkUseCase toggleBookmarkUseCase;
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ApiResponse<VideoEditResponse>> create(
+    public ResponseEntity<BaseResponse<VideoEditResponse>> create(
             @RequestHeader("X-User-Id") Long userId,
             @Valid @RequestPart("request") CreateVideoEditRequest request,
             @RequestPart("thumbnail") MultipartFile thumbnail) throws IOException {
@@ -57,20 +57,20 @@ public class VideoEditController {
         VideoEdit created = createVideoEditUseCase.create(command);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(ApiResponse.success("영상이 등록되었습니다.", VideoEditResponse.from(created)));
+                .body(BaseResponse.success("영상이 등록되었습니다.", VideoEditResponse.from(created)));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<VideoEditResponse>> getById(
+    public ResponseEntity<BaseResponse<VideoEditResponse>> getById(
             @PathVariable Long id,
             @RequestHeader("X-User-Id") Long userId) {
 
         VideoEdit videoEdit = getVideoEditUseCase.getById(id, userId);
-        return ResponseEntity.ok(ApiResponse.success(VideoEditResponse.from(videoEdit)));
+        return ResponseEntity.ok(BaseResponse.success(VideoEditResponse.from(videoEdit)));
     }
 
     @GetMapping
-    public ResponseEntity<ApiResponse<VideoEditPageResponse>> search(
+    public ResponseEntity<BaseResponse<VideoEditPageResponse>> search(
             @RequestHeader("X-User-Id") Long userId,
             @Valid @ModelAttribute VideoEditSearchRequest request) {
 
@@ -84,21 +84,21 @@ public class VideoEditController {
         );
 
         Page<VideoEdit> result = getVideoEditUseCase.search(criteria);
-        return ResponseEntity.ok(ApiResponse.success(VideoEditPageResponse.from(result)));
+        return ResponseEntity.ok(BaseResponse.success(VideoEditPageResponse.from(result)));
     }
 
     @GetMapping("/bookmarks")
-    public ResponseEntity<ApiResponse<VideoEditPageResponse>> getBookmarked(
+    public ResponseEntity<BaseResponse<VideoEditPageResponse>> getBookmarked(
             @RequestHeader("X-User-Id") Long userId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
 
         Page<VideoEdit> result = getVideoEditUseCase.getBookmarkedVideos(userId, page, size);
-        return ResponseEntity.ok(ApiResponse.success(VideoEditPageResponse.from(result)));
+        return ResponseEntity.ok(BaseResponse.success(VideoEditPageResponse.from(result)));
     }
 
     @PatchMapping(value = "/{id}/thumbnail", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ApiResponse<VideoEditResponse>> updateThumbnail(
+    public ResponseEntity<BaseResponse<VideoEditResponse>> updateThumbnail(
             @PathVariable Long id,
             @RequestHeader("X-User-Id") Long userId,
             @RequestPart("thumbnail") MultipartFile thumbnail) throws IOException {
@@ -112,26 +112,26 @@ public class VideoEditController {
 
         VideoEdit updated = updateVideoEditUseCase.updateThumbnail(command);
         return ResponseEntity.ok(
-                ApiResponse.success("썸네일이 수정되었습니다.", VideoEditResponse.from(updated))
+                BaseResponse.success("썸네일이 수정되었습니다.", VideoEditResponse.from(updated))
         );
     }
 
     @PatchMapping("/{id}/bookmark")
-    public ResponseEntity<ApiResponse<VideoEditResponse>> toggleBookmark(
+    public ResponseEntity<BaseResponse<VideoEditResponse>> toggleBookmark(
             @PathVariable Long id,
             @RequestHeader("X-User-Id") Long userId) {
 
         VideoEdit updated = toggleBookmarkUseCase.toggle(id, userId);
         String message = updated.isBookMarked() ? "북마크가 추가되었습니다." : "북마크가 해제되었습니다.";
-        return ResponseEntity.ok(ApiResponse.success(message, VideoEditResponse.from(updated)));
+        return ResponseEntity.ok(BaseResponse.success(message, VideoEditResponse.from(updated)));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse<Void>> delete(
+    public ResponseEntity<BaseResponse<Void>> delete(
             @PathVariable Long id,
             @RequestHeader("X-User-Id") Long userId) {
 
         deleteVideoEditUseCase.delete(id, userId);
-        return ResponseEntity.ok(ApiResponse.success("영상이 삭제되었습니다.", null));
+        return ResponseEntity.ok(BaseResponse.success("영상이 삭제되었습니다.", null));
     }
 }
