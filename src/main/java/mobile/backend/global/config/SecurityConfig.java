@@ -47,7 +47,7 @@ public class SecurityConfig {
                     .requestMatchers("/swagger-ui/**", "/v3/api-docs/**")
                     .permitAll()
                     // admin 경로 전부 허용
-                    .requestMatchers("/admin/**").permitAll()
+                    .requestMatchers("/api/admin/**").permitAll()
                     // 인증 없이 허용할 경로
                     .requestMatchers("/users/sign-up", "/auth/login", "/users/nickname/check")
                     .permitAll()
