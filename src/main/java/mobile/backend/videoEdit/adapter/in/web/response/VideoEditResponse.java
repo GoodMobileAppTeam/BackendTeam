@@ -12,7 +12,9 @@ public record VideoEditResponse(
         String videoUrl,
         LocalDate saveTime,
         boolean isBookMarked,
-        String thumbnailUrl
+        String thumbnailUrl,
+        String description
+
 ) {
     public static VideoEditResponse from(VideoEdit domain) {
         return new VideoEditResponse(
@@ -23,7 +25,8 @@ public record VideoEditResponse(
                 domain.getVideoUrl(),
                 domain.getSaveTime(),
                 domain.isBookMarked(),
-                domain.getThumbnailUrl()
+                domain.getThumbnailUrl(),
+                domain.getDescription()
         );
     }
 }

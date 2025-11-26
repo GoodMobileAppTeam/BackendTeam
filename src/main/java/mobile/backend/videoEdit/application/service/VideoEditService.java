@@ -50,8 +50,8 @@ public class VideoEditService implements
                 command.duration(),
                 command.videoUrl(),
                 command.saveTime(),
-                command.description(),
-                thumbnailUrl
+                thumbnailUrl,
+                command.description()
         );
 
         return videoEditRepository.save(videoEdit);

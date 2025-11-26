@@ -20,10 +20,10 @@ public record CreateVideoEditCommand(
             throw new IllegalArgumentException("videoUrl은 필수입니다.");
         }
         if (saveTime == null) throw new IllegalArgumentException("saveTime은 필수입니다.");
-        if (thumbnailData == null || thumbnailData.length == 0) {
+        if (description == null || thumbnailData.length == 0) {
             throw new IllegalArgumentException("썸네일 데이터는 필수입니다.");
         }
-        if (thumbnailData.length > 500) {
+        if (description.length() > 500) {
             throw new IllegalArgumentException("description이 500자를 초과합니다");
         }
     }
