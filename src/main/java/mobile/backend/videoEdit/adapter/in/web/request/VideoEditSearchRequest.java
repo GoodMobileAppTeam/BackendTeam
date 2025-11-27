@@ -7,8 +7,6 @@ import jakarta.validation.constraints.Positive;
 
 @Schema(description = "영상 검색 요청 DTO")
 public record VideoEditSearchRequest(
-        @Min(value = 2000, message = "년도는 2000 이상이어야 합니다.")
-        @Max(value = 2100, message = "년도는 2100 이하여야 합니다.")
         Integer year,
 
         @Min(value = 1, message = "월은 1 이상이어야 합니다.")
