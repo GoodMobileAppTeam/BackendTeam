@@ -3,11 +3,8 @@ package mobile.backend.videoEdit.application.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import mobile.backend.global.exception.CustomException;
-import mobile.backend.videoEdit.application.port.in.CreateVideoEditUseCase;
-import mobile.backend.videoEdit.application.port.in.DeleteVideoEditUseCase;
+import mobile.backend.videoEdit.application.port.in.VideoEditCommandUseCase;
 import mobile.backend.videoEdit.application.port.in.GetVideoEditUseCase;
-import mobile.backend.videoEdit.application.port.in.ToggleBookmarkUseCase;
-import mobile.backend.videoEdit.application.port.in.UpdateVideoEditUseCase;
 import mobile.backend.videoEdit.application.port.out.FileStoragePort;
 import mobile.backend.videoEdit.application.port.out.VideoEditRepository;
 import mobile.backend.videoEdit.domain.command.CreateVideoEditCommand;
@@ -23,12 +20,9 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class VideoEditService implements
-        CreateVideoEditUseCase,
-        GetVideoEditUseCase,
-        UpdateVideoEditUseCase,
-        DeleteVideoEditUseCase,
-        ToggleBookmarkUseCase {
+public class VideoEditCommandService implements
+        VideoEditCommandUseCase,
+        GetVideoEditUseCase{
 
     private final VideoEditRepository videoEditRepository;
     private final FileStoragePort fileStoragePort;

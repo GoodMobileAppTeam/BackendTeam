@@ -35,11 +35,8 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class VideoEditController {
 
-    private final CreateVideoEditUseCase createVideoEditUseCase;
+    private final VideoEditCommandUseCase videoEditCommandUseCase;
     private final GetVideoEditUseCase getVideoEditUseCase;
-    private final UpdateVideoEditUseCase updateVideoEditUseCase;
-    private final DeleteVideoEditUseCase deleteVideoEditUseCase;
-    private final ToggleBookmarkUseCase toggleBookmarkUseCase;
 
     @Operation(
             summary = "영상 등록",
@@ -105,7 +102,7 @@ public class VideoEditController {
                 request.description()
         );
 
-        VideoEdit created = createVideoEditUseCase.create(command);
+        VideoEdit created = videoEditCommandUseCase.create(command);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(BaseResponse.success("영상이 등록되었습니다.", VideoEditResponse.from(created)));
@@ -293,7 +290,7 @@ public class VideoEditController {
                 thumbnail.getOriginalFilename()
         );
 
-        VideoEdit updated = updateVideoEditUseCase.updateThumbnail(command);
+        VideoEdit updated = videoEditCommandUseCase.updateThumbnail(command);
         return ResponseEntity.ok(
                 BaseResponse.success("썸네일이 수정되었습니다.", VideoEditResponse.from(updated))
         );
@@ -341,7 +338,7 @@ public class VideoEditController {
             @Parameter(description = "사용자 ID (추후 JWT 토큰으로 대체 예정)", required = true, example = "1")
             @RequestHeader("X-User-Id") Long userId) {
 
-        VideoEdit updated = toggleBookmarkUseCase.toggle(id, userId);
+        VideoEdit updated = videoEditCommandUseCase.toggle(id, userId);
         String message = updated.isBookMarked() ? "북마크가 추가되었습니다." : "북마크가 해제되었습니다.";
         return ResponseEntity.ok(BaseResponse.success(message, VideoEditResponse.from(updated)));
     }
@@ -390,7 +387,7 @@ public class VideoEditController {
             @Parameter(description = "사용자 ID (추후 JWT 토큰으로 대체 예정)", required = true, example = "1")
             @RequestHeader("X-User-Id") Long userId) {
 
-        deleteVideoEditUseCase.delete(id, userId);
+        videoEditCommandUseCase.delete(id, userId);
         return ResponseEntity.ok(BaseResponse.success("영상이 삭제되었습니다.", null));
     }
 }
