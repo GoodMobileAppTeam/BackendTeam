@@ -48,6 +48,9 @@ public class UserEntity {
   @Column(name = "social_type", nullable = false)
   private SocialType socialType;
 
+  @Column(name = "profile_image_url")
+  private String profileImageUrl;
+
   @Column(name = "created_at")
   private LocalDateTime createdAt;
 
@@ -56,6 +59,7 @@ public class UserEntity {
         .name(command.getName())
         .socialId(command.getSocialId())
         .socialType(command.getSocialType())
+        .profileImageUrl(null)
         .createdAt(LocalDateTime.now())
         .build();
   }
@@ -66,6 +70,7 @@ public class UserEntity {
         this.name,
         this.socialId,
         this.socialType,
+        this.profileImageUrl,
         this.createdAt
     );
   }
