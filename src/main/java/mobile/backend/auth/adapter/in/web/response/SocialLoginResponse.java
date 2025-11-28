@@ -1,18 +1,16 @@
 package mobile.backend.auth.adapter.in.web.response;
 
-import lombok.Builder;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
-@Builder
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class SocialLoginResponse {
     private Long userId;
-    private String refreshToken;
+    private String accessToken;
 
-    public static SocialLoginResponse of(Long userId, String refreshToken) {
-        return SocialLoginResponse.builder()
-                .userId(userId)
-                .refreshToken(refreshToken)
-                .build();
+    public static SocialLoginResponse of(Long userId, String accessToken) {
+        return new SocialLoginResponse(userId, accessToken);
     }
 }

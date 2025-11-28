@@ -2,73 +2,64 @@ package mobile.backend.auth.application.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import mobile.backend.auth.application.port.in.LogoutUseCase;
-import mobile.backend.auth.application.port.in.RefreshTokenUseCase;
-import mobile.backend.auth.application.port.in.SocialLoginUseCase;
+import mobile.backend.auth.application.port.in.AuthCommandUseCase;
 import mobile.backend.auth.application.port.out.RefreshTokenRepository;
 import mobile.backend.auth.application.port.out.SocialTokenValidator;
 import mobile.backend.auth.domain.command.RefreshTokenCommand;
 import mobile.backend.auth.domain.command.SocialLoginCommand;
 import mobile.backend.auth.domain.model.RefreshToken;
-import mobile.backend.auth.domain.model.TokenPair;
+import mobile.backend.auth.domain.model.AuthToken;
 import mobile.backend.auth.exception.AuthErrorCode;
 import mobile.backend.global.exception.CustomException;
 import mobile.backend.global.security.jwt.JwtProperties;
 import mobile.backend.global.security.jwt.JwtProvider;
-import mobile.backend.user.adapter.out.persistence.entity.UserEntity;
-import mobile.backend.user.adapter.out.persistence.jpa.UserJpaRepository;
+import mobile.backend.user.application.port.out.UserRepository;
+import mobile.backend.user.domain.model.User;
 import mobile.backend.user.domain.model.SocialType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.List;
+
+import mobile.backend.user.domain.model.SocialUserInfo;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class AuthService implements SocialLoginUseCase, RefreshTokenUseCase, LogoutUseCase {
+public class AuthService implements AuthCommandUseCase {
 
     private final JwtProvider jwtProvider;
     private final JwtProperties jwtProperties;
     private final RefreshTokenRepository refreshTokenRepository;
-    private final UserJpaRepository userJpaRepository;
+    private final UserRepository userRepository;
     private final List<SocialTokenValidator> socialTokenValidators;
 
     @Override
     @Transactional
-    public TokenPair execute(SocialLoginCommand command) {
-        // 파라미터 검증
-        if (command.getSocialToken() == null || command.getProvider() == null) {
-            throw new CustomException(AuthErrorCode.INVALID_PARAMETER);
-        }
-
+    public AuthToken login(SocialLoginCommand command) {
         // 1. 소셜 토큰 검증 및 소셜 ID 추출
-        String socialId = validateSocialToken(command.getSocialToken(), command.getProvider());
+        SocialUserInfo userInfo = validateSocialToken(command.getSocialToken(), command.getProvider());
 
         // 2. DB에서 사용자 조회 또는 생성
-        UserEntity user = userJpaRepository
-                .findBySocialIdAndSocialType(socialId, command.getProvider())
-                .orElseGet(() -> createNewUser(socialId, command.getProvider()));
+        User user = userRepository
+                .findBySocialIdAndSocialType(userInfo.getSocialId(), command.getProvider())
+                .orElseGet(() -> userRepository.save(User.fromSocialUserInfo(userInfo, command.getProvider())));
 
         // 3. JWT 토큰 생성
         String accessToken = jwtProvider.generateAccessToken(user.getId());
         String refreshToken = jwtProvider.generateRefreshToken(user.getId());
 
         // 4. RefreshToken 저장 (기존 토큰이 있으면 덮어쓰기)
-        saveRefreshToken(user.getId(), refreshToken);
+        refreshTokenRepository.save(
+                RefreshToken.create(user.getId(), refreshToken, jwtProperties.getRefreshTokenExpireTime())
+        );
+        return AuthToken.of(user.getId(), accessToken, refreshToken);
 
-        return TokenPair.of(user.getId(), accessToken, refreshToken);
     }
 
     @Override
-    public String execute(RefreshTokenCommand command) {
-        // 파라미터 검증
-        if (command.getRefreshToken() == null || command.getRefreshToken().isEmpty()) {
-            throw new CustomException(AuthErrorCode.INVALID_PARAMETER);
-        }
-
+    public String refreshAccessToken(RefreshTokenCommand command) {
         // 1. RefreshToken 검증
         if (!jwtProvider.validateToken(command.getRefreshToken())) {
             throw new CustomException(AuthErrorCode.INVALID_REFRESH_TOKEN);
@@ -98,64 +89,20 @@ public class AuthService implements SocialLoginUseCase, RefreshTokenUseCase, Log
 
     @Override
     @Transactional
-    public void execute(Long userId) {
-        try {
-            // RefreshToken 삭제
-            refreshTokenRepository.deleteByUserId(userId);
-        } catch (Exception e) {
-            log.error("Logout failed for user {}: {}", userId, e.getMessage());
-            throw new CustomException(AuthErrorCode.INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    private String validateSocialToken(String socialToken, SocialType provider) {
-        try {
-            return socialTokenValidators.stream()
-                    .filter(validator -> validator.supports(provider))
-                    .findFirst()
-                    .orElseThrow(() -> new CustomException(AuthErrorCode.INVALID_SOCIAL_TOKEN))
-                    .validateAndGetSocialId(socialToken);
-        } catch (CustomException e) {
-            throw e;
-        } catch (Exception e) {
-            log.error("Social token validation failed: {}", e.getMessage());
-            throw new CustomException(AuthErrorCode.INVALID_SOCIAL_TOKEN);
-        }
+    public void logout(Long userId) {
+        // RefreshToken 삭제
+        refreshTokenRepository.deleteByUserId(userId);
+        // RefreshTokenRepository에서 AuthErrorCode.REFRESH_TOKEN_DELETE_FAILED로 예외 처리됨
     }
 
 
-    private UserEntity createNewUser(String socialId, SocialType socialType) {
-        try {
-            UserEntity newUser = UserEntity.builder()
-                    .socialId(socialId)
-                    .socialType(socialType)
-                    .name("User_" + socialId.substring(0, Math.min(8, socialId.length())))
-                    .profileImageUrl(null)
-                    .id2(0)
-                    .createdAt(LocalDateTime.now())
-                    .build();
-            return userJpaRepository.save(newUser);
-        } catch (Exception e) {
-            log.error("User creation failed: {}", e.getMessage(), e);
-            throw new CustomException(AuthErrorCode.INTERNAL_SERVER_ERROR);
+    private SocialUserInfo validateSocialToken(String socialToken, SocialType socialType) {
+        for (SocialTokenValidator validator : socialTokenValidators) {
+            if (validator.matchesSocialType(socialType)) {
+                return validator.validateAndGetUserInfo(socialToken);
+            }
         }
+        throw new CustomException(AuthErrorCode.INVALID_SOCIAL_TOKEN);
     }
 
-    private void saveRefreshToken(Long userId, String refreshToken) {
-        try {
-            LocalDateTime expiresAt = LocalDateTime.now()
-                    .plusSeconds(jwtProperties.getRefreshTokenExpireTime() / 1000);
-
-            RefreshToken token = RefreshToken.of(
-                    userId,
-                    refreshToken,
-                    expiresAt
-            );
-
-            refreshTokenRepository.save(token);
-        } catch (Exception e) {
-            log.error("RefreshToken save failed: {}", e.getMessage());
-            throw new CustomException(AuthErrorCode.INTERNAL_SERVER_ERROR);
-        }
-    }
 }

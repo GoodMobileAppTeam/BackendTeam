@@ -1,16 +1,15 @@
 package mobile.backend.auth.adapter.in.web.response;
 
-import lombok.Builder;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
-@Builder
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class RefreshTokenResponse {
     private String accessToken;
 
     public static RefreshTokenResponse of(String accessToken) {
-        return RefreshTokenResponse.builder()
-                .accessToken(accessToken)
-                .build();
+        return new RefreshTokenResponse(accessToken);
     }
 }

@@ -1,5 +1,7 @@
 package mobile.backend.auth.adapter.out.persistence.entity;
 
+import mobile.backend.auth.domain.model.RefreshToken;
+import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -20,13 +22,17 @@ public class RefreshTokenEntity {
     private String id;  // Redis key
 
     @Indexed
+    @NotNull
     private Long userId;
 
+    @NotNull
     private String token;
 
+    @NotNull
     private LocalDateTime expiresAt;
 
     @TimeToLive
+    @NotNull
     private Long ttl;  // 초 단위
 
     @Builder
@@ -46,4 +52,13 @@ public class RefreshTokenEntity {
                 .ttl(ttlSeconds)
                 .build();
     }
+
+    public RefreshToken toDomain() {
+        return RefreshToken.of(
+                this.userId,
+                this.token,
+                this.expiresAt
+        );
+    }
+
 }

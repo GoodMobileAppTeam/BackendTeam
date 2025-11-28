@@ -66,8 +66,6 @@ dependencies {
 	// Redis (RefreshToken 저장용)
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
-	// Lettuce (Redis client - 보통 자동 포함되지만 명시)
-	implementation 'io.lettuce:lettuce-core'
 
 }
 

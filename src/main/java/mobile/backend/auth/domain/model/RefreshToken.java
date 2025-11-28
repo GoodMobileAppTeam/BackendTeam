@@ -20,6 +20,12 @@ public class RefreshToken {
                 .build();
     }
 
+    public static RefreshToken create(Long userId, String token, Long expireTimeMillis) {
+        LocalDateTime expiresAt = LocalDateTime.now()
+                .plusSeconds(expireTimeMillis / 1000);
+        return RefreshToken.of(userId, token, expiresAt);
+    }
+
     public boolean isExpired() {
         return LocalDateTime.now().isAfter(expiresAt);
     }

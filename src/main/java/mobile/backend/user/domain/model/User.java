@@ -18,24 +18,32 @@ public class User {
 
   private final String profileImageUrl;
 
-  private final Integer id2;
-
   private final LocalDateTime createdAt;
 
-  private User(Long id, String name, String socialId, SocialType socialType, String profileImageUrl, Integer id2,
-      LocalDateTime createdAt) {
+  private User(Long id, String name, String socialId, SocialType socialType, String profileImageUrl, LocalDateTime createdAt) {
     this.id = id;
     this.name = name;
     this.socialId = socialId;
     this.socialType = socialType;
     this.profileImageUrl = profileImageUrl;
-    this.id2 = id2;
     this.createdAt = createdAt;
   }
 
-  public static User of(Long id, String name, String socialId, SocialType socialType, String profileImageUrl, Integer id2, LocalDateTime createdAt) {
-    return new User(id, name, socialId, socialType, profileImageUrl, id2, createdAt);
+  public static User of(Long id, String name, String socialId, SocialType socialType, String profileImageUrl, LocalDateTime createdAt) {
+    return new User(id, name, socialId, socialType, profileImageUrl, createdAt);
   }
+
+  public static User fromSocialUserInfo(SocialUserInfo userInfo, SocialType socialType) {
+    return new User(
+            null,  // id는 저장 시 자동 생성
+            userInfo.getNickname(),
+            userInfo.getSocialId(),
+            socialType,
+            userInfo.getProfileImageUrl(),
+            LocalDateTime.now()
+    );
+  }
+
 
   public static String getProfileImagePath(String uuid) {
     return String.format(PROFILE_IMAGE_PATH, uuid);

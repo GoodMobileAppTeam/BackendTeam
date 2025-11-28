@@ -5,7 +5,7 @@ import org.springframework.data.repository.CrudRepository;
 
 import java.util.Optional;
 
-public interface RefreshTokenRedisRepository extends CrudRepository<RefreshTokenEntity, String> {
+public interface RefreshTokenRedisCrudRepository extends CrudRepository<RefreshTokenEntity, String> {
     Optional<RefreshTokenEntity> findByUserId(Long userId);
     Optional<RefreshTokenEntity> findByToken(String token);
     void deleteByUserId(Long userId);

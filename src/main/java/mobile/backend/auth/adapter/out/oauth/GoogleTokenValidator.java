@@ -1,4 +1,4 @@
-package mobile.backend.auth.application.service;
+package mobile.backend.auth.adapter.out.oauth;
 
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
@@ -11,6 +11,7 @@ import mobile.backend.global.exception.CustomException;
 import mobile.backend.user.domain.model.SocialType;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import mobile.backend.user.domain.model.SocialUserInfo;
 
 import java.util.Collections;
 
@@ -22,15 +23,12 @@ public class GoogleTokenValidator implements SocialTokenValidator {
     private String clientId;
 
     @Override
-    public boolean supports(SocialType socialType) {
+    public boolean matchesSocialType(SocialType socialType) {
         return socialType == SocialType.GOOGLE;
     }
 
     @Override
-    public String validateAndGetSocialId(String idToken) {
-          // ===== 테스트용: 실제 검증 건너뛰기 =====
-//        log.info("TEST MODE: Skipping Google token validation");
-//        return "google_test_user_12345";
+    public SocialUserInfo validateAndGetUserInfo(String idToken) {
 
         try {
             GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(
@@ -48,9 +46,10 @@ public class GoogleTokenValidator implements SocialTokenValidator {
 
             GoogleIdToken.Payload payload = googleIdToken.getPayload();
             String socialId = payload.getSubject();
-
+            String nickname = (String) payload.get("name");
+            String profileImageUrl = (String) payload.get("picture");
             log.info("Google token validated successfully for user: {}", socialId);
-            return socialId;
+            return SocialUserInfo.of(socialId, nickname, profileImageUrl);
 
         } catch (CustomException e) {
             throw e;
