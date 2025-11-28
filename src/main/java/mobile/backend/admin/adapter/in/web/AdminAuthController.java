@@ -3,6 +3,7 @@ package mobile.backend.admin.adapter.in.web;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import mobile.backend.admin.adapter.in.web.request.AdminLoginRequest;
 import mobile.backend.admin.application.port.in.AdminLoginUseCase;
 import mobile.backend.admin.domain.command.AdminLoginCommand;
@@ -15,8 +16,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/admin")
+@RequestMapping("/admin")
 @Tag(name = "어드민 인증 API", description = "어드민 페이지 인증 API")
+@Slf4j
 @RequiredArgsConstructor
 public class AdminAuthController {
 

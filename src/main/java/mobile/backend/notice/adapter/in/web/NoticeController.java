@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "공지 API", description = "공지 전용 API")
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/notices")
+@RequestMapping("/v1/notices")
 public class NoticeController {
 
   private final NoticeCommandUseCase noticeCommandUseCase;
@@ -50,7 +50,7 @@ public class NoticeController {
     Notice notice = noticeQueryUseCase.getHomeNotice(userId);
 
     if (notice == null) {
-      return BaseResponse.success("현재 볼 수 있는 공지가 없습니다.", null);
+      return BaseResponse.success("현재 볼 수 있는 최신 공지가 없습니다.", null);
     }
 
     return BaseResponse.success(NoticeResponse.from(notice));
