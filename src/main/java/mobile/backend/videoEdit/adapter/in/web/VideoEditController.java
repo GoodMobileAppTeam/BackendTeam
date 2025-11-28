@@ -30,7 +30,7 @@ import java.io.IOException;
 public class VideoEditController {
 
     private final VideoEditCommandUseCase videoEditCommandUseCase;
-    private final GetVideoEditUseCase getVideoEditUseCase;
+    private final VideoEditQueryUseCase videoEditQueryUseCase;
 
     @Operation(
             summary = "영상 등록",
@@ -69,7 +69,7 @@ public class VideoEditController {
             @PathVariable Long id,
             @RequestHeader("X-User-Id") Long userId) {
 
-        VideoEdit videoEdit = getVideoEditUseCase.getById(id, userId);
+        VideoEdit videoEdit = videoEditQueryUseCase.getById(id, userId);
         return ResponseEntity.ok(BaseResponse.success(VideoEditResponse.from(videoEdit)));
     }
 
@@ -92,7 +92,7 @@ public class VideoEditController {
                 request.size()
         );
 
-        Page<VideoEdit> result = getVideoEditUseCase.search(criteria);
+        Page<VideoEdit> result = videoEditQueryUseCase.search(criteria);
         return ResponseEntity.ok(BaseResponse.success(VideoEditPageResponse.from(result)));
     }
 
@@ -106,7 +106,7 @@ public class VideoEditController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
 
-        Page<VideoEdit> result = getVideoEditUseCase.getBookmarkedVideos(userId, page, size);
+        Page<VideoEdit> result = videoEditQueryUseCase.getBookmarkedVideos(userId, page, size);
         return ResponseEntity.ok(BaseResponse.success(VideoEditPageResponse.from(result)));
     }
 
