@@ -10,6 +10,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import mobile.backend.global.adapter.out.persistence.entity.BaseTimeEntity;
+import mobile.backend.videoEdit.domain.model.VideoEdit;
 
 import java.time.LocalDate;
 
@@ -67,5 +68,38 @@ public class VideoEditEntity extends BaseTimeEntity {
                                        String thumbnailUrl, String description) {
         return new VideoEditEntity(id, albumId, userId, duration, videoUrl,
                 saveTime, isBookMark, thumbnailUrl, description);
+    }
+
+    public static VideoEdit toDomain(VideoEditEntity entity) {
+        if (entity == null) return null;
+
+        return VideoEdit.reconstitute(
+                entity.getId(),
+                entity.getAlbumId(),
+                entity.getUserId(),
+                entity.getDuration(),
+                entity.getVideoUrl(),
+                entity.getSaveTime(),
+                Boolean.TRUE.equals(entity.getIsBookMark()),
+                entity.getThumbnailUrl(),
+                entity.getDescription()
+        );
+
+    }
+
+    public static VideoEditEntity toEntity(VideoEdit domain) {
+        if (domain == null) return null;
+
+        return VideoEditEntity.from(
+                domain.getId(),
+                domain.getAlbumId(),
+                domain.getUserId(),
+                domain.getDuration(),
+                domain.getVideoUrl(),
+                domain.getSaveTime(),
+                domain.isBookMarked(),
+                domain.getThumbnailUrl(),
+                domain.getDescription()
+        );
     }
 }
