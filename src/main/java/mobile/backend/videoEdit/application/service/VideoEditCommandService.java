@@ -8,7 +8,7 @@ import mobile.backend.videoEdit.application.port.in.VideoEditCommandUseCase;
 import mobile.backend.videoEdit.application.port.in.VideoEditQueryUseCase;
 import mobile.backend.videoEdit.application.port.out.VideoEditRepository;
 import mobile.backend.videoEdit.domain.command.CreateVideoEditCommand;
-import mobile.backend.videoEdit.domain.command.VideoEditSearchCriteria;
+import mobile.backend.videoEdit.domain.command.SearchVideoEditCommand;
 import mobile.backend.videoEdit.domain.model.VideoEdit;
 import mobile.backend.videoEdit.exception.VideoErrorCode;
 import org.springframework.data.domain.Page;
@@ -57,13 +57,13 @@ public class VideoEditCommandService implements
     }
 
     @Override
-    public Page<VideoEdit> search(VideoEditSearchCriteria criteria) {
+    public Page<VideoEdit> search(SearchVideoEditCommand criteria) {
         return videoEditRepository.search(criteria);
     }
 
     @Override
     public Page<VideoEdit> getBookmarkedVideos(Long userId, int page, int size) {
-        VideoEditSearchCriteria criteria = VideoEditSearchCriteria.bookmarked(userId, page, size);
+        SearchVideoEditCommand criteria = SearchVideoEditCommand.bookmarked(userId, page, size);
         return videoEditRepository.search(criteria);
     }
 
