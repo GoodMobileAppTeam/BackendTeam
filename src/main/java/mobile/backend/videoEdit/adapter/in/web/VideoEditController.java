@@ -47,7 +47,7 @@ public class VideoEditController {
                 userId,
                 request.duration(),
                 request.videoUrl(),
-                thumbnail.getBytes(),
+                thumbnail,
                 thumbnail.getOriginalFilename(),
                 request.saveTime(),
                 request.description()
