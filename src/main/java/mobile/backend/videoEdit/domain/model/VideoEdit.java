@@ -69,13 +69,6 @@ public class VideoEdit {
         this.isBookMarked = !this.isBookMarked;
     }
 
-    public void updateThumbnailUrl(String thumbnailUrl) {
-        if (thumbnailUrl == null || thumbnailUrl.isBlank()) {
-            throw new IllegalArgumentException("썸네일 URL은 비어있을 수 없습니다.");
-        }
-        this.thumbnailUrl = thumbnailUrl;
-    }
-
     public boolean isOwnedBy(Long userId) {
         return this.userId.equals(userId);
     }
