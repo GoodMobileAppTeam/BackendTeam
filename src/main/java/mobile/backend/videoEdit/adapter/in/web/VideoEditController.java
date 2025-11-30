@@ -11,7 +11,6 @@ import mobile.backend.videoEdit.adapter.in.web.response.VideoEditPageResponse;
 import mobile.backend.videoEdit.adapter.in.web.response.VideoEditResponse;
 import mobile.backend.videoEdit.application.port.in.*;
 import mobile.backend.videoEdit.domain.command.CreateVideoEditCommand;
-import mobile.backend.videoEdit.domain.command.UpdateVideoEditCommand;
 import mobile.backend.videoEdit.domain.command.VideoEditSearchCriteria;
 import mobile.backend.videoEdit.domain.model.VideoEdit;
 import org.springframework.data.domain.Page;
@@ -108,29 +107,6 @@ public class VideoEditController {
 
         Page<VideoEdit> result = videoEditQueryUseCase.getBookmarkedVideos(userId, page, size);
         return ResponseEntity.ok(BaseResponse.success(VideoEditPageResponse.from(result)));
-    }
-
-    @Operation(
-            summary = "썸네일 수정",
-            description = "영상의 썸네일 이미지를 변경합니다. 기존 썸네일은 S3에서 삭제됩니다."
-    )
-    @PatchMapping(value = "/{id}/thumbnail", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<BaseResponse<VideoEditResponse>> updateThumbnail(
-            @PathVariable Long id,
-            @RequestHeader("X-User-Id") Long userId,
-            @RequestPart("thumbnail") MultipartFile thumbnail) throws IOException {
-
-        UpdateVideoEditCommand command = new UpdateVideoEditCommand(
-                id,
-                userId,
-                thumbnail.getBytes(),
-                thumbnail.getOriginalFilename()
-        );
-
-        VideoEdit updated = videoEditCommandUseCase.updateThumbnail(command);
-        return ResponseEntity.ok(
-                BaseResponse.success("썸네일이 수정되었습니다.", VideoEditResponse.from(updated))
-        );
     }
 
     @Operation(

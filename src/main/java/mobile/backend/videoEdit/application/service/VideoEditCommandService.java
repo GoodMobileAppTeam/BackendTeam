@@ -8,7 +8,6 @@ import mobile.backend.videoEdit.application.port.in.VideoEditQueryUseCase;
 import mobile.backend.videoEdit.application.port.out.FileStoragePort;
 import mobile.backend.videoEdit.application.port.out.VideoEditRepository;
 import mobile.backend.videoEdit.domain.command.CreateVideoEditCommand;
-import mobile.backend.videoEdit.domain.command.UpdateVideoEditCommand;
 import mobile.backend.videoEdit.domain.command.VideoEditSearchCriteria;
 import mobile.backend.videoEdit.domain.model.VideoEdit;
 import mobile.backend.videoEdit.exception.VideoErrorCode;
@@ -67,28 +66,6 @@ public class VideoEditCommandService implements
     public Page<VideoEdit> getBookmarkedVideos(Long userId, int page, int size) {
         VideoEditSearchCriteria criteria = VideoEditSearchCriteria.bookmarked(userId, page, size);
         return videoEditRepository.search(criteria);
-    }
-
-    @Override
-    @Transactional
-    public VideoEdit updateThumbnail(UpdateVideoEditCommand command) {
-        VideoEdit videoEdit = findVideoEditOrThrow(command.videoEditId());
-        validateOwnership(videoEdit, command.userId());
-
-        if (command.thumbnailData() != null && command.thumbnailData().length > 0) {
-            if (videoEdit.getThumbnailUrl() != null) {
-                fileStoragePort.delete(videoEdit.getThumbnailUrl());
-            }
-
-            String newThumbnailUrl = fileStoragePort.upload(
-                    command.thumbnailData(),
-                    command.thumbnailFileName(),
-                    THUMBNAIL_DIRECTORY
-            );
-            videoEdit.updateThumbnailUrl(newThumbnailUrl);
-        }
-
-        return videoEditRepository.save(videoEdit);
     }
 
     @Override
