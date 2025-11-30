@@ -15,7 +15,7 @@ import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
-public class VideoEditPersistenceAdapter implements VideoEditRepository {
+public class VideoEditRepositoryImpl implements VideoEditRepository {
 
     private final VideoEditJpaRepository jpaRepository;
 
