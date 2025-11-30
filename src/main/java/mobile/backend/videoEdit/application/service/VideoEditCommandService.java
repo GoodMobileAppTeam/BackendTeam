@@ -73,17 +73,11 @@ public class VideoEditCommandService implements
         VideoEdit videoEdit = findVideoEditOrThrow(id);
         validateOwnership(videoEdit, userId);
 
-        try {
-            if (videoEdit.getThumbnailUrl() != null) {
-                s3Manager.deleteObjectByUrl(videoEdit.getThumbnailUrl());
-            }
-
-            videoEditRepository.delete(videoEdit);
-
-        } catch (Exception e) {
-            log.error("영상 삭제 중 오류 발생: {}", e.getMessage(), e);
-            throw new CustomException(VideoErrorCode.FILE_STORAGE_ERROR);
+        if (videoEdit.getThumbnailUrl() != null) {
+            s3Manager.deleteObjectByUrl(videoEdit.getThumbnailUrl());
         }
+
+        videoEditRepository.delete(videoEdit);
     }
 
     @Override
