@@ -1,6 +1,8 @@
 package mobile.backend.videoEdit.domain.model;
 
 import lombok.Getter;
+import mobile.backend.global.exception.CustomException;
+import mobile.backend.videoEdit.exception.VideoErrorCode;
 
 import java.time.LocalDate;
 
@@ -73,4 +75,9 @@ public class VideoEdit {
         return this.userId.equals(userId);
     }
 
+    public static void validateOwnership(VideoEdit videoEdit, Long userId) {
+        if (!videoEdit.isOwnedBy(userId)) {
+            throw new CustomException(VideoErrorCode.VIDEO_ACCESS_DENIED);
+        }
+    }
 }
