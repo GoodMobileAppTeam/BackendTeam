@@ -19,9 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class VideoEditCommandService implements
-        VideoEditCommandUseCase,
-        VideoEditQueryUseCase {
+public class VideoEditCommandService implements VideoEditCommandUseCase, VideoEditQueryUseCase {
 
     private final VideoEditRepository videoEditRepository;
     private final AmazonS3Manager s3Manager;
@@ -52,7 +50,7 @@ public class VideoEditCommandService implements
     @Override
     public VideoEdit getById(Long id, Long userId) {
         VideoEdit videoEdit = findVideoEditOrThrow(id);
-        validateOwnership(videoEdit, userId);
+        VideoEdit.validateOwnership(videoEdit, userId);
         return videoEdit;
     }
 
@@ -71,7 +69,7 @@ public class VideoEditCommandService implements
     @Transactional
     public void delete(Long id, Long userId) {
         VideoEdit videoEdit = findVideoEditOrThrow(id);
-        validateOwnership(videoEdit, userId);
+        VideoEdit.validateOwnership(videoEdit, userId);
 
         if (videoEdit.getThumbnailUrl() != null) {
             s3Manager.deleteObjectByUrl(videoEdit.getThumbnailUrl());
@@ -84,7 +82,7 @@ public class VideoEditCommandService implements
     @Transactional
     public VideoEdit toggle(Long videoEditId, Long userId) {
         VideoEdit videoEdit = findVideoEditOrThrow(videoEditId);
-        validateOwnership(videoEdit, userId);
+        VideoEdit.validateOwnership(videoEdit, userId);
 
         videoEdit.toggleBookmark();
         return videoEditRepository.save(videoEdit);
@@ -95,9 +93,4 @@ public class VideoEditCommandService implements
                 .orElseThrow(() -> new CustomException(VideoErrorCode.VIDEO_NOT_FOUND));
     }
 
-    private void validateOwnership(VideoEdit videoEdit, Long userId) {
-        if (!videoEdit.isOwnedBy(userId)) {
-            throw new CustomException(VideoErrorCode.VIDEO_ACCESS_DENIED);
-        }
-    }
 }
