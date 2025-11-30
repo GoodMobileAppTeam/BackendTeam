@@ -1,5 +1,7 @@
 package mobile.backend.videoEdit.domain.command;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import java.time.LocalDate;
 
 public record CreateVideoEditCommand(
@@ -7,7 +9,7 @@ public record CreateVideoEditCommand(
         Long userId,
         Integer duration,
         String videoUrl,
-        byte[] thumbnailData,
+        MultipartFile thumbnailData,
         String thumbnailFileName,
         LocalDate saveTime,
         String description

@@ -2,10 +2,10 @@ package mobile.backend.videoEdit.application.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import mobile.backend.global.adapter.out.s3.AmazonS3Manager;
 import mobile.backend.global.exception.CustomException;
 import mobile.backend.videoEdit.application.port.in.VideoEditCommandUseCase;
 import mobile.backend.videoEdit.application.port.in.VideoEditQueryUseCase;
-import mobile.backend.videoEdit.application.port.out.FileStoragePort;
 import mobile.backend.videoEdit.application.port.out.VideoEditRepository;
 import mobile.backend.videoEdit.domain.command.CreateVideoEditCommand;
 import mobile.backend.videoEdit.domain.command.VideoEditSearchCriteria;
@@ -24,17 +24,16 @@ public class VideoEditCommandService implements
         VideoEditQueryUseCase {
 
     private final VideoEditRepository videoEditRepository;
-    private final FileStoragePort fileStoragePort;
-
-    private static final String THUMBNAIL_DIRECTORY = "thumbnails";
+    private final AmazonS3Manager s3Manager;
 
     @Override
     @Transactional
     public VideoEdit create(CreateVideoEditCommand command) {
-        String thumbnailUrl = fileStoragePort.upload(
-                command.thumbnailData(),
+
+
+        String thumbnailUrl = s3Manager.uploadFile(
                 command.thumbnailFileName(),
-                THUMBNAIL_DIRECTORY
+                command.thumbnailData()
         );
 
         VideoEdit videoEdit = VideoEdit.create(
@@ -76,7 +75,7 @@ public class VideoEditCommandService implements
 
         try {
             if (videoEdit.getThumbnailUrl() != null) {
-                fileStoragePort.delete(videoEdit.getThumbnailUrl());
+                s3Manager.deleteObjectByUrl(videoEdit.getThumbnailUrl());
             }
 
             videoEditRepository.delete(videoEdit);
