@@ -49,7 +49,8 @@ public class SecurityConfig {
                     // 인증 없이 허용할 경로
                     .requestMatchers("/users/sign-up", "/auth/login", "/users/nickname/check")
                     .permitAll()
-
+                    .requestMatchers("/v1/videos/**")
+                    .permitAll()
                     // 그 외 모든 요청은 모두 인증 필요
                     .anyRequest()
                     .authenticated());
