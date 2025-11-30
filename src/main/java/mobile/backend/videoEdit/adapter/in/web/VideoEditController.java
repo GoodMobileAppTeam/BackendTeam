@@ -11,7 +11,7 @@ import mobile.backend.videoEdit.adapter.in.web.response.VideoEditPageResponse;
 import mobile.backend.videoEdit.adapter.in.web.response.VideoEditResponse;
 import mobile.backend.videoEdit.application.port.in.*;
 import mobile.backend.videoEdit.domain.command.CreateVideoEditCommand;
-import mobile.backend.videoEdit.domain.command.VideoEditSearchCriteria;
+import mobile.backend.videoEdit.domain.command.SearchVideoEditCommand;
 import mobile.backend.videoEdit.domain.model.VideoEdit;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -82,7 +82,7 @@ public class VideoEditController {
             @RequestHeader("X-User-Id") Long userId,
             @Valid @ModelAttribute VideoEditSearchRequest request) {
 
-        VideoEditSearchCriteria criteria = VideoEditSearchCriteria.of(
+        SearchVideoEditCommand criteria = SearchVideoEditCommand.of(
                 userId,
                 request.year(),
                 request.month(),

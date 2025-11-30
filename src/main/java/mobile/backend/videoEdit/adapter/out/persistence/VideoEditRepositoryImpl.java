@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import mobile.backend.videoEdit.adapter.out.persistence.entity.VideoEditEntity;
 import mobile.backend.videoEdit.adapter.out.persistence.jpa.VideoEditJpaRepository;
 import mobile.backend.videoEdit.application.port.out.VideoEditRepository;
-import mobile.backend.videoEdit.domain.command.VideoEditSearchCriteria;
+import mobile.backend.videoEdit.domain.command.SearchVideoEditCommand;
 import mobile.backend.videoEdit.domain.model.VideoEdit;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -33,7 +33,7 @@ public class VideoEditRepositoryImpl implements VideoEditRepository {
     }
 
     @Override
-    public Page<VideoEdit> search(VideoEditSearchCriteria criteria) {
+    public Page<VideoEdit> search(SearchVideoEditCommand criteria) {
         Pageable pageable = PageRequest.of(criteria.page(), criteria.size());
 
         Page<VideoEditEntity> entityPage = jpaRepository.search(
