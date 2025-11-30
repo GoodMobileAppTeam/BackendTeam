@@ -18,19 +18,18 @@ import java.util.Optional;
 public class VideoEditPersistenceAdapter implements VideoEditRepository {
 
     private final VideoEditJpaRepository jpaRepository;
-    private final VideoEditMapper mapper;
 
     @Override
     public VideoEdit save(VideoEdit videoEdit) {
-        VideoEditEntity entity = mapper.toEntity(videoEdit);
+        VideoEditEntity entity = VideoEditEntity.toEntity(videoEdit);
         VideoEditEntity savedEntity = jpaRepository.save(entity);
-        return mapper.toDomain(savedEntity);
+        return VideoEditEntity.toDomain(savedEntity);
     }
 
     @Override
     public Optional<VideoEdit> findById(Long id) {
         return jpaRepository.findById(id)
-                .map(mapper::toDomain);
+                .map(VideoEditEntity::toDomain);
     }
 
     @Override
@@ -45,7 +44,7 @@ public class VideoEditPersistenceAdapter implements VideoEditRepository {
                 pageable
         );
 
-        return entityPage.map(mapper::toDomain);
+        return entityPage.map(VideoEditEntity::toDomain);
     }
 
     @Override
