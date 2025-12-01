@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Positive;
+import mobile.backend.videoEdit.domain.command.SearchVideoEditCommand;
 
 @Schema(description = "영상 검색 요청 DTO")
 public record VideoEditSearchRequest(
@@ -25,5 +26,16 @@ public record VideoEditSearchRequest(
     public VideoEditSearchRequest {
         if (page == null) page = 0;
         if (size == null) size = 20;
+    }
+
+    public SearchVideoEditCommand toCommand(Long userId) {
+        return SearchVideoEditCommand.of(
+                userId,
+                year,
+                month,
+                isBookMarked,
+                page,
+                size
+        );
     }
 }

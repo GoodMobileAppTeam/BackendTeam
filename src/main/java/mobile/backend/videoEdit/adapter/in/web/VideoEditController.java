@@ -42,16 +42,7 @@ public class VideoEditController {
             @Valid @RequestPart("request") CreateVideoEditRequest request,
             @RequestPart("thumbnail") MultipartFile thumbnail) throws IOException {
 
-        CreateVideoEditCommand command = new CreateVideoEditCommand(
-                request.albumId(),
-                userId,
-                request.duration(),
-                request.videoUrl(),
-                thumbnail,
-                thumbnail.getOriginalFilename(),
-                request.saveTime(),
-                request.description()
-        );
+        CreateVideoEditCommand command = request.toCommand(userId, thumbnail);
 
         VideoEdit created = videoEditCommandUseCase.create(command);
         return ResponseEntity
@@ -82,14 +73,7 @@ public class VideoEditController {
             @RequestHeader("X-User-Id") Long userId,
             @Valid @ModelAttribute VideoEditSearchRequest request) {
 
-        SearchVideoEditCommand criteria = SearchVideoEditCommand.of(
-                userId,
-                request.year(),
-                request.month(),
-                request.isBookMarked(),
-                request.page(),
-                request.size()
-        );
+        SearchVideoEditCommand criteria = request.toCommand(userId);
 
         Page<VideoEdit> result = videoEditQueryUseCase.search(criteria);
         return ResponseEntity.ok(BaseResponse.success(VideoEditPageResponse.from(result)));

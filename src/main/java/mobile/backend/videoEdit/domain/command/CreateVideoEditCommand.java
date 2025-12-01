@@ -13,5 +13,27 @@ public record CreateVideoEditCommand(
         String thumbnailFileName,
         LocalDate saveTime,
         String description
-) {}
+) {
+    public static CreateVideoEditCommand of(
+            Long albumId,
+            Long userId,
+            Integer duration,
+            String videoUrl,
+            MultipartFile thumbnailData,
+            String thumbnailFileName,
+            LocalDate saveTime,
+            String description
+    ) {
+        return new CreateVideoEditCommand(
+                albumId,
+                userId,
+                duration,
+                videoUrl,
+                thumbnailData,
+                thumbnailFileName,
+                saveTime,
+                description
+        );
+    }
+}
 

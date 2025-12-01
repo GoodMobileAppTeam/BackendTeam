@@ -6,6 +6,8 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
+import mobile.backend.videoEdit.domain.command.CreateVideoEditCommand;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 
@@ -28,4 +30,17 @@ public record CreateVideoEditRequest(
         LocalDate saveTime,
 
         String description
-) {}
+) {
+    public CreateVideoEditCommand toCommand(Long userId, MultipartFile thumbnail) {
+        return CreateVideoEditCommand.of(
+                albumId,
+                userId,
+                duration,
+                videoUrl,
+                thumbnail,
+                thumbnail != null ? thumbnail.getOriginalFilename() : null,
+                saveTime,
+                description
+        );
+    }
+}
