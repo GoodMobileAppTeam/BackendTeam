@@ -15,7 +15,8 @@ public enum AuthErrorCode implements BaseErrorCode {
     // 401 에러
     AUTHENTICATION_FAILED(HttpStatus.UNAUTHORIZED, "인증 실패"),
     INVALID_SOCIAL_TOKEN(HttpStatus.UNAUTHORIZED, "소셜 토큰 검증 실패"),
-    INVALID_REFRESH_TOKEN(HttpStatus.UNAUTHORIZED, "Refresh token invalid or expired"),
+    INVALID_REFRESH_TOKEN(HttpStatus.UNAUTHORIZED, "Refresh token invalid"),
+    EXPIRED_REFRESH_TOKEN(HttpStatus.UNAUTHORIZED, "Refresh token expired"),
     INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "토큰 검증 실패"),
 
     // 500 에러

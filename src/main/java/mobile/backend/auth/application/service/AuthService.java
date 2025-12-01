@@ -80,7 +80,7 @@ public class AuthService implements AuthCommandUseCase {
         // 5. 만료 확인
         if (storedToken.isExpired()) {
             refreshTokenRepository.deleteByUserId(userId);
-            throw new CustomException(AuthErrorCode.INVALID_REFRESH_TOKEN);
+            throw new CustomException(AuthErrorCode.EXPIRED_REFRESH_TOKEN);
         }
 
         // 6. 새로운 AccessToken 발급
