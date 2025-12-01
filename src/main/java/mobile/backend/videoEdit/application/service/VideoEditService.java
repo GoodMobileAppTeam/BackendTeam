@@ -3,14 +3,12 @@ package mobile.backend.videoEdit.application.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import mobile.backend.global.adapter.out.s3.AmazonS3Manager;
-import mobile.backend.global.exception.CustomException;
 import mobile.backend.videoEdit.application.port.in.VideoEditCommandUseCase;
 import mobile.backend.videoEdit.application.port.in.VideoEditQueryUseCase;
 import mobile.backend.videoEdit.application.port.out.VideoEditRepository;
 import mobile.backend.videoEdit.domain.command.CreateVideoEditCommand;
 import mobile.backend.videoEdit.domain.command.SearchVideoEditCommand;
 import mobile.backend.videoEdit.domain.model.VideoEdit;
-import mobile.backend.videoEdit.exception.VideoErrorCode;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,7 +25,6 @@ public class VideoEditService implements VideoEditCommandUseCase, VideoEditQuery
     @Override
     @Transactional
     public VideoEdit create(CreateVideoEditCommand command) {
-
 
         String thumbnailUrl = s3Manager.uploadFile(
                 command.thumbnailFileName(),
@@ -49,7 +46,7 @@ public class VideoEditService implements VideoEditCommandUseCase, VideoEditQuery
 
     @Override
     public VideoEdit getById(Long id, Long userId) {
-        VideoEdit videoEdit = findVideoEditOrThrow(id);
+        VideoEdit videoEdit = videoEditRepository.findById(id);
         VideoEdit.validateOwnership(videoEdit, userId);
         return videoEdit;
     }
@@ -68,7 +65,7 @@ public class VideoEditService implements VideoEditCommandUseCase, VideoEditQuery
     @Override
     @Transactional
     public void delete(Long id, Long userId) {
-        VideoEdit videoEdit = findVideoEditOrThrow(id);
+        VideoEdit videoEdit = videoEditRepository.findById(id);
         VideoEdit.validateOwnership(videoEdit, userId);
 
         if (videoEdit.getThumbnailUrl() != null) {
@@ -81,16 +78,11 @@ public class VideoEditService implements VideoEditCommandUseCase, VideoEditQuery
     @Override
     @Transactional
     public VideoEdit toggle(Long videoEditId, Long userId) {
-        VideoEdit videoEdit = findVideoEditOrThrow(videoEditId);
+        VideoEdit videoEdit = videoEditRepository.findById(videoEditId);
         VideoEdit.validateOwnership(videoEdit, userId);
 
         videoEdit.toggleBookmark();
         return videoEditRepository.save(videoEdit);
-    }
-
-    private VideoEdit findVideoEditOrThrow(Long id) {
-        return videoEditRepository.findById(id)
-                .orElseThrow(() -> new CustomException(VideoErrorCode.VIDEO_NOT_FOUND));
     }
 
 }

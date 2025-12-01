@@ -1,17 +1,17 @@
 package mobile.backend.videoEdit.adapter.out.persistence;
 
 import lombok.RequiredArgsConstructor;
+import mobile.backend.global.exception.CustomException;
 import mobile.backend.videoEdit.adapter.out.persistence.entity.VideoEditEntity;
 import mobile.backend.videoEdit.adapter.out.persistence.jpa.VideoEditJpaRepository;
 import mobile.backend.videoEdit.application.port.out.VideoEditRepository;
 import mobile.backend.videoEdit.domain.command.SearchVideoEditCommand;
 import mobile.backend.videoEdit.domain.model.VideoEdit;
+import mobile.backend.videoEdit.exception.VideoErrorCode;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
-
-import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
@@ -27,9 +27,10 @@ public class VideoEditRepositoryImpl implements VideoEditRepository {
     }
 
     @Override
-    public Optional<VideoEdit> findById(Long id) {
+    public VideoEdit findById(Long id) {
         return jpaRepository.findById(id)
-                .map(VideoEditEntity::toDomain);
+                .map(VideoEditEntity::toDomain)
+                .orElseThrow(() -> new CustomException(VideoErrorCode.VIDEO_NOT_FOUND));
     }
 
     @Override
