@@ -47,7 +47,7 @@ public class VideoEdit {
     }
 
     // DB에서 복원용 팩토리 메서드
-    public static VideoEdit reconstitute(Long id, Long albumId, Long userId,
+    public static VideoEdit from(Long id, Long albumId, Long userId,
                                          Integer duration, String videoUrl,
                                          LocalDate saveTime,
                                          boolean isBookMarked, String thumbnailUrl, String description) {

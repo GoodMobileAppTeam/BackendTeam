@@ -73,7 +73,7 @@ public class VideoEditEntity extends BaseTimeEntity {
     public static VideoEdit toDomain(VideoEditEntity entity) {
         if (entity == null) return null;
 
-        return VideoEdit.reconstitute(
+        return VideoEdit.from(
                 entity.getId(),
                 entity.getAlbumId(),
                 entity.getUserId(),
