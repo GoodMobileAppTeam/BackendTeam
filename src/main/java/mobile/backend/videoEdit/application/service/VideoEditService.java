@@ -19,7 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class VideoEditCommandService implements VideoEditCommandUseCase, VideoEditQueryUseCase {
+public class VideoEditService implements VideoEditCommandUseCase, VideoEditQueryUseCase {
 
     private final VideoEditRepository videoEditRepository;
     private final AmazonS3Manager s3Manager;
