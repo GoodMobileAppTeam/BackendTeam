@@ -7,9 +7,8 @@ import mobile.backend.auth.application.port.out.RefreshTokenRepository;
 import mobile.backend.auth.domain.model.RefreshToken;
 import mobile.backend.global.security.jwt.JwtProperties;
 import org.springframework.stereotype.Repository;
-
-
-import java.util.Optional;
+import mobile.backend.auth.exception.AuthErrorCode;
+import mobile.backend.global.exception.CustomException;
 
 
 @Repository
@@ -34,22 +33,18 @@ public class RefreshTokenRepositoryImpl implements RefreshTokenRepository {
     }
 
     @Override
-    public Optional<RefreshToken> findByUserId(Long userId) {
-            return redisRepository.findByUserId(userId)
-                    .map(RefreshTokenEntity::toDomain);
-    }
-
-    @Override
-    public Optional<RefreshToken> findByToken(String token) {
-            return redisRepository.findByToken(token)
-                    .map(RefreshTokenEntity::toDomain);
-    }
-
-    @Override
     public void deleteByUserId(Long userId) {
             //RefreshTokenEntity에 "refresh:" + userId 형식으로 생성되기에 ID를 직접 만들어서 deleteById 사용
             String id = "refresh:" + userId;
             redisRepository.deleteById(id);
     }
+
+    @Override
+    public RefreshToken findByUserIdOrThrow(Long userId) {
+        return redisRepository.findByUserId(userId)
+                .map(RefreshTokenEntity::toDomain)
+                .orElseThrow(() -> new CustomException(AuthErrorCode.INVALID_REFRESH_TOKEN));
+    }
+
 
 }

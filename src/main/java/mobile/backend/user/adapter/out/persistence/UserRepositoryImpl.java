@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import mobile.backend.user.adapter.out.persistence.jpa.UserJpaRepository;
 import mobile.backend.user.application.port.out.UserRepository;
 import mobile.backend.user.domain.model.User;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Repository;
 import mobile.backend.user.adapter.out.persistence.entity.UserEntity;
 import mobile.backend.user.domain.model.SocialType;
@@ -31,7 +32,7 @@ public class UserRepositoryImpl implements UserRepository {
       UserEntity savedEntity = userJpaRepository.save(entity);
 
       return savedEntity.toDomain();
-    } catch (Exception e) {
+    } catch (DataIntegrityViolationException e) {
       throw new CustomException(UserErrorCode.USER_SAVE_FAILED);
     }
   }

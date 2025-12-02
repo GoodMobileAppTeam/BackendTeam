@@ -69,8 +69,7 @@ public class AuthService implements AuthCommandUseCase {
         Long userId = jwtProvider.getUserIdFromToken(command.getRefreshToken());
 
         // 3. Redis에서 RefreshToken 조회
-        RefreshToken storedToken = refreshTokenRepository.findByUserId(userId)
-                .orElseThrow(() -> new CustomException(AuthErrorCode.INVALID_REFRESH_TOKEN));
+        RefreshToken storedToken = refreshTokenRepository.findByUserIdOrThrow(userId);
 
         // 4. 저장된 토큰과 요청된 토큰 비교
         if (!storedToken.getToken().equals(command.getRefreshToken())) {
@@ -92,7 +91,6 @@ public class AuthService implements AuthCommandUseCase {
     public void logout(Long userId) {
         // RefreshToken 삭제
         refreshTokenRepository.deleteByUserId(userId);
-        // RefreshTokenRepository에서 AuthErrorCode.REFRESH_TOKEN_DELETE_FAILED로 예외 처리됨
     }
 
 
