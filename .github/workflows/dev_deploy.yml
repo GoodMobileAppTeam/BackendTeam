@@ -97,6 +97,9 @@ jobs:
             JWT_SECRET=${{ secrets.JWT_SECRET }}
             JWT_ACCESS_TOKEN_EXPIRE_TIME=${{ secrets.JWT_ACCESS_TOKEN_EXPIRE_TIME }}
             JWT_REFRESH_TOKEN_EXPIRE_TIME=${{ secrets.JWT_REFRESH_TOKEN_EXPIRE_TIME }}
+            GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}
+            ADMIN_USERNAME=${{ secrets.ADMIN_USERNAME }}
+            ADMIN_PASSWORD=${{ secrets.ADMIN_PASSWORD }}
             EOF
             
             echo "=== Generate docker-compose.yml from Secret ==="

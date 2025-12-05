@@ -14,7 +14,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import mobile.backend.user.domain.command.UserCreateCommand;
 import mobile.backend.user.domain.model.SocialType;
 import mobile.backend.user.domain.model.User;
 
@@ -48,16 +47,20 @@ public class UserEntity {
   @Column(name = "social_type", nullable = false)
   private SocialType socialType;
 
+  @Column(name = "profile_image_url")
+  private String profileImageUrl;
+
   @Column(name = "created_at")
   private LocalDateTime createdAt;
 
-  public static UserEntity from(UserCreateCommand command) {
+  public static UserEntity from(User user) {
     return UserEntity.builder()
-        .name(command.getName())
-        .socialId(command.getSocialId())
-        .socialType(command.getSocialType())
-        .createdAt(LocalDateTime.now())
-        .build();
+            .name(user.getName())
+            .socialId(user.getSocialId())
+            .socialType(user.getSocialType())
+            .profileImageUrl(user.getProfileImageUrl())
+            .createdAt(user.getCreatedAt())
+            .build();
   }
 
   public User toDomain() {
@@ -66,6 +69,7 @@ public class UserEntity {
         this.name,
         this.socialId,
         this.socialType,
+        this.profileImageUrl,
         this.createdAt
     );
   }

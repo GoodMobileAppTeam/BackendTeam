@@ -37,7 +37,13 @@ out/
 .vscode/
 
 ### env ###
-env
+.env
 
 ### db ###
 /db
+
+### Test files ###
+oauth.html
+test-google-login.html
+test-google.json
+test-kakao-login.html

@@ -10,7 +10,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @Configuration
 public class CorsConfig {
 
-  private static final List<String> ALLOWED_ORIGINS = List.of("http://localhost:3000");
+  private static final List<String> ALLOWED_ORIGINS = List.of("http://localhost:3000", "http://localhost:5173");
 
   @Bean
   public UrlBasedCorsConfigurationSource corsConfigurationSource() {
@@ -20,7 +20,12 @@ public class CorsConfig {
     configuration.setAllowedOrigins(ALLOWED_ORIGINS);
     // 리스트에 작성한 HTTP 메소드 요청만 허용
     configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH"));
+    // 클라이언트가 보내는 요청 헤더 허용(관리자 페이지 로그인 때문에 허용)
+    configuration.setAllowedHeaders(
+        Arrays.asList("Authorization", "Content-Type", "X-Requested-With", "Accept", "Origin")
+    );
     // 리스트에 작성한 헤더들이 포함된 요청만 허용
+    configuration.setAllowedHeaders(List.of("*"));
     configuration.setAllowCredentials(true);
     // 클라이언트가 Authorization 헤더를 읽을 수 있도록 허용(JWT를 사용할 경우)
     configuration.setExposedHeaders(List.of("Authorization"));
