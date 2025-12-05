@@ -100,6 +100,9 @@ jobs:
             GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}
             ADMIN_USERNAME=${{ secrets.ADMIN_USERNAME }}
             ADMIN_PASSWORD=${{ secrets.ADMIN_PASSWORD }}
+            AWS_REDIS_HOST=${{ secrets.AWS_REDIS_HOST }}
+            AWS_REDIS_PORT=${{ secrets.AWS_REDIS_PORT }}
+            AWS_REDIS_PASSWORD=${{ secrets.AWS_REDIS_PASSWORD }}
             EOF
             
             echo "=== Generate docker-compose.yml from Secret ==="
