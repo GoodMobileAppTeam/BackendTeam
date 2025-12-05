@@ -1,18 +1,15 @@
 package mobile.backend.global.config;
 
 import lombok.RequiredArgsConstructor;
+import mobile.backend.global.security.jwt.JwtAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 //Security Config 설정
 @Configuration
@@ -20,61 +17,46 @@ import org.springframework.security.web.SecurityFilterChain;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-  private final CorsConfig corsConfig;
-//  private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
-  @Bean
-  public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-    http
-        // CSRF 보호 기능 비활성화 (REST API에서는 필요없음)
-        .csrf(AbstractHttpConfigurer::disable)
-        // CORS 설정 활성화(보통은 CORS 설정 활성화 하지 않음. 서버에서 NginX로 CORS 검증)
-        .cors(cors -> cors.configurationSource(corsConfig.corsConfigurationSource()))
-        // 기본 인증(HTTP Basic)과 폼 로그인 비활성화
-        // → 브라우저 팝업 및 기본 로그인 페이지 차단, JWT 인증만 사용
-        .httpBasic(AbstractHttpConfigurer::disable)
-        .formLogin(AbstractHttpConfigurer::disable)
-        // 세션을 생성하지 않음 (JWT 사용으로 인한 Stateless 설정)
-        .sessionManagement(
-            session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-        // HTTP 요청에 대한 권한 설정
-        .authorizeHttpRequests(
-            request ->
-                request
-                    // OPTIONS 요청은 인증 없이 허용
-                    .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                    // Swagger 경로 인증 허용
-                    .requestMatchers("/swagger-ui/**", "/v3/api-docs/**")
-                    .permitAll()
-                    // admin 경로 전부 허용
-                    .requestMatchers("/admin/**").permitAll()
-                    // 인증 없이 허용할 경로
-                    .requestMatchers("/users/sign-up", "/auth/login", "/users/nickname/check")
-                    .permitAll()
-                    .requestMatchers("/v1/notices/**").permitAll()     // 공지 관련 API 임시 허용
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http
+                // CSRF 비활성화 (JWT 사용으로 인해)
+                .csrf(AbstractHttpConfigurer::disable)
 
-                    // 그 외 모든 요청은 모두 인증 필요
-                    .anyRequest()
-                    .authenticated());
-//        .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
-    return http.build();
-  }
+                // CORS 설정 활성화 (CorsConfig에서 설정)
+                .cors(cors -> {})
 
-  /**
-   * 비밀번호 인코더 Bean 등록
-   **/
-  @Bean
-  public PasswordEncoder passwordEncoder() {
-    return new BCryptPasswordEncoder();
-  }
+                // 세션 사용 안 함 (Stateless)
+                .sessionManagement(session ->
+                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                )
 
-  /**
-   * 인증 관리자 Bean 등록
-   **/
-  @Bean
-  public AuthenticationManager authenticationManager(
-      AuthenticationConfiguration authenticationConfiguration) throws Exception {
-    return authenticationConfiguration.getAuthenticationManager();
-  }
+                // 요청 권한 설정
+                .authorizeHttpRequests(auth -> auth
+                        // 인증 없이 접근 가능한 경로
+                        .requestMatchers(
+                                "/swagger-ui/**",
+                                "/v3/api-docs/**",
+                                "/admin/**"
+                        ).permitAll()
+
+                        .requestMatchers(
+                                "/v1/auth/login",
+                                "/v1/auth/refresh"
+                        ).permitAll()
+
+                        // 그 외 모든 요청은 인증 필요
+                        .anyRequest().authenticated()
+                )
+
+                // JWT 인증 필터 추가
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+
+        return http.build();
+    }
+}
+
 
 }

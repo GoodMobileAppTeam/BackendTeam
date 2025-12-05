@@ -25,6 +25,7 @@ public class CorsConfig {
         Arrays.asList("Authorization", "Content-Type", "X-Requested-With", "Accept", "Origin")
     );
     // 리스트에 작성한 헤더들이 포함된 요청만 허용
+    configuration.setAllowedHeaders(List.of("*"));
     configuration.setAllowCredentials(true);
     // 클라이언트가 Authorization 헤더를 읽을 수 있도록 허용(JWT를 사용할 경우)
     configuration.setExposedHeaders(List.of("Authorization"));
