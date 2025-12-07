@@ -5,6 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -15,8 +16,15 @@ import mobile.backend.videoEdit.domain.model.VideoEdit;
 import java.time.LocalDate;
 
 @Entity
-@Table(name = "video_edit")
-@Getter
+@Table(
+        name = "video_edit",
+        indexes = {
+                @Index(
+                        name = "idx_video_user_save_time_desc",
+                        columnList = "user_id, save_time DESC"
+                )
+        }
+)@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class VideoEditEntity extends BaseTimeEntity {
 

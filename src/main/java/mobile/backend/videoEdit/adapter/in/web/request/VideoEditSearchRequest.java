@@ -1,41 +1,31 @@
 package mobile.backend.videoEdit.adapter.in.web.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.NotNull;
+import mobile.backend.global.exception.CustomException;
 import mobile.backend.videoEdit.domain.command.SearchVideoEditCommand;
+import mobile.backend.videoEdit.exception.VideoErrorCode;
+import java.time.LocalDate;
 
 @Schema(description = "영상 검색 요청 DTO")
 public record VideoEditSearchRequest(
-        Integer year,
 
-        @Min(value = 1, message = "월은 1 이상이어야 합니다.")
-        @Max(value = 12, message = "월은 12 이하여야 합니다.")
-        Integer month,
+        @NotNull
+        LocalDate startDate,
 
-        Boolean isBookMarked,
-
-        @Min(value = 0, message = "페이지는 0 이상이어야 합니다.")
-        Integer page,
-
-        @Positive(message = "사이즈는 양수여야 합니다.")
-        @Max(value = 100, message = "사이즈는 100 이하여야 합니다.")
-        Integer size
+        @NotNull
+        LocalDate endDate
 ) {
-    public VideoEditSearchRequest {
-        if (page == null) page = 0;
-        if (size == null) size = 20;
-    }
-
     public SearchVideoEditCommand toCommand(Long userId) {
-        return SearchVideoEditCommand.of(
-                userId,
-                year,
-                month,
-                isBookMarked,
-                page,
-                size
-        );
+
+        if (startDate.isAfter(endDate)) {
+            throw new CustomException(VideoErrorCode.INVALID_DATE_RANGE);
+        }
+
+        if (startDate.isAfter(LocalDate.now()) || endDate.isAfter(LocalDate.now())) {
+            throw new CustomException(VideoErrorCode.FUTURE_DATE_NOT_ALLOWED);
+        }
+
+        return SearchVideoEditCommand.of(userId, startDate, endDate);
     }
 }

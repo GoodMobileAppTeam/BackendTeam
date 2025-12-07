@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 import mobile.backend.global.adapter.in.web.response.BaseResponse;
 import mobile.backend.videoEdit.adapter.in.web.request.CreateVideoEditRequest;
 import mobile.backend.videoEdit.adapter.in.web.request.VideoEditSearchRequest;
-import mobile.backend.videoEdit.adapter.in.web.response.VideoEditPageResponse;
+import mobile.backend.videoEdit.adapter.in.web.response.VideoEditListResponse;
 import mobile.backend.videoEdit.adapter.in.web.response.VideoEditResponse;
 import mobile.backend.videoEdit.application.port.in.*;
 import mobile.backend.videoEdit.domain.command.CreateVideoEditCommand;
@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 
 @Tag(name = "Video Edit", description = "영상 편집 관리 API")
 @RestController
@@ -65,21 +66,20 @@ public class VideoEditController {
 
     @Operation(
             summary = "영상 목록 조회",
-            description = "조건에 맞는 영상 목록을 조회합니다. 년/월 필터링, 페이징을 지원합니다. " +
-                    "필터를 지정하지 않으면 전체 영상을 최신순으로 조회합니다."
+            description = "날짜 범위에 맞는 목록을 반환 (yyyy-MM-dd 형식 사용)"
     )
     @GetMapping
-    public ResponseEntity<BaseResponse<VideoEditPageResponse>> search(
+    public ResponseEntity<BaseResponse<VideoEditListResponse>> search(
             @RequestHeader("X-User-Id") Long userId,
             @Valid @ModelAttribute VideoEditSearchRequest request) {
 
         SearchVideoEditCommand criteria = request.toCommand(userId);
 
-        Page<VideoEdit> result = videoEditQueryUseCase.search(criteria);
-        return ResponseEntity.ok(BaseResponse.success(VideoEditPageResponse.from(result)));
+        List<VideoEdit> result = videoEditQueryUseCase.search(criteria);
+        return ResponseEntity.ok(BaseResponse.success(VideoEditListResponse.from(result)));
     }
 
-    @Operation(
+/*    @Operation(
             summary = "북마크한 영상 목록 조회",
             description = "사용자가 북마크한 영상 목록을 페이징하여 조회합니다."
     )
@@ -91,7 +91,7 @@ public class VideoEditController {
 
         Page<VideoEdit> result = videoEditQueryUseCase.getBookmarkedVideos(userId, page, size);
         return ResponseEntity.ok(BaseResponse.success(VideoEditPageResponse.from(result)));
-    }
+    }*/
 
     @Operation(
             summary = "북마크 토글",

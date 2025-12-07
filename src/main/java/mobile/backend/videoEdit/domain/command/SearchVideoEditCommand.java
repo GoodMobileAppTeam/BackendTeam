@@ -1,19 +1,14 @@
 package mobile.backend.videoEdit.domain.command;
 
+import java.time.LocalDate;
+
 public record SearchVideoEditCommand(
         Long userId,
-        Integer year,
-        Integer month,
-        Boolean isBookMarked,
-        int page,
-        int size
+        LocalDate startDate,
+        LocalDate endDate
 ) {
-    public static SearchVideoEditCommand of(Long userId, Integer year, Integer month,
-                                            Boolean isBookMarked, int page, int size) {
-        return new SearchVideoEditCommand(userId, year, month, isBookMarked, page, size);
-    }
-
-    public static SearchVideoEditCommand bookmarked(Long userId, int page, int size) {
-        return new SearchVideoEditCommand(userId, null, null, true, page, size);
+    public static SearchVideoEditCommand of(Long userId, LocalDate startDate,
+                                            LocalDate endDate) {
+        return new SearchVideoEditCommand(userId, startDate, endDate);
     }
 }

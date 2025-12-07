@@ -7,21 +7,30 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDate;
+import java.util.List;
+
 public interface VideoEditJpaRepository extends JpaRepository<VideoEditEntity, Long> {
 
     @Query("""
         SELECT v FROM VideoEditEntity v
         WHERE v.userId = :userId
-        AND (:year IS NULL OR YEAR(v.saveTime) = :year)
-        AND (:month IS NULL OR MONTH(v.saveTime) = :month)
-        AND (:isBookMarked IS NULL OR v.isBookMark = :isBookMarked)
+        AND v.saveTime BETWEEN :startDate AND :endDate
         ORDER BY v.saveTime DESC
-        """)
-    Page<VideoEditEntity> search(
+    """)
+    List<VideoEditEntity> findByDateRange(
             @Param("userId") Long userId,
-            @Param("year") Integer year,
-            @Param("month") Integer month,
-            @Param("isBookMarked") Boolean isBookMarked,
-            Pageable pageable
+            @Param("startDate") LocalDate startDate,
+            @Param("endDate") LocalDate endDate
+    );
+
+    @Query("""
+        SELECT v FROM VideoEditEntity v
+        WHERE v.userId = :userId
+        AND v.isBookMark = true
+        ORDER BY v.saveTime DESC
+    """)
+    List<VideoEditEntity> findBookmarked(
+            @Param("userId") Long userId
     );
 }

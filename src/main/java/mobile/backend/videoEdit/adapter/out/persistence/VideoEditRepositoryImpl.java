@@ -13,6 +13,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 @RequiredArgsConstructor
 public class VideoEditRepositoryImpl implements VideoEditRepository {
@@ -34,18 +36,17 @@ public class VideoEditRepositoryImpl implements VideoEditRepository {
     }
 
     @Override
-    public Page<VideoEdit> search(SearchVideoEditCommand criteria) {
-        Pageable pageable = PageRequest.of(criteria.page(), criteria.size());
+    public List<VideoEdit> search(SearchVideoEditCommand criteria) {
 
-        Page<VideoEditEntity> entityPage = jpaRepository.search(
+        List<VideoEditEntity> entityList = jpaRepository.findByDateRange(
                 criteria.userId(),
-                criteria.year(),
-                criteria.month(),
-                criteria.isBookMarked(),
-                pageable
+                criteria.startDate(),
+                criteria.endDate()
         );
 
-        return entityPage.map(VideoEditEntity::toDomain);
+        return entityList.stream()
+                .map(VideoEditEntity::toDomain)
+                .toList();
     }
 
     @Override
