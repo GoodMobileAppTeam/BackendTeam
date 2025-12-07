@@ -7,6 +7,7 @@ import mobile.backend.videoEdit.application.port.in.VideoEditCommandUseCase;
 import mobile.backend.videoEdit.application.port.in.VideoEditQueryUseCase;
 import mobile.backend.videoEdit.application.port.out.VideoEditRepository;
 import mobile.backend.videoEdit.domain.command.CreateVideoEditCommand;
+import mobile.backend.videoEdit.domain.command.SearchBookmarkVideoEditCommand;
 import mobile.backend.videoEdit.domain.command.SearchVideoEditCommand;
 import mobile.backend.videoEdit.domain.model.VideoEdit;
 import org.springframework.stereotype.Service;
@@ -57,11 +58,10 @@ public class VideoEditService implements VideoEditCommandUseCase, VideoEditQuery
         return videoEditRepository.search(criteria);
     }
 
-/*    @Override
-    public Page<VideoEdit> getBookmarkedVideos(Long userId, int page, int size) {
-        SearchVideoEditCommand criteria = SearchVideoEditCommand.bookmarked(userId, page, size);
-        return videoEditRepository.search(criteria);
-    }*/
+    @Override
+    public List<VideoEdit> getBookmarkedVideos(SearchBookmarkVideoEditCommand command) {
+        return videoEditRepository.bookmarkSearch(command);
+    }
 
     @Override
     @Transactional

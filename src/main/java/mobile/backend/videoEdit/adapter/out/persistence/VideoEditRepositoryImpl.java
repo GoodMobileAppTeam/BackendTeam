@@ -5,10 +5,10 @@ import mobile.backend.global.exception.CustomException;
 import mobile.backend.videoEdit.adapter.out.persistence.entity.VideoEditEntity;
 import mobile.backend.videoEdit.adapter.out.persistence.jpa.VideoEditJpaRepository;
 import mobile.backend.videoEdit.application.port.out.VideoEditRepository;
+import mobile.backend.videoEdit.domain.command.SearchBookmarkVideoEditCommand;
 import mobile.backend.videoEdit.domain.command.SearchVideoEditCommand;
 import mobile.backend.videoEdit.domain.model.VideoEdit;
 import mobile.backend.videoEdit.exception.VideoErrorCode;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
@@ -45,6 +45,23 @@ public class VideoEditRepositoryImpl implements VideoEditRepository {
         );
 
         return entityList.stream()
+                .map(VideoEditEntity::toDomain)
+                .toList();
+    }
+
+    @Override
+    public List<VideoEdit> bookmarkSearch(SearchBookmarkVideoEditCommand command) {
+
+        Pageable pageable = PageRequest.of(0, command.size());
+
+        List<VideoEditEntity> entities = jpaRepository.findBookmarkedByCursor(
+                        command.userId(),
+                        command.cursorDate(),
+                        command.cursorId(),
+                        pageable
+                );
+
+        return entities.stream()
                 .map(VideoEditEntity::toDomain)
                 .toList();
     }

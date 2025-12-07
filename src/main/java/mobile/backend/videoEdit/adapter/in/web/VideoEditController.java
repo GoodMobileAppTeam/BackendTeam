@@ -6,14 +6,16 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import mobile.backend.global.adapter.in.web.response.BaseResponse;
 import mobile.backend.videoEdit.adapter.in.web.request.CreateVideoEditRequest;
+import mobile.backend.videoEdit.adapter.in.web.request.VideoEditBookmarkSearchRequest;
 import mobile.backend.videoEdit.adapter.in.web.request.VideoEditSearchRequest;
+import mobile.backend.videoEdit.adapter.in.web.response.VideoEditBookmarkSearchResponse;
 import mobile.backend.videoEdit.adapter.in.web.response.VideoEditListResponse;
 import mobile.backend.videoEdit.adapter.in.web.response.VideoEditResponse;
 import mobile.backend.videoEdit.application.port.in.*;
 import mobile.backend.videoEdit.domain.command.CreateVideoEditCommand;
+import mobile.backend.videoEdit.domain.command.SearchBookmarkVideoEditCommand;
 import mobile.backend.videoEdit.domain.command.SearchVideoEditCommand;
 import mobile.backend.videoEdit.domain.model.VideoEdit;
-import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -79,19 +81,22 @@ public class VideoEditController {
         return ResponseEntity.ok(BaseResponse.success(VideoEditListResponse.from(result)));
     }
 
-/*    @Operation(
+    @Operation(
             summary = "북마크한 영상 목록 조회",
-            description = "사용자가 북마크한 영상 목록을 페이징하여 조회합니다."
+            description = "사용자가 북마크한 영상 목록을 커서 페이징하여 조회합니다."
     )
     @GetMapping("/bookmarks")
-    public ResponseEntity<BaseResponse<VideoEditPageResponse>> getBookmarked(
+    public ResponseEntity<BaseResponse<VideoEditBookmarkSearchResponse>> getBookmarked(
             @RequestHeader("X-User-Id") Long userId,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size) {
+            @Valid @ModelAttribute VideoEditBookmarkSearchRequest request) {
 
-        Page<VideoEdit> result = videoEditQueryUseCase.getBookmarkedVideos(userId, page, size);
-        return ResponseEntity.ok(BaseResponse.success(VideoEditPageResponse.from(result)));
-    }*/
+        SearchBookmarkVideoEditCommand command = request.toCommand(userId);
+
+        List<VideoEdit> result = videoEditQueryUseCase.getBookmarkedVideos(command);
+
+        return ResponseEntity.ok(BaseResponse.success(VideoEditBookmarkSearchResponse.from(result, request.size()))
+        );
+    }
 
     @Operation(
             summary = "북마크 토글",
