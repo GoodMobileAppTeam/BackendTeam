@@ -53,6 +53,7 @@ public class UserEntity {
   @Column(name = "created_at")
   private LocalDateTime createdAt;
 
+
   public static UserEntity from(User user) {
     return UserEntity.builder()
             .name(user.getName())

@@ -8,5 +8,4 @@ public interface UserRepository {
 
   Optional<User> findBySocialIdAndSocialType(String socialId, SocialType socialType);
   User save(User user);
-
 }
