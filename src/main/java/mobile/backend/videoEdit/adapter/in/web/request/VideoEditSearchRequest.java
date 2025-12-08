@@ -5,15 +5,19 @@ import jakarta.validation.constraints.NotNull;
 import mobile.backend.global.exception.CustomException;
 import mobile.backend.videoEdit.domain.command.SearchVideoEditCommand;
 import mobile.backend.videoEdit.exception.VideoErrorCode;
+import org.springframework.format.annotation.DateTimeFormat;
+
 import java.time.LocalDate;
 
 @Schema(description = "영상 검색 요청 DTO")
 public record VideoEditSearchRequest(
 
         @NotNull
+        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
         LocalDate startDate,
 
         @NotNull
+        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
         LocalDate endDate
 ) {
     public SearchVideoEditCommand toCommand(Long userId) {
