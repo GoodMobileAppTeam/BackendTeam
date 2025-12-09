@@ -1,5 +1,8 @@
 package mobile.backend.auth.adapter.in.web;
 
+import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -25,15 +28,62 @@ public class TestAuthController {
 
     @PostMapping("/test-signup")
     public ResponseEntity<BaseResponse<TestAuthResponse>> signup(
-            @Valid @RequestBody TestSignupRequest request) {
+            @Valid @RequestBody TestSignupRequest request,
+            HttpServletResponse httpResponse) {  // ← 파라미터 추가
+
         AuthToken authToken = testAuthCommandUseCase.signup(request.toCommand());
+
+        // AccessToken을 Cookie로 설정 (아래 8줄 추가)
+        ResponseCookie accessTokenCookie = ResponseCookie.from("accessToken", authToken.getAccessToken())
+                .httpOnly(true)
+                .secure(false)
+                .path("/")
+                .maxAge(2 * 60 * 60)
+                .sameSite("Strict")
+                .build();
+
+        // RefreshToken을 Cookie로 설정 (아래 8줄 추가)
+        ResponseCookie refreshTokenCookie = ResponseCookie.from("refreshToken", authToken.getRefreshToken())
+                .httpOnly(true)
+                .secure(false)
+                .path("/")
+                .maxAge(7 * 24 * 60 * 60)
+                .sameSite("Strict")
+                .build();
+
+        httpResponse.addHeader(HttpHeaders.SET_COOKIE, accessTokenCookie.toString());
+        httpResponse.addHeader(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString());
+
         return ResponseEntity.ok(BaseResponse.success(TestAuthResponse.from(authToken)));
     }
 
+
     @PostMapping("/test-login")
     public ResponseEntity<BaseResponse<TestAuthResponse>> login(
-            @Valid @RequestBody TestLoginRequest request) {
+            @Valid @RequestBody TestLoginRequest request,
+            HttpServletResponse httpResponse) {
+
         AuthToken authToken = testAuthCommandUseCase.login(request.toCommand());
+
+        ResponseCookie accessTokenCookie = ResponseCookie.from("accessToken", authToken.getAccessToken())
+                .httpOnly(true)
+                .secure(false)
+                .path("/")
+                .maxAge(2 * 60 * 60)
+                .sameSite("Strict")
+                .build();
+
+        ResponseCookie refreshTokenCookie = ResponseCookie.from("refreshToken", authToken.getRefreshToken())
+                .httpOnly(true)
+                .secure(false)
+                .path("/")
+                .maxAge(7 * 24 * 60 * 60)
+                .sameSite("Strict")
+                .build();
+
+        httpResponse.addHeader(HttpHeaders.SET_COOKIE, accessTokenCookie.toString());
+        httpResponse.addHeader(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString());
+
         return ResponseEntity.ok(BaseResponse.success(TestAuthResponse.from(authToken)));
     }
 }
