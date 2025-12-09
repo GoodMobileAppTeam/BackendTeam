@@ -72,3 +72,8 @@ cloud:
     credentials:
       access-key: ${AWS_ACCESS_KEY}
       secret-key: ${AWS_SECRET_KEY}
+
+#Kakao API
+kakao:
+  local:
+    api-key: ${KAKAO_REST_API_KEY}
