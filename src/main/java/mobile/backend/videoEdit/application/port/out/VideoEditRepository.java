@@ -12,5 +12,4 @@ public interface VideoEditRepository {
     List<VideoEdit> search(SearchVideoEditCommand criteria);
     List<VideoEdit> bookmarkSearch(SearchBookmarkVideoEditCommand command);
     void delete(VideoEdit videoEdit);
-    boolean existsById(Long id);
 }

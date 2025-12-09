@@ -70,9 +70,4 @@ public class VideoEditRepositoryImpl implements VideoEditRepository {
     public void delete(VideoEdit videoEdit) {
         jpaRepository.deleteById(videoEdit.getId());
     }
-
-    @Override
-    public boolean existsById(Long id) {
-        return jpaRepository.existsById(id);
-    }
 }
