@@ -11,11 +11,13 @@ import mobile.backend.videoEdit.adapter.in.web.request.VideoEditSearchRequest;
 import mobile.backend.videoEdit.adapter.in.web.response.VideoEditBookmarkSearchResponse;
 import mobile.backend.videoEdit.adapter.in.web.response.VideoEditListResponse;
 import mobile.backend.videoEdit.adapter.in.web.response.VideoEditResponse;
+import mobile.backend.videoEdit.adapter.in.web.response.VideoEditSummaryResponse;
 import mobile.backend.videoEdit.application.port.in.*;
 import mobile.backend.videoEdit.domain.command.CreateVideoEditCommand;
 import mobile.backend.videoEdit.domain.command.SearchBookmarkVideoEditCommand;
 import mobile.backend.videoEdit.domain.command.SearchVideoEditCommand;
 import mobile.backend.videoEdit.domain.model.VideoEdit;
+import mobile.backend.videoEdit.domain.model.VideoEditSummary;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -123,5 +125,17 @@ public class VideoEditController {
 
         videoEditCommandUseCase.delete(id, userId);
         return ResponseEntity.ok(BaseResponse.success("영상이 삭제되었습니다.", null));
+    }
+
+    @GetMapping("/summary")
+    public ResponseEntity<BaseResponse<List<VideoEditSummaryResponse>>> getDailySummary(
+            @RequestHeader("X-User-Id") Long userId,
+            @Valid @ModelAttribute VideoEditSearchRequest request) {
+
+        SearchVideoEditCommand command = request.toCommand(userId);
+
+        List<VideoEditSummary> summaries = videoEditQueryUseCase.getDailySummary(command);
+
+        return ResponseEntity.ok(BaseResponse.success(VideoEditSummaryResponse.fromDomainList(summaries)));
     }
 }
