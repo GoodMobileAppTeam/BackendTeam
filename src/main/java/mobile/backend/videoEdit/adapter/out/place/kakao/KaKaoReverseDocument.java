@@ -24,7 +24,7 @@ public class KaKaoReverseDocument {
 
   // 도로명 주소 객체
   @JsonProperty("road_address")
-  private KaKaoAddress roadAddress;
+  private KaKaoRoadAddress roadAddress;
 
   // 지번 주소 객체
   @JsonProperty("address")

@@ -3,15 +3,21 @@ package mobile.backend.videoEdit.adapter.in.web;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import java.io.IOException;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import mobile.backend.global.adapter.in.web.response.BaseResponse;
 import mobile.backend.videoEdit.adapter.in.web.request.CreateVideoEditRequest;
 import mobile.backend.videoEdit.adapter.in.web.request.VideoEditBookmarkSearchRequest;
 import mobile.backend.videoEdit.adapter.in.web.request.VideoEditSearchRequest;
+import mobile.backend.videoEdit.adapter.in.web.request.place.PlaceNameListRequest;
 import mobile.backend.videoEdit.adapter.in.web.response.VideoEditBookmarkSearchResponse;
 import mobile.backend.videoEdit.adapter.in.web.response.VideoEditListResponse;
 import mobile.backend.videoEdit.adapter.in.web.response.VideoEditResponse;
-import mobile.backend.videoEdit.application.port.in.*;
+import mobile.backend.videoEdit.adapter.in.web.response.place.PlaceNameResponse;
+import mobile.backend.videoEdit.application.port.in.PlaceNameQueryUseCase;
+import mobile.backend.videoEdit.application.port.in.VideoEditCommandUseCase;
+import mobile.backend.videoEdit.application.port.in.VideoEditQueryUseCase;
 import mobile.backend.videoEdit.domain.command.CreateVideoEditCommand;
 import mobile.backend.videoEdit.domain.command.SearchBookmarkVideoEditCommand;
 import mobile.backend.videoEdit.domain.command.SearchVideoEditCommand;
@@ -19,11 +25,18 @@ import mobile.backend.videoEdit.domain.model.VideoEdit;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.io.IOException;
-import java.util.List;
 
 @Tag(name = "Video Edit", description = "영상 편집 관리 API")
 @RestController
@@ -33,6 +46,7 @@ public class VideoEditController {
 
     private final VideoEditCommandUseCase videoEditCommandUseCase;
     private final VideoEditQueryUseCase videoEditQueryUseCase;
+    private final PlaceNameQueryUseCase placeNameQueryUseCase;
 
     @Operation(
             summary = "영상 등록",
@@ -123,5 +137,19 @@ public class VideoEditController {
 
         videoEditCommandUseCase.delete(id, userId);
         return ResponseEntity.ok(BaseResponse.success("영상이 삭제되었습니다.", null));
+    }
+
+    @Operation(
+        summary = "(위도,경도) -> 상호명 반환",
+        description = "영상들의 위도와 경도를 리스트로 요청하면 상호명을 리스트 순서대로 반환합니다.\n"
+            + "placeName 우선순위\n"
+            + "1순위 : 건물명 반환\n"
+            + "2순위 : 도로명 주소 반환(시/도 + 군까지)\n"
+            + "3순위 : 지번 주소 반환(시/도 + 군까지)\n"
+            + "1순위 없으면 -> 2순위, 2순위 없으면 -> 3순위"
+    )
+    @PostMapping("/placeNames")
+    public BaseResponse<List<PlaceNameResponse>> getPlaceNames(@RequestBody PlaceNameListRequest request) {
+        return BaseResponse.success(placeNameQueryUseCase.getPlaceNames(request.toCommand()));
     }
 }
