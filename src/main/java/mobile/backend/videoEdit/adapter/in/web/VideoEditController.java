@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import mobile.backend.global.adapter.in.web.response.BaseResponse;
+import mobile.backend.global.security.CustomUserDetails;
 import mobile.backend.videoEdit.adapter.in.web.request.CreateVideoEditRequest;
 import mobile.backend.videoEdit.adapter.in.web.request.VideoEditBookmarkSearchRequest;
 import mobile.backend.videoEdit.adapter.in.web.request.VideoEditSearchRequest;
@@ -47,11 +48,11 @@ public class VideoEditController {
     )
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<BaseResponse<VideoEditResponse>> create(
-            @AuthenticationPrincipal UserDetails userDetails,
+            @AuthenticationPrincipal CustomUserDetails customUserDetails,
             @Valid @RequestPart("request") CreateVideoEditRequest request,
             @RequestPart("thumbnail") MultipartFile thumbnail) throws IOException {
 
-        CreateVideoEditCommand command = request.toCommand(userDetails.getUsername(), thumbnail);
+        CreateVideoEditCommand command = request.toCommand(customUserDetails.getUserId(), thumbnail);
 
         VideoEdit created = videoEditCommandUseCase.create(command);
         return ResponseEntity
@@ -66,9 +67,9 @@ public class VideoEditController {
     @GetMapping("/{id}")
     public ResponseEntity<BaseResponse<VideoEditResponse>> getById(
             @PathVariable Long id,
-            @AuthenticationPrincipal UserDetails userDetails) {
+            @AuthenticationPrincipal CustomUserDetails customUserDetails) {
 
-        VideoEdit videoEdit = videoEditQueryUseCase.getById(id, userDetails.getUsername());
+        VideoEdit videoEdit = videoEditQueryUseCase.getById(id, customUserDetails.getUserId());
         return ResponseEntity.ok(BaseResponse.success(VideoEditResponse.from(videoEdit)));
     }
 
@@ -78,10 +79,10 @@ public class VideoEditController {
     )
     @GetMapping
     public ResponseEntity<BaseResponse<VideoEditListResponse>> search(
-            @AuthenticationPrincipal UserDetails userDetails,
+            @AuthenticationPrincipal CustomUserDetails customUserDetails,
             @Valid @ModelAttribute VideoEditSearchRequest request) {
 
-        SearchVideoEditCommand criteria = request.toCommand(userDetails.getUsername());
+        SearchVideoEditCommand criteria = request.toCommand(customUserDetails.getUserId());
 
         List<VideoEdit> result = videoEditQueryUseCase.search(criteria);
         return ResponseEntity.ok(BaseResponse.success(VideoEditListResponse.from(result, request.size())));
@@ -93,10 +94,10 @@ public class VideoEditController {
     )
     @GetMapping("/bookmarks")
     public ResponseEntity<BaseResponse<VideoEditBookmarkSearchResponse>> getBookmarked(
-            @AuthenticationPrincipal UserDetails userDetails,
+            @AuthenticationPrincipal CustomUserDetails customUserDetails,
             @Valid @ModelAttribute VideoEditBookmarkSearchRequest request) {
 
-        SearchBookmarkVideoEditCommand command = request.toCommand(userDetails.getUsername());
+        SearchBookmarkVideoEditCommand command = request.toCommand(customUserDetails.getUserId());
 
         List<VideoEdit> result = videoEditQueryUseCase.getBookmarkedVideos(command);
 
@@ -111,9 +112,9 @@ public class VideoEditController {
     @PatchMapping("/{id}/bookmark")
     public ResponseEntity<BaseResponse<VideoEditResponse>> toggleBookmark(
             @PathVariable Long id,
-            @AuthenticationPrincipal UserDetails userDetails) {
+            @AuthenticationPrincipal CustomUserDetails customUserDetails) {
 
-        VideoEdit updated = videoEditCommandUseCase.toggle(id, userDetails.getUsername());
+        VideoEdit updated = videoEditCommandUseCase.toggle(id, customUserDetails.getUserId());
         String message = updated.isBookMarked() ? "북마크가 추가되었습니다." : "북마크가 해제되었습니다.";
         return ResponseEntity.ok(BaseResponse.success(message, VideoEditResponse.from(updated)));
     }
@@ -125,9 +126,9 @@ public class VideoEditController {
     @DeleteMapping("/{id}")
     public ResponseEntity<BaseResponse<Void>> delete(
             @PathVariable Long id,
-            @AuthenticationPrincipal UserDetails userDetails) {
+            @AuthenticationPrincipal CustomUserDetails customUserDetails) {
 
-        videoEditCommandUseCase.delete(id, userDetails.getUsername());
+        videoEditCommandUseCase.delete(id, customUserDetails.getUserId ());
         return ResponseEntity.ok(BaseResponse.success("영상이 삭제되었습니다.", null));
     }
 
@@ -137,10 +138,10 @@ public class VideoEditController {
     )
     @GetMapping("/summary")
     public ResponseEntity<BaseResponse<List<VideoEditSummaryResponse>>> getDailySummary(
-            @AuthenticationPrincipal UserDetails userDetails,
+            @AuthenticationPrincipal CustomUserDetails customUserDetails,
             @Valid @ModelAttribute VideoEditSummaryRequest request) {
 
-        SearchSummaryVideoEditCommand command = request.toCommand(userDetails.getUsername());
+        SearchSummaryVideoEditCommand command = request.toCommand(customUserDetails.getUserId());
 
         List<VideoEditSummary> summaries = videoEditQueryUseCase.getDailySummary(command);
 
