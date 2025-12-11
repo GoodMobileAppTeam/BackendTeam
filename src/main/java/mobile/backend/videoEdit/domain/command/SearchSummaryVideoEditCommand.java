@@ -5,16 +5,12 @@ import mobile.backend.videoEdit.exception.VideoErrorCode;
 
 import java.time.LocalDate;
 
-public record SearchVideoEditCommand(
+public record SearchSummaryVideoEditCommand(
         Long userId,
         LocalDate startDate,
-        LocalDate endDate,
-        LocalDate cursorDate,
-        Long cursorId,
-        int size
+        LocalDate endDate
 ) {
-    public static SearchVideoEditCommand of(Long userId, LocalDate startDate, LocalDate endDate,
-                                            LocalDate cursorDate, Long cursorId, int size) {
+    public static SearchSummaryVideoEditCommand of(Long userId, LocalDate startDate, LocalDate endDate) {
 
         if (startDate.isAfter(endDate)) {
             throw new CustomException(VideoErrorCode.INVALID_DATE_RANGE);
@@ -24,6 +20,6 @@ public record SearchVideoEditCommand(
             throw new CustomException(VideoErrorCode.FUTURE_DATE_NOT_ALLOWED);
         }
 
-        return new SearchVideoEditCommand(userId, startDate, endDate, cursorDate, cursorId, size);
+        return new SearchSummaryVideoEditCommand(userId, startDate, endDate);
     }
 }

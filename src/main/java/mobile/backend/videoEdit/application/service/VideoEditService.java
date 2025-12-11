@@ -7,11 +7,15 @@ import mobile.backend.videoEdit.application.port.in.VideoEditCommandUseCase;
 import mobile.backend.videoEdit.application.port.in.VideoEditQueryUseCase;
 import mobile.backend.videoEdit.application.port.out.VideoEditRepository;
 import mobile.backend.videoEdit.domain.command.CreateVideoEditCommand;
+import mobile.backend.videoEdit.domain.command.SearchBookmarkVideoEditCommand;
+import mobile.backend.videoEdit.domain.command.SearchSummaryVideoEditCommand;
 import mobile.backend.videoEdit.domain.command.SearchVideoEditCommand;
+import mobile.backend.videoEdit.domain.model.VideoEditSummary;
 import mobile.backend.videoEdit.domain.model.VideoEdit;
-import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Slf4j
 @Service
@@ -52,14 +56,13 @@ public class VideoEditService implements VideoEditCommandUseCase, VideoEditQuery
     }
 
     @Override
-    public Page<VideoEdit> search(SearchVideoEditCommand criteria) {
+    public List<VideoEdit> search(SearchVideoEditCommand criteria) {
         return videoEditRepository.search(criteria);
     }
 
     @Override
-    public Page<VideoEdit> getBookmarkedVideos(Long userId, int page, int size) {
-        SearchVideoEditCommand criteria = SearchVideoEditCommand.bookmarked(userId, page, size);
-        return videoEditRepository.search(criteria);
+    public List<VideoEdit> getBookmarkedVideos(SearchBookmarkVideoEditCommand command) {
+        return videoEditRepository.bookmarkSearch(command);
     }
 
     @Override
@@ -83,6 +86,11 @@ public class VideoEditService implements VideoEditCommandUseCase, VideoEditQuery
 
         videoEdit.toggleBookmark();
         return videoEditRepository.save(videoEdit);
+    }
+
+    @Override
+    public List<VideoEditSummary> getDailySummary(SearchSummaryVideoEditCommand command) {
+        return videoEditRepository.findDailySummary(command);
     }
 
 }
