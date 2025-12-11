@@ -72,7 +72,7 @@ public class VideoEditController {
 
     @Operation(
             summary = "영상 목록 조회",
-            description = "날짜 범위에 맞는 목록을 반환 (yyyy-MM-dd 형식 사용)"
+            description = "날짜 범위에 맞는 목록을 반환 (yyyy-MM-dd 형식 사용, 커서 페이징 사용)"
     )
     @GetMapping
     public ResponseEntity<BaseResponse<VideoEditListResponse>> search(
@@ -129,6 +129,10 @@ public class VideoEditController {
         return ResponseEntity.ok(BaseResponse.success("영상이 삭제되었습니다.", null));
     }
 
+    @Operation(
+            summary = "영상 정보 요약 반환",
+            description = "날짜 범위에 맞는 목록의 요약을 반환 (yyyy-MM-dd 형식 사용)"
+    )
     @GetMapping("/summary")
     public ResponseEntity<BaseResponse<List<VideoEditSummaryResponse>>> getDailySummary(
             @RequestHeader("X-User-Id") Long userId,

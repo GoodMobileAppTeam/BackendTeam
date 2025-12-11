@@ -6,7 +6,7 @@ import mobile.backend.videoEdit.domain.model.VideoEdit;
 import java.time.LocalDate;
 import java.util.List;
 
-@Schema(description = "영상 목록 응답 DTO (단순 리스트)")
+@Schema(description = "영상 목록 응답 DTO")
 public record VideoEditListResponse(
 
         @Schema(description = "영상 목록")
