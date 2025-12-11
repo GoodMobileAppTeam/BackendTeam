@@ -44,112 +44,117 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 public class VideoEditController {
 
-    private final VideoEditCommandUseCase videoEditCommandUseCase;
-    private final VideoEditQueryUseCase videoEditQueryUseCase;
-    private final PlaceNameQueryUseCase placeNameQueryUseCase;
+  private final VideoEditCommandUseCase videoEditCommandUseCase;
+  private final VideoEditQueryUseCase videoEditQueryUseCase;
+  private final PlaceNameQueryUseCase placeNameQueryUseCase;
 
-    @Operation(
-            summary = "영상 등록",
-            description = "새로운 영상을 등록합니다. 영상 정보(JSON)와 썸네일 이미지를 함께 전송해야 합니다. " +
-                    "영상 길이는 최대 60초까지 가능합니다."
-    )
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<BaseResponse<VideoEditResponse>> create(
-            @RequestHeader("X-User-Id") Long userId,
-            @Valid @RequestPart("request") CreateVideoEditRequest request,
-            @RequestPart("thumbnail") MultipartFile thumbnail) throws IOException {
+  @Operation(
+      summary = "영상 등록",
+      description = "새로운 영상을 등록합니다. 영상 정보(JSON)와 썸네일 이미지를 함께 전송해야 합니다. " +
+          "영상 길이는 최대 60초까지 가능합니다."
+  )
+  @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+  public ResponseEntity<BaseResponse<VideoEditResponse>> create(
+      @RequestHeader("X-User-Id") Long userId,
+      @Valid @RequestPart("request") CreateVideoEditRequest request,
+      @RequestPart("thumbnail") MultipartFile thumbnail) throws IOException {
 
-        CreateVideoEditCommand command = request.toCommand(userId, thumbnail);
+    CreateVideoEditCommand command = request.toCommand(userId, thumbnail);
 
-        VideoEdit created = videoEditCommandUseCase.create(command);
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(BaseResponse.success("영상이 등록되었습니다.", VideoEditResponse.from(created)));
-    }
+    VideoEdit created = videoEditCommandUseCase.create(command);
+    return ResponseEntity
+        .status(HttpStatus.CREATED)
+        .body(BaseResponse.success("영상이 등록되었습니다.", VideoEditResponse.from(created)));
+  }
 
-    @Operation(
-            summary = "영상 단건 조회",
-            description = "영상 ID로 특정 영상의 상세 정보를 조회합니다. 본인이 등록한 영상만 조회 가능합니다."
-    )
-    @GetMapping("/{id}")
-    public ResponseEntity<BaseResponse<VideoEditResponse>> getById(
-            @PathVariable Long id,
-            @RequestHeader("X-User-Id") Long userId) {
+  @Operation(
+      summary = "영상 단건 조회",
+      description = "영상 ID로 특정 영상의 상세 정보를 조회합니다. 본인이 등록한 영상만 조회 가능합니다."
+  )
+  @GetMapping("/{id}")
+  public ResponseEntity<BaseResponse<VideoEditResponse>> getById(
+      @PathVariable Long id,
+      @RequestHeader("X-User-Id") Long userId) {
 
-        VideoEdit videoEdit = videoEditQueryUseCase.getById(id, userId);
-        return ResponseEntity.ok(BaseResponse.success(VideoEditResponse.from(videoEdit)));
-    }
+    VideoEdit videoEdit = videoEditQueryUseCase.getById(id, userId);
+    return ResponseEntity.ok(BaseResponse.success(VideoEditResponse.from(videoEdit)));
+  }
 
-    @Operation(
-            summary = "영상 목록 조회",
-            description = "날짜 범위에 맞는 목록을 반환 (yyyy-MM-dd 형식 사용)"
-    )
-    @GetMapping
-    public ResponseEntity<BaseResponse<VideoEditListResponse>> search(
-            @RequestHeader("X-User-Id") Long userId,
-            @Valid @ModelAttribute VideoEditSearchRequest request) {
+  @Operation(
+      summary = "영상 목록 조회",
+      description = "날짜 범위에 맞는 목록을 반환 (yyyy-MM-dd 형식 사용)"
+  )
+  @GetMapping
+  public ResponseEntity<BaseResponse<VideoEditListResponse>> search(
+      @RequestHeader("X-User-Id") Long userId,
+      @Valid @ModelAttribute VideoEditSearchRequest request) {
 
-        SearchVideoEditCommand criteria = request.toCommand(userId);
+    SearchVideoEditCommand criteria = request.toCommand(userId);
 
-        List<VideoEdit> result = videoEditQueryUseCase.search(criteria);
-        return ResponseEntity.ok(BaseResponse.success(VideoEditListResponse.from(result)));
-    }
+    List<VideoEdit> result = videoEditQueryUseCase.search(criteria);
+    return ResponseEntity.ok(BaseResponse.success(VideoEditListResponse.from(result)));
+  }
 
-    @Operation(
-            summary = "북마크한 영상 목록 조회",
-            description = "사용자가 북마크한 영상 목록을 커서 페이징하여 조회합니다."
-    )
-    @GetMapping("/bookmarks")
-    public ResponseEntity<BaseResponse<VideoEditBookmarkSearchResponse>> getBookmarked(
-            @RequestHeader("X-User-Id") Long userId,
-            @Valid @ModelAttribute VideoEditBookmarkSearchRequest request) {
+  @Operation(
+      summary = "북마크한 영상 목록 조회",
+      description = "사용자가 북마크한 영상 목록을 커서 페이징하여 조회합니다."
+  )
+  @GetMapping("/bookmarks")
+  public ResponseEntity<BaseResponse<VideoEditBookmarkSearchResponse>> getBookmarked(
+      @RequestHeader("X-User-Id") Long userId,
+      @Valid @ModelAttribute VideoEditBookmarkSearchRequest request) {
 
-        SearchBookmarkVideoEditCommand command = request.toCommand(userId);
+    SearchBookmarkVideoEditCommand command = request.toCommand(userId);
 
-        List<VideoEdit> result = videoEditQueryUseCase.getBookmarkedVideos(command);
+    List<VideoEdit> result = videoEditQueryUseCase.getBookmarkedVideos(command);
 
-        return ResponseEntity.ok(BaseResponse.success(VideoEditBookmarkSearchResponse.from(result, request.size()))
-        );
-    }
+    return ResponseEntity.ok(
+        BaseResponse.success(VideoEditBookmarkSearchResponse.from(result, request.size()))
+    );
+  }
 
-    @Operation(
-            summary = "북마크 토글",
-            description = "영상의 북마크 상태를 변경합니다. 북마크되어 있으면 해제하고, 해제되어 있으면 추가합니다."
-    )
-    @PatchMapping("/{id}/bookmark")
-    public ResponseEntity<BaseResponse<VideoEditResponse>> toggleBookmark(
-            @PathVariable Long id,
-            @RequestHeader("X-User-Id") Long userId) {
+  @Operation(
+      summary = "북마크 토글",
+      description = "영상의 북마크 상태를 변경합니다. 북마크되어 있으면 해제하고, 해제되어 있으면 추가합니다."
+  )
+  @PatchMapping("/{id}/bookmark")
+  public ResponseEntity<BaseResponse<VideoEditResponse>> toggleBookmark(
+      @PathVariable Long id,
+      @RequestHeader("X-User-Id") Long userId) {
 
-        VideoEdit updated = videoEditCommandUseCase.toggle(id, userId);
-        String message = updated.isBookMarked() ? "북마크가 추가되었습니다." : "북마크가 해제되었습니다.";
-        return ResponseEntity.ok(BaseResponse.success(message, VideoEditResponse.from(updated)));
-    }
+    VideoEdit updated = videoEditCommandUseCase.toggle(id, userId);
+    String message = updated.isBookMarked() ? "북마크가 추가되었습니다." : "북마크가 해제되었습니다.";
+    return ResponseEntity.ok(BaseResponse.success(message, VideoEditResponse.from(updated)));
+  }
 
-    @Operation(
-            summary = "영상 삭제",
-            description = "영상을 삭제합니다. 영상과 함께 S3에 저장된 썸네일도 함께 삭제됩니다."
-    )
-    @DeleteMapping("/{id}")
-    public ResponseEntity<BaseResponse<Void>> delete(
-            @PathVariable Long id,
-            @RequestHeader("X-User-Id") Long userId) {
+  @Operation(
+      summary = "영상 삭제",
+      description = "영상을 삭제합니다. 영상과 함께 S3에 저장된 썸네일도 함께 삭제됩니다."
+  )
+  @DeleteMapping("/{id}")
+  public ResponseEntity<BaseResponse<Void>> delete(
+      @PathVariable Long id,
+      @RequestHeader("X-User-Id") Long userId) {
 
-        videoEditCommandUseCase.delete(id, userId);
-        return ResponseEntity.ok(BaseResponse.success("영상이 삭제되었습니다.", null));
-    }
+    videoEditCommandUseCase.delete(id, userId);
+    return ResponseEntity.ok(BaseResponse.success("영상이 삭제되었습니다.", null));
+  }
 
-    @Operation(
-        summary = "(위도,경도) -> 상호명 반환",
-        description = "영상들의 위도와 경도를 리스트로 요청하면 상호명을 리스트 순서대로 반환합니다.\n"
-            + "placeName 우선순위\n"
-            + "1순위 : 건물명 반환\n"
-            + "2순위 : 도로명 주소 반환(시/도 + 군까지)\n"
-            + "3순위 : 지번 주소 반환(시/도 + 군까지)\n"
-            + "1순위 없으면 -> 2순위, 2순위 없으면 -> 3순위"
-    )
-    @PostMapping("/placeNames")
-    public BaseResponse<List<PlaceNameResponse>> getPlaceNames(@RequestBody PlaceNameListRequest request) {
-        return BaseResponse.success(placeNameQueryUseCase.getPlaceNames(request.toCommand()));
-    }
+  @Operation(
+      summary = "영상들 gps 정보(위도,경도) -> 상호명 반환",
+      description = """
+          영상들의 위도와 경도를 리스트로 요청하면 상호명을 리스트 순서대로 반환합니다.<br>
+          placeName 우선순위<br>
+          - 1순위 : 건물명 반환<br>
+          - 2순위 : 도로명 주소 반환(시/도 + 군까지)<br>
+          - 3순위 : 지번 주소 반환(시/도 + 군까지)<br>
+          
+          1순위 없으면 -> 2순위, 2순위 없으면 -> 3순위
+          """
+  )
+  @PostMapping("/placeNames")
+  public BaseResponse<List<PlaceNameResponse>> getPlaceNames(
+      @RequestBody PlaceNameListRequest request) {
+    return BaseResponse.success(placeNameQueryUseCase.getPlaceNames(request.toCommand()));
+  }
 }
