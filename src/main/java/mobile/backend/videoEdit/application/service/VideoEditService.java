@@ -8,7 +8,9 @@ import mobile.backend.videoEdit.application.port.in.VideoEditQueryUseCase;
 import mobile.backend.videoEdit.application.port.out.VideoEditRepository;
 import mobile.backend.videoEdit.domain.command.CreateVideoEditCommand;
 import mobile.backend.videoEdit.domain.command.SearchBookmarkVideoEditCommand;
+import mobile.backend.videoEdit.domain.command.SearchSummaryVideoEditCommand;
 import mobile.backend.videoEdit.domain.command.SearchVideoEditCommand;
+import mobile.backend.videoEdit.domain.model.VideoEditSummary;
 import mobile.backend.videoEdit.domain.model.VideoEdit;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -84,6 +86,11 @@ public class VideoEditService implements VideoEditCommandUseCase, VideoEditQuery
 
         videoEdit.toggleBookmark();
         return videoEditRepository.save(videoEdit);
+    }
+
+    @Override
+    public List<VideoEditSummary> getDailySummary(SearchSummaryVideoEditCommand command) {
+        return videoEditRepository.findDailySummary(command);
     }
 
 }

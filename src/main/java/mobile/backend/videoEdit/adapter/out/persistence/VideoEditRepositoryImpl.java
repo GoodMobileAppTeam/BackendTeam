@@ -3,10 +3,13 @@ package mobile.backend.videoEdit.adapter.out.persistence;
 import lombok.RequiredArgsConstructor;
 import mobile.backend.global.exception.CustomException;
 import mobile.backend.videoEdit.adapter.out.persistence.entity.VideoEditEntity;
+import mobile.backend.videoEdit.adapter.out.persistence.jpa.VideoDailySummaryProjection;
 import mobile.backend.videoEdit.adapter.out.persistence.jpa.VideoEditJpaRepository;
 import mobile.backend.videoEdit.application.port.out.VideoEditRepository;
 import mobile.backend.videoEdit.domain.command.SearchBookmarkVideoEditCommand;
+import mobile.backend.videoEdit.domain.command.SearchSummaryVideoEditCommand;
 import mobile.backend.videoEdit.domain.command.SearchVideoEditCommand;
+import mobile.backend.videoEdit.domain.model.VideoEditSummary;
 import mobile.backend.videoEdit.domain.model.VideoEdit;
 import mobile.backend.videoEdit.exception.VideoErrorCode;
 import org.springframework.data.domain.PageRequest;
@@ -38,10 +41,15 @@ public class VideoEditRepositoryImpl implements VideoEditRepository {
     @Override
     public List<VideoEdit> search(SearchVideoEditCommand criteria) {
 
+        Pageable pageable = PageRequest.of(0, criteria.size());
+
         List<VideoEditEntity> entityList = jpaRepository.findByDateRange(
                 criteria.userId(),
                 criteria.startDate(),
-                criteria.endDate()
+                criteria.endDate(),
+                criteria.cursorDate(),
+                criteria.cursorId(),
+                pageable
         );
 
         return entityList.stream()
@@ -69,5 +77,19 @@ public class VideoEditRepositoryImpl implements VideoEditRepository {
     @Override
     public void delete(VideoEdit videoEdit) {
         jpaRepository.deleteById(videoEdit.getId());
+    }
+
+    @Override
+    public List<VideoEditSummary> findDailySummary(SearchSummaryVideoEditCommand command) {
+
+        List<VideoDailySummaryProjection> results = jpaRepository.findDailySummary(
+                        command.userId(),
+                        command.startDate(),
+                        command.endDate()
+                );
+
+        return results.stream()
+                .map(VideoEditSummary::fromProjection)
+                .toList();
     }
 }
