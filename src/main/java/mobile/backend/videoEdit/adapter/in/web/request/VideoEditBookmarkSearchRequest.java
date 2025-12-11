@@ -4,22 +4,14 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
-import mobile.backend.videoEdit.domain.command.SearchVideoEditCommand;
+import mobile.backend.videoEdit.domain.command.SearchBookmarkVideoEditCommand;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
 
-@Schema(description = "영상 검색 요청 DTO")
-public record VideoEditSearchRequest(
 
-        @NotNull
-        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-        LocalDate startDate,
-
-        @NotNull
-        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-        LocalDate endDate,
-
+@Schema(description = "북마크 영상 검색 요청 DTO")
+public record VideoEditBookmarkSearchRequest(
         @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
         LocalDate cursorDate,
 
@@ -30,8 +22,7 @@ public record VideoEditSearchRequest(
         @Max(50)
         Integer size
 ) {
-    public SearchVideoEditCommand toCommand(Long userId) {
-
-        return SearchVideoEditCommand.of(userId, startDate, endDate, cursorDate, cursorId, size);
+    public SearchBookmarkVideoEditCommand toCommand(Long userId) {
+        return new SearchBookmarkVideoEditCommand(userId, cursorDate, cursorId, size);
     }
 }
