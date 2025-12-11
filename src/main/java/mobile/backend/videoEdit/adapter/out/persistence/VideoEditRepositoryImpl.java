@@ -7,6 +7,7 @@ import mobile.backend.videoEdit.adapter.out.persistence.jpa.VideoDailySummaryPro
 import mobile.backend.videoEdit.adapter.out.persistence.jpa.VideoEditJpaRepository;
 import mobile.backend.videoEdit.application.port.out.VideoEditRepository;
 import mobile.backend.videoEdit.domain.command.SearchBookmarkVideoEditCommand;
+import mobile.backend.videoEdit.domain.command.SearchSummaryVideoEditCommand;
 import mobile.backend.videoEdit.domain.command.SearchVideoEditCommand;
 import mobile.backend.videoEdit.domain.model.VideoEditSummary;
 import mobile.backend.videoEdit.domain.model.VideoEdit;
@@ -39,6 +40,8 @@ public class VideoEditRepositoryImpl implements VideoEditRepository {
 
     @Override
     public List<VideoEdit> search(SearchVideoEditCommand criteria) {
+
+        Pageable pageable = PageRequest.of(0, criteria.size());
 
         List<VideoEditEntity> entityList = jpaRepository.findByDateRange(
                 criteria.userId(),
@@ -74,7 +77,7 @@ public class VideoEditRepositoryImpl implements VideoEditRepository {
     }
 
     @Override
-    public List<VideoEditSummary> findDailySummary(SearchVideoEditCommand command) {
+    public List<VideoEditSummary> findDailySummary(SearchSummaryVideoEditCommand command) {
 
         List<VideoDailySummaryProjection> results = jpaRepository.findDailySummary(
                         command.userId(),

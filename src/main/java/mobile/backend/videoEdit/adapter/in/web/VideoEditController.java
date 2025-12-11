@@ -8,6 +8,7 @@ import mobile.backend.global.adapter.in.web.response.BaseResponse;
 import mobile.backend.videoEdit.adapter.in.web.request.CreateVideoEditRequest;
 import mobile.backend.videoEdit.adapter.in.web.request.VideoEditBookmarkSearchRequest;
 import mobile.backend.videoEdit.adapter.in.web.request.VideoEditSearchRequest;
+import mobile.backend.videoEdit.adapter.in.web.request.VideoEditSummaryRequest;
 import mobile.backend.videoEdit.adapter.in.web.response.VideoEditBookmarkSearchResponse;
 import mobile.backend.videoEdit.adapter.in.web.response.VideoEditListResponse;
 import mobile.backend.videoEdit.adapter.in.web.response.VideoEditResponse;
@@ -15,6 +16,7 @@ import mobile.backend.videoEdit.adapter.in.web.response.VideoEditSummaryResponse
 import mobile.backend.videoEdit.application.port.in.*;
 import mobile.backend.videoEdit.domain.command.CreateVideoEditCommand;
 import mobile.backend.videoEdit.domain.command.SearchBookmarkVideoEditCommand;
+import mobile.backend.videoEdit.domain.command.SearchSummaryVideoEditCommand;
 import mobile.backend.videoEdit.domain.command.SearchVideoEditCommand;
 import mobile.backend.videoEdit.domain.model.VideoEdit;
 import mobile.backend.videoEdit.domain.model.VideoEditSummary;
@@ -130,9 +132,9 @@ public class VideoEditController {
     @GetMapping("/summary")
     public ResponseEntity<BaseResponse<List<VideoEditSummaryResponse>>> getDailySummary(
             @RequestHeader("X-User-Id") Long userId,
-            @Valid @ModelAttribute VideoEditSearchRequest request) {
+            @Valid @ModelAttribute VideoEditSummaryRequest request) {
 
-        SearchVideoEditCommand command = request.toCommand(userId);
+        SearchSummaryVideoEditCommand command = request.toCommand(userId);
 
         List<VideoEditSummary> summaries = videoEditQueryUseCase.getDailySummary(command);
 

@@ -8,6 +8,7 @@ import mobile.backend.videoEdit.application.port.in.VideoEditQueryUseCase;
 import mobile.backend.videoEdit.application.port.out.VideoEditRepository;
 import mobile.backend.videoEdit.domain.command.CreateVideoEditCommand;
 import mobile.backend.videoEdit.domain.command.SearchBookmarkVideoEditCommand;
+import mobile.backend.videoEdit.domain.command.SearchSummaryVideoEditCommand;
 import mobile.backend.videoEdit.domain.command.SearchVideoEditCommand;
 import mobile.backend.videoEdit.domain.model.VideoEditSummary;
 import mobile.backend.videoEdit.domain.model.VideoEdit;
@@ -88,7 +89,7 @@ public class VideoEditService implements VideoEditCommandUseCase, VideoEditQuery
     }
 
     @Override
-    public List<VideoEditSummary> getDailySummary(SearchVideoEditCommand command) {
+    public List<VideoEditSummary> getDailySummary(SearchSummaryVideoEditCommand command) {
         return videoEditRepository.findDailySummary(command);
     }
 

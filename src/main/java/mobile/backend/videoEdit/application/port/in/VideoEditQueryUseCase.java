@@ -1,6 +1,7 @@
 package mobile.backend.videoEdit.application.port.in;
 
 import mobile.backend.videoEdit.domain.command.SearchBookmarkVideoEditCommand;
+import mobile.backend.videoEdit.domain.command.SearchSummaryVideoEditCommand;
 import mobile.backend.videoEdit.domain.command.SearchVideoEditCommand;
 import mobile.backend.videoEdit.domain.model.VideoEditSummary;
 import mobile.backend.videoEdit.domain.model.VideoEdit;
@@ -11,5 +12,5 @@ public interface VideoEditQueryUseCase {
     VideoEdit getById(Long id, Long userId);
     List<VideoEdit> search(SearchVideoEditCommand criteria);
     List<VideoEdit> getBookmarkedVideos(SearchBookmarkVideoEditCommand command);
-    List<VideoEditSummary> getDailySummary(SearchVideoEditCommand criteria);
+    List<VideoEditSummary> getDailySummary(SearchSummaryVideoEditCommand criteria);
 }
