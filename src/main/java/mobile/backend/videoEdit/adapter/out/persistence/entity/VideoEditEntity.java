@@ -22,6 +22,10 @@ import java.time.LocalDate;
                 @Index(
                         name = "idx_video_user_save_time_desc",
                         columnList = "user_id, save_time DESC"
+                ),
+                @Index(
+                        name = "idx_user_save_created_desc",
+                        columnList = "user_id, save_time, created_at DESC"
                 )
         }
 )@Getter
