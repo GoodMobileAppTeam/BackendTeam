@@ -17,6 +17,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import mobile.backend.global.security.CustomUserDetails;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+
 
 @Tag(name = "Swagger 테스트용 auth API", description = "Swagger에서 기능 테스트를 위한 테스트용 회원가입, 로그인 API")
 @RestController
@@ -29,11 +33,16 @@ public class TestAuthController {
     @PostMapping("/test-signup")
     public ResponseEntity<BaseResponse<TestAuthResponse>> signup(
             @Valid @RequestBody TestSignupRequest request,
-            HttpServletResponse httpResponse) {  // ← 파라미터 추가
+            HttpServletResponse httpResponse) {
 
         AuthToken authToken = testAuthCommandUseCase.signup(request.toCommand());
 
-        // AccessToken을 Cookie로 설정 (아래 8줄 추가)
+        CustomUserDetails userDetails = new CustomUserDetails(authToken.getUserId());
+        UsernamePasswordAuthenticationToken authentication =
+                new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+
         ResponseCookie accessTokenCookie = ResponseCookie.from("accessToken", authToken.getAccessToken())
                 .httpOnly(true)
                 .secure(false)
@@ -42,7 +51,7 @@ public class TestAuthController {
                 .sameSite("Strict")
                 .build();
 
-        // RefreshToken을 Cookie로 설정 (아래 8줄 추가)
+
         ResponseCookie refreshTokenCookie = ResponseCookie.from("refreshToken", authToken.getRefreshToken())
                 .httpOnly(true)
                 .secure(false)
@@ -64,6 +73,11 @@ public class TestAuthController {
             HttpServletResponse httpResponse) {
 
         AuthToken authToken = testAuthCommandUseCase.login(request.toCommand());
+
+        CustomUserDetails userDetails = new CustomUserDetails(authToken.getUserId());
+        UsernamePasswordAuthenticationToken authentication =
+                new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+        SecurityContextHolder.getContext().setAuthentication(authentication);
 
         ResponseCookie accessTokenCookie = ResponseCookie.from("accessToken", authToken.getAccessToken())
                 .httpOnly(true)
