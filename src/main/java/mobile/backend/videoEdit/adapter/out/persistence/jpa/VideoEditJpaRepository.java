@@ -15,12 +15,20 @@ public interface VideoEditJpaRepository extends JpaRepository<VideoEditEntity, L
         SELECT v FROM VideoEditEntity v
         WHERE v.userId = :userId
         AND v.saveTime BETWEEN :startDate AND :endDate
-        ORDER BY v.saveTime DESC
+            AND (
+                :cursorDate IS NULL
+                OR v.saveTime < :cursorDate
+                OR (v.saveTime = :cursorDate AND v.id < :cursorId)
+            )
+        ORDER BY v.saveTime DESC, v.id DESC
     """)
     List<VideoEditEntity> findByDateRange(
             @Param("userId") Long userId,
             @Param("startDate") LocalDate startDate,
-            @Param("endDate") LocalDate endDate
+            @Param("endDate") LocalDate endDate,
+            @Param("cursorDate") LocalDate cursorDate,
+            @Param("cursorId") Long cursorId,
+            Pageable pageable
     );
 
     @Query("""

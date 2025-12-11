@@ -46,7 +46,10 @@ public class VideoEditRepositoryImpl implements VideoEditRepository {
         List<VideoEditEntity> entityList = jpaRepository.findByDateRange(
                 criteria.userId(),
                 criteria.startDate(),
-                criteria.endDate()
+                criteria.endDate(),
+                criteria.cursorDate(),
+                criteria.cursorId(),
+                pageable
         );
 
         return entityList.stream()

@@ -82,7 +82,7 @@ public class VideoEditController {
         SearchVideoEditCommand criteria = request.toCommand(userId);
 
         List<VideoEdit> result = videoEditQueryUseCase.search(criteria);
-        return ResponseEntity.ok(BaseResponse.success(VideoEditListResponse.from(result)));
+        return ResponseEntity.ok(BaseResponse.success(VideoEditListResponse.from(result, request.size())));
     }
 
     @Operation(
