@@ -24,15 +24,16 @@ public class KaKaoPlaceClient implements PlaceNameExternalApi {
   public PlaceNameResponse findPlaceName(LocationPointCommand command) {
 
     // https://dapi.kakao.com/v2/local/geo/coord2address.json?x=126.923728&y=37.556876
-    KaKaoReverseGeocodingResponse response = kakaoWebClient.get()
+    // WebClient를 사용해 카카오 coord2address API를 GET 호출 → JSON 응답을 자바 객체로 변환 → 동기적으로 가져오기
+    KaKaoReverseGeocodingResponse response = kakaoWebClient.get() // GET 메서드 사용
         .uri(uriBuilder -> uriBuilder
             .path("/v2/local/geo/coord2address.json")
             .queryParam("x", command.getLongitude()) // x : 경도(longitude)
             .queryParam("y", command.getLatitude()) // y : 위도(latitude)
-            .build())
-        .retrieve()
-        .bodyToMono(KaKaoReverseGeocodingResponse.class)
-        .block();
+            .build()) // 조합해서 url 만들기
+        .retrieve() // API 응답 받아오기
+        .bodyToMono(KaKaoReverseGeocodingResponse.class) // 응답 JSON 데이터를 응답 DTO로 역직렬화 (반환 타입은 Mono<T> [비동기식])
+        .block(); // WebClient는 원래 비동기 논블로킹이지만, Spring MVC의 동기방식에 맞게 block()을 사용해 카카오 API 서버에서 응답(JSON)이 올 때까지 기다림
 
     String placeName = extractPlaceName(response);
 
@@ -47,8 +48,8 @@ public class KaKaoPlaceClient implements PlaceNameExternalApi {
 
     KaKaoReverseDocument document = response.getDocuments().getFirst();
 
-    KaKaoRoadAddress roadAddress = document.getRoadAddress();
-    KaKaoAddress address = document.getAddress();
+    KaKaoRoadAddress roadAddress = document.getRoadAddress(); // 도로명 주소
+    KaKaoAddress address = document.getAddress(); // 지번 주소
 
     // 1순위 : 건물명
     if (roadAddress != null && StringUtils.hasText(roadAddress.getBuildingName())) {

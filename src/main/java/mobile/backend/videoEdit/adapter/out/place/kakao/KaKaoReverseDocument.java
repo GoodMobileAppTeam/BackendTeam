@@ -12,10 +12,12 @@ import lombok.NoArgsConstructor;
  *
  * 실제 JSON:
  * <pre><code>
- * {
- *   "road_address": {...},
- *   "address": {...}
- * }
+ * "documents": [
+ *  {
+ *    "road_address": {...},
+ *    "address": {...}
+ *  }
+ * ]
  * </code></pre>
  */
 @Getter
