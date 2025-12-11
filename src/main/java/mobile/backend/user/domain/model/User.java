@@ -3,6 +3,7 @@ package mobile.backend.user.domain.model;
 import java.time.LocalDateTime;
 import lombok.Getter;
 
+
 @Getter
 public class User {
 
@@ -19,6 +20,7 @@ public class User {
   private final String profileImageUrl;
 
   private final LocalDateTime createdAt;
+
 
   private User(Long id, String name, String socialId, SocialType socialType, String profileImageUrl, LocalDateTime createdAt) {
     this.id = id;
@@ -48,6 +50,5 @@ public class User {
   public static String getProfileImagePath(String uuid) {
     return String.format(PROFILE_IMAGE_PATH, uuid);
   }
-
 
 }
