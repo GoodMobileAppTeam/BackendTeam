@@ -18,6 +18,9 @@ public record VideoEditResponse(
         @Schema(description = "사용자 ID", example = "1")
         Long userId,
 
+        @Schema(description = "영상 제목", example = "오늘의 영상")
+        String title,
+
         @Schema(description = "영상 길이 (초)", example = "45")
         Integer duration,
 
@@ -32,10 +35,8 @@ public record VideoEditResponse(
         boolean isBookMarked,
 
         @Schema(description = "썸네일 URL", example = "https://bucket.s3.amazonaws.com/thumbnails/uuid.jpg")
-        String thumbnailUrl,
+        String thumbnailUrl
 
-        @Schema(description = "영상 설명", example = "오늘의 운동 영상")
-        String description
 
 ) {
     public static VideoEditResponse from(VideoEdit domain) {
@@ -43,12 +44,12 @@ public record VideoEditResponse(
                 domain.getId(),
                 domain.getAlbumId(),
                 domain.getUserId(),
+                domain.getTitle(),
                 domain.getDuration(),
                 domain.getVideoUrl(),
                 domain.getSaveTime(),
                 domain.isBookMarked(),
-                domain.getThumbnailUrl(),
-                domain.getDescription()
+                domain.getThumbnailUrl()
         );
     }
 }

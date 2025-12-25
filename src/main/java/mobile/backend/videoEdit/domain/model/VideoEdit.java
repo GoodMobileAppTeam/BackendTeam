@@ -11,20 +11,20 @@ public class VideoEdit {
     private final Long id;
     private final Long albumId;
     private final Long userId;
+    private final String title;
     private final Integer duration;
     private final String videoUrl;
     private final LocalDate saveTime;
     private boolean isBookMarked;
     private String thumbnailUrl;
-    private String description;
 
     private String bgmKey;
 
     private static final int MAX_DURATION_SECONDS = 60;
 
-    private VideoEdit(Long id, Long albumId, Long userId, Integer duration,
+    private VideoEdit(Long id, Long albumId, Long userId, String title, Integer duration,
                       String videoUrl, LocalDate saveTime,
-                      boolean isBookMarked, String thumbnailUrl, String description, String bgmKey) {
+                      boolean isBookMarked, String thumbnailUrl, String bgmKey) {
         this.id = id;
         this.albumId = albumId;
         this.userId = userId;
@@ -33,29 +33,28 @@ public class VideoEdit {
         this.saveTime = saveTime;
         this.isBookMarked = isBookMarked;
         this.thumbnailUrl = thumbnailUrl;
-        this.description = description;
         this.bgmKey = bgmKey;
     }
 
     // 새 영상 생성용 팩토리 메서드
-    public static VideoEdit create(Long albumId, Long userId, Integer duration,
-                                   String videoUrl, LocalDate saveTime, String thumbnailUrl, String description, String bgmKey) {
+    public static VideoEdit create(Long albumId, Long userId, String title, Integer duration,
+                                   String videoUrl, LocalDate saveTime, String thumbnailUrl, String bgmKey) {
         validateDuration(duration);
 
 
         return new VideoEdit(
-                null, albumId, userId, duration, videoUrl,
-                saveTime, false, thumbnailUrl, description, bgmKey
+                null, albumId, userId, title, duration, videoUrl,
+                saveTime, false, thumbnailUrl, bgmKey
         );
     }
 
     // DB에서 복원용 팩토리 메서드
-    public static VideoEdit from(Long id, Long albumId, Long userId,
+    public static VideoEdit from(Long id, Long albumId, Long userId, String title,
                                          Integer duration, String videoUrl,
                                          LocalDate saveTime,
-                                         boolean isBookMarked, String thumbnailUrl, String description, String bgmKey) {
-        return new VideoEdit(id, albumId, userId, duration, videoUrl,
-                saveTime, isBookMarked, thumbnailUrl, description, bgmKey);
+                                         boolean isBookMarked, String thumbnailUrl, String bgmKey) {
+        return new VideoEdit(id, albumId, userId, title, duration, videoUrl,
+                saveTime, isBookMarked, thumbnailUrl, bgmKey);
     }
 
     private static void validateDuration(Integer duration) {
@@ -82,13 +81,5 @@ public class VideoEdit {
         if (!videoEdit.isOwnedBy(userId)) {
             throw new CustomException(VideoErrorCode.VIDEO_ACCESS_DENIED);
         }
-    }
-
-    public void setBgm(String bgmKey) {
-        this.bgmKey = bgmKey;
-    }
-
-    public void clearBgm() {
-        this.bgmKey = null;
     }
 }

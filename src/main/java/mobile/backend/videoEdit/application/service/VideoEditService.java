@@ -38,11 +38,11 @@ public class VideoEditService implements VideoEditCommandUseCase, VideoEditQuery
         VideoEdit videoEdit = VideoEdit.create(
                 command.albumId(),
                 command.userId(),
+                command.title(),
                 command.duration(),
                 command.videoUrl(),
                 command.saveTime(),
                 thumbnailUrl,
-                command.description(),
                 command.bgmKey()
         );
 
