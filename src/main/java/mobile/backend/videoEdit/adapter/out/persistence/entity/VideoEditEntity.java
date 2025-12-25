@@ -20,12 +20,8 @@ import java.time.LocalDate;
         name = "video_edit",
         indexes = {
                 @Index(
-                        name = "idx_video_user_save_time_desc",
-                        columnList = "user_id, save_time DESC"
-                ),
-                @Index(
-                        name = "idx_user_save_created_desc",
-                        columnList = "user_id, save_time, created_at DESC"
+                        name = "idx_video_user_cursor_desc",
+                        columnList = "user_id, save_time, created_at DESC, id DESC"
                 )
         }
 )@Getter
@@ -97,6 +93,7 @@ public class VideoEditEntity extends BaseTimeEntity {
                 entity.getDuration(),
                 entity.getVideoUrl(),
                 entity.getSaveTime(),
+                entity.getCreatedAt(),
                 Boolean.TRUE.equals(entity.getIsBookMark()),
                 entity.getThumbnailUrl(),
                 entity.getBgmKey()

@@ -7,6 +7,7 @@ import mobile.backend.videoEdit.application.port.in.VideoEditCommandUseCase;
 import mobile.backend.videoEdit.application.port.in.VideoEditQueryUseCase;
 import mobile.backend.videoEdit.application.port.out.VideoEditRepository;
 import mobile.backend.videoEdit.domain.command.CreateVideoEditCommand;
+import mobile.backend.videoEdit.domain.command.ScrollDirection;
 import mobile.backend.videoEdit.domain.command.SearchBookmarkVideoEditCommand;
 import mobile.backend.videoEdit.domain.command.SearchSummaryVideoEditCommand;
 import mobile.backend.videoEdit.domain.command.SearchVideoEditCommand;
@@ -57,8 +58,16 @@ public class VideoEditService implements VideoEditCommandUseCase, VideoEditQuery
     }
 
     @Override
-    public List<VideoEdit> search(SearchVideoEditCommand criteria) {
-        return videoEditRepository.search(criteria);
+    public List<VideoEdit> search(SearchVideoEditCommand command) {
+
+        List<VideoEdit> result = videoEditRepository.search(command);
+
+        if (command.direction() == ScrollDirection.INIT && result.isEmpty()) {
+            // 빈 응답 정책 (기획에 따라 변동 가능)
+            return List.of();
+        }
+
+        return result;
     }
 
     @Override

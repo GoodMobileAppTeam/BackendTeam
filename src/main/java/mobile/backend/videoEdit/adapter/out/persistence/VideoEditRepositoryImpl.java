@@ -16,6 +16,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collections;
 import java.util.List;
 
 @Repository
@@ -39,22 +40,47 @@ public class VideoEditRepositoryImpl implements VideoEditRepository {
     }
 
     @Override
-    public List<VideoEdit> search(SearchVideoEditCommand criteria) {
+    public List<VideoEdit> search(SearchVideoEditCommand command) {
 
-        Pageable pageable = PageRequest.of(0, criteria.size());
+        Pageable pageable = PageRequest.of(0, command.size());
 
-        List<VideoEditEntity> entityList = jpaRepository.findByDateRange(
-                criteria.userId(),
-                criteria.startDate(),
-                criteria.endDate(),
-                criteria.cursorDate(),
-                criteria.cursorId(),
-                pageable
-        );
+        List<VideoEditEntity> entities = switch (command.direction()) {
 
-        return entityList.stream()
+            case INIT -> jpaRepository.findInitPage(
+                    command.userId(),
+                    command.baseDateEnd(),
+                    pageable
+            );
+
+            case DOWN -> jpaRepository.findNextPage(
+                    command.userId(),
+                    command.cursorSaveTime(),
+                    command.cursorCreatedAt(),
+                    command.cursorId(),
+                    pageable
+            );
+
+            case UP -> {
+                List<VideoEditEntity> result =
+                        jpaRepository.findPrevPage(
+                                command.userId(),
+                                command.cursorSaveTime(),
+                                command.cursorCreatedAt(),
+                                command.cursorId(),
+                                pageable
+                        );
+                yield reverse(result);
+            }
+        };
+
+        return entities.stream()
                 .map(VideoEditEntity::toDomain)
                 .toList();
+    }
+
+    private List<VideoEditEntity> reverse(List<VideoEditEntity> list) {
+        Collections.reverse(list);
+        return list;
     }
 
     @Override

@@ -7,26 +7,83 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface VideoEditJpaRepository extends JpaRepository<VideoEditEntity, Long> {
 
     @Query("""
-        SELECT v FROM VideoEditEntity v
-        WHERE v.userId = :userId
-        AND v.saveTime BETWEEN :startDate AND :endDate
-            AND (
-                :cursorDate IS NULL
-                OR v.saveTime < :cursorDate
-                OR (v.saveTime = :cursorDate AND v.id < :cursorId)
+    SELECT v
+    FROM VideoEditEntity v
+    WHERE v.userId = :userId
+      AND v.saveTime <= :baseDateEnd
+    ORDER BY
+      v.saveTime DESC,
+      v.createdAt DESC,
+      v.id DESC
+""")
+    List<VideoEditEntity> findInitPage(
+            Long userId,
+            LocalDate baseDateEnd,
+            Pageable pageable
+    );
+
+    @Query("""
+    SELECT v
+    FROM VideoEditEntity v
+    WHERE v.userId = :userId
+      AND (
+        v.saveTime < :cursorSaveTime
+        OR (
+          v.saveTime = :cursorSaveTime
+          AND (
+            v.createdAt < :cursorCreatedAt
+            OR (
+              v.createdAt = :cursorCreatedAt
+              AND v.id < :cursorId
             )
-        ORDER BY v.saveTime DESC, v.id DESC
-    """)
-    List<VideoEditEntity> findByDateRange(
+          )
+        )
+      )
+    ORDER BY
+      v.saveTime DESC,
+      v.createdAt DESC,
+      v.id DESC
+""")
+    List<VideoEditEntity> findNextPage(
             @Param("userId") Long userId,
-            @Param("startDate") LocalDate startDate,
-            @Param("endDate") LocalDate endDate,
-            @Param("cursorDate") LocalDate cursorDate,
+            @Param("cursorSaveTime") LocalDate cursorSaveTime,
+            @Param("cursorCreatedAt") LocalDateTime cursorCreatedAt,
+            @Param("cursorId") Long cursorId,
+            Pageable pageable
+    );
+
+    @Query("""
+    SELECT v
+    FROM VideoEditEntity v
+    WHERE v.userId = :userId
+      AND (
+        v.saveTime > :cursorSaveTime
+        OR (
+          v.saveTime = :cursorSaveTime
+          AND (
+            v.createdAt > :cursorCreatedAt
+            OR (
+              v.createdAt = :cursorCreatedAt
+              AND v.id > :cursorId
+            )
+          )
+        )
+      )
+    ORDER BY
+      v.saveTime ASC,
+      v.createdAt ASC,
+      v.id ASC
+""")
+    List<VideoEditEntity> findPrevPage(
+            @Param("userId") Long userId,
+            @Param("cursorSaveTime") LocalDate cursorSaveTime,
+            @Param("cursorCreatedAt") LocalDateTime cursorCreatedAt,
             @Param("cursorId") Long cursorId,
             Pageable pageable
     );

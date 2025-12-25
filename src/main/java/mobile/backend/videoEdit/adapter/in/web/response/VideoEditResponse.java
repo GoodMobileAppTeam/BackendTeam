@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import mobile.backend.videoEdit.domain.model.VideoEdit;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Schema(description = "영상 응답 DTO")
 public record VideoEditResponse(
@@ -31,6 +32,13 @@ public record VideoEditResponse(
         @JsonFormat(pattern = "yyyy-MM-dd")
         LocalDate saveTime,
 
+        @Schema(description = "실제 db에 저장된 날자", example = "2025-04-01T00:10:00")
+        @JsonFormat(
+                shape = JsonFormat.Shape.STRING,
+                pattern = "yyyy-MM-dd'T'HH:mm:ss"
+        )
+        LocalDateTime createdAt,
+
         @Schema(description = "북마크 여부", example = "false")
         boolean isBookMarked,
 
@@ -48,6 +56,7 @@ public record VideoEditResponse(
                 domain.getDuration(),
                 domain.getVideoUrl(),
                 domain.getSaveTime(),
+                domain.getCreatedAt(),
                 domain.isBookMarked(),
                 domain.getThumbnailUrl()
         );

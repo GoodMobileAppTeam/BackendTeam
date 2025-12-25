@@ -5,6 +5,7 @@ import mobile.backend.global.exception.CustomException;
 import mobile.backend.videoEdit.exception.VideoErrorCode;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Getter
 public class VideoEdit {
@@ -15,6 +16,7 @@ public class VideoEdit {
     private final Integer duration;
     private final String videoUrl;
     private final LocalDate saveTime;
+    private final LocalDateTime createdAt;
     private boolean isBookMarked;
     private String thumbnailUrl;
 
@@ -23,14 +25,16 @@ public class VideoEdit {
     private static final int MAX_DURATION_SECONDS = 60;
 
     private VideoEdit(Long id, Long albumId, Long userId, String title, Integer duration,
-                      String videoUrl, LocalDate saveTime,
+                      String videoUrl, LocalDate saveTime, LocalDateTime createdAt,
                       boolean isBookMarked, String thumbnailUrl, String bgmKey) {
         this.id = id;
         this.albumId = albumId;
         this.userId = userId;
+        this.title = title;
         this.duration = duration;
         this.videoUrl = videoUrl;
         this.saveTime = saveTime;
+        this.createdAt = createdAt;
         this.isBookMarked = isBookMarked;
         this.thumbnailUrl = thumbnailUrl;
         this.bgmKey = bgmKey;
@@ -44,17 +48,17 @@ public class VideoEdit {
 
         return new VideoEdit(
                 null, albumId, userId, title, duration, videoUrl,
-                saveTime, false, thumbnailUrl, bgmKey
+                saveTime, null, false, thumbnailUrl, bgmKey
         );
     }
 
     // DB에서 복원용 팩토리 메서드
     public static VideoEdit from(Long id, Long albumId, Long userId, String title,
                                          Integer duration, String videoUrl,
-                                         LocalDate saveTime,
+                                         LocalDate saveTime, LocalDateTime createdAt,
                                          boolean isBookMarked, String thumbnailUrl, String bgmKey) {
         return new VideoEdit(id, albumId, userId, title, duration, videoUrl,
-                saveTime, isBookMarked, thumbnailUrl, bgmKey);
+                saveTime, createdAt, isBookMarked, thumbnailUrl, bgmKey);
     }
 
     private static void validateDuration(Integer duration) {
