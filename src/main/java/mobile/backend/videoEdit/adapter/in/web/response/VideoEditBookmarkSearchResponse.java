@@ -6,7 +6,7 @@ import mobile.backend.videoEdit.domain.model.VideoEdit;
 import java.time.LocalDate;
 import java.util.List;
 
-@Schema(description = "북마크 영상 목록 응답 DTO (커서 페이징)")
+@Schema(description = "북마크 영상 목록 응답 DTO")
 public record  VideoEditBookmarkSearchResponse(
         List<VideoEditResponse> content,
         LocalDate nextCursorDate,
