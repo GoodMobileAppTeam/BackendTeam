@@ -87,25 +87,89 @@ public interface VideoEditJpaRepository extends JpaRepository<VideoEditEntity, L
             @Param("cursorId") Long cursorId,
             Pageable pageable
     );
+/* ====  */
 
     @Query("""
-        SELECT v FROM VideoEditEntity v
+        SELECT v
+        FROM VideoEditEntity v
         WHERE v.userId = :userId
-            AND v.isBookMark = true
-            AND (
-                :cursorDate IS NULL
-                OR v.saveTime < :cursorDate
-                OR (v.saveTime = :cursorDate AND v.id < :cursorId)
-            )
-        ORDER BY v.saveTime DESC, v.id DESC
+          AND v.isBookMark = true
+          AND v.saveTime <= :baseDateEnd
+        ORDER BY
+          v.saveTime DESC,
+          v.createdAt DESC,
+          v.id DESC
     """)
-    List<VideoEditEntity> findBookmarkedByCursor(
+    List<VideoEditEntity> findBookmarkedInitPage(
             @Param("userId") Long userId,
-            @Param("cursorDate") LocalDate cursorDate,
+            @Param("baseDateEnd") LocalDate baseDateEnd,
+            Pageable pageable
+    );
+
+    @Query("""
+        SELECT v
+        FROM VideoEditEntity v
+        WHERE v.userId = :userId
+          AND v.isBookMark = true
+          AND (
+            v.saveTime < :cursorSaveTime
+            OR (
+              v.saveTime = :cursorSaveTime
+              AND (
+                v.createdAt < :cursorCreatedAt
+                OR (
+                  v.createdAt = :cursorCreatedAt
+                  AND v.id < :cursorId
+                )
+              )
+            )
+          )
+        ORDER BY
+          v.saveTime DESC,
+          v.createdAt DESC,
+          v.id DESC
+    """)
+    List<VideoEditEntity> findBookmarkedNextPage(
+            @Param("userId") Long userId,
+            @Param("cursorSaveTime") LocalDate cursorSaveTime,
+            @Param("cursorCreatedAt") LocalDateTime cursorCreatedAt,
             @Param("cursorId") Long cursorId,
             Pageable pageable
     );
 
+    @Query("""
+        SELECT v
+        FROM VideoEditEntity v
+        WHERE v.userId = :userId
+          AND v.isBookMark = true
+          AND (
+            v.saveTime > :cursorSaveTime
+            OR (
+              v.saveTime = :cursorSaveTime
+              AND (
+                v.createdAt > :cursorCreatedAt
+                OR (
+                  v.createdAt = :cursorCreatedAt
+                  AND v.id > :cursorId
+                )
+              )
+            )
+          )
+        ORDER BY
+          v.saveTime ASC,
+          v.createdAt ASC,
+          v.id ASC
+    """)
+    List<VideoEditEntity> findBookmarkedPrevPage(
+            @Param("userId") Long userId,
+            @Param("cursorSaveTime") LocalDate cursorSaveTime,
+            @Param("cursorCreatedAt") LocalDateTime cursorCreatedAt,
+            @Param("cursorId") Long cursorId,
+            Pageable pageable
+    );
+
+
+    /* ==== */
     @Query(value = """
     SELECT 
         v.save_time AS saveTime,
