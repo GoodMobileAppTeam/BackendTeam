@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Schema(description = "영상 목록 응답 DTO")
-public record VideoEditListResponse(
+public record VideoEditSearchResponse(
 
         List<VideoEditResponse> content,
 
@@ -19,7 +19,7 @@ public record VideoEditListResponse(
         boolean hasNext
 ) {
 
-    public static VideoEditListResponse from(
+    public static VideoEditSearchResponse from(
             List<VideoEdit> videos,
             int size
     ) {
@@ -36,7 +36,7 @@ public record VideoEditListResponse(
             id = last.getId();
         }
 
-        return new VideoEditListResponse(
+        return new VideoEditSearchResponse(
                 videos.stream().map(VideoEditResponse::from).toList(),
                 saveTime,
                 createdAt,
