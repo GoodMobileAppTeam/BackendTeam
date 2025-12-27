@@ -21,7 +21,7 @@ import java.time.LocalDate;
         indexes = {
                 @Index(
                         name = "idx_video_user_cursor_desc",
-                        columnList = "user_id, save_time, created_at DESC, id DESC"
+                        columnList = "user_id, is_book_mark, save_time DESC, created_at DESC, id DESC"
                 )
         }
 )@Getter
@@ -50,7 +50,7 @@ public class VideoEditEntity extends BaseTimeEntity {
     @Column(name = "save_time", nullable = false)
     private LocalDate saveTime;
 
-    @Column(name = "is_book_mark")
+    @Column(name = "is_book_mark", nullable = false)
     private Boolean isBookMark;
 
     @Column(name = "thumbnail_url")
