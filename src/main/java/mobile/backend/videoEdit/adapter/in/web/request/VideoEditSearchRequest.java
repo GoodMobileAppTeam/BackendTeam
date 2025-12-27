@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
+import mobile.backend.videoEdit.application.service.Cursor;
 import mobile.backend.videoEdit.domain.command.ScrollDirection;
 import mobile.backend.videoEdit.domain.command.SearchVideoEditCommand;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -17,11 +18,11 @@ public record VideoEditSearchRequest(
         @NotNull
         ScrollDirection direction,
 
-        // INIT 전용
+        // INIT
         @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
         LocalDate baseDateEnd,
 
-        // 커서
+        // CURSOR
         @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
         LocalDate cursorSaveTime,
 
@@ -30,29 +31,30 @@ public record VideoEditSearchRequest(
 
         Long cursorId,
 
-        @NotNull
         @Min(1)
         @Max(50)
-        Integer size
+        int size
 ) {
 
-    public SearchVideoEditCommand toCommand(Long userId) {
+    public SearchVideoEditCommand toCommand(Long userId, boolean onlyBookMarked) {
 
         return switch (direction) {
             case INIT -> SearchVideoEditCommand.init(
                     userId,
                     baseDateEnd,
+                    onlyBookMarked,
                     size
             );
+
             case DOWN, UP -> SearchVideoEditCommand.scroll(
                     userId,
-                    cursorSaveTime,
-                    cursorCreatedAt,
-                    cursorId,
                     direction,
+                    Cursor.of(cursorSaveTime, cursorCreatedAt, cursorId),
+                    onlyBookMarked,
                     size
             );
         };
     }
 }
+
 

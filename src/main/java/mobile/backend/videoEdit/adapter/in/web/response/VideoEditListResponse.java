@@ -7,7 +7,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Schema(description = "보드 영상 목록 응답 DTO")
+@Schema(description = "영상 목록 응답 DTO")
 public record VideoEditListResponse(
 
         List<VideoEditResponse> content,
@@ -32,7 +32,7 @@ public record VideoEditListResponse(
         if (hasNext) {
             VideoEdit last = videos.get(videos.size() - 1);
             saveTime = last.getSaveTime();
-            createdAt = last.getCreatedAt(); // domain에 반드시 있어야 함
+            createdAt = last.getCreatedAt();
             id = last.getId();
         }
 
