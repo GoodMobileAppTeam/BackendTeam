@@ -95,17 +95,18 @@ public class VideoEditController {
     }
 
     @Operation(
-            summary = "영상 목록 조회",
-            description = "날짜 범위에 맞는 목록을 반환 (yyyy-MM-dd 형식 사용, 커서 페이징 사용)"
+            summary = "보드 영상 목록 조회",
+            description = "사용자의 영상 목록을 커서 페이징하여 조회합니다."
     )
     @GetMapping
     public ResponseEntity<BaseResponse<VideoEditListResponse>> search(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @Valid @ModelAttribute VideoEditSearchRequest request) {
 
-        SearchVideoEditCommand criteria = request.toCommand(userDetails.getUserId());
+        SearchVideoEditCommand command = request.toCommand(userDetails.getUserId());
 
-        List<VideoEdit> result = videoEditQueryUseCase.search(criteria);
+        List<VideoEdit> result = videoEditQueryUseCase.search(command);
+
         return ResponseEntity.ok(BaseResponse.success(VideoEditListResponse.from(result, request.size())));
     }
 
@@ -120,10 +121,9 @@ public class VideoEditController {
 
         SearchBookmarkVideoEditCommand command = request.toCommand(userDetails.getUserId());
 
-        List<VideoEdit> result = videoEditQueryUseCase.getBookmarkedVideos(command);
+        List<VideoEdit> result = videoEditQueryUseCase.search(command);
 
-        return ResponseEntity.ok(BaseResponse.success(VideoEditBookmarkSearchResponse.from(result, request.size()))
-        );
+        return ResponseEntity.ok(BaseResponse.success(VideoEditListResponse.from(result, request.size())));
     }
 
     @Operation(
