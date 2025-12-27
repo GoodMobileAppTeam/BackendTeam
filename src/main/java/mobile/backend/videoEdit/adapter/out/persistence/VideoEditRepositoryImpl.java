@@ -6,7 +6,7 @@ import mobile.backend.videoEdit.adapter.out.persistence.entity.VideoEditEntity;
 import mobile.backend.videoEdit.adapter.out.persistence.jpa.VideoDailySummaryProjection;
 import mobile.backend.videoEdit.adapter.out.persistence.jpa.VideoEditJpaRepository;
 import mobile.backend.videoEdit.application.port.out.VideoEditRepository;
-import mobile.backend.videoEdit.domain.command.SearchBookmarkVideoEditCommand;
+import mobile.backend.videoEdit.domain.command.ScrollDirection;
 import mobile.backend.videoEdit.domain.command.SearchSummaryVideoEditCommand;
 import mobile.backend.videoEdit.domain.command.SearchVideoEditCommand;
 import mobile.backend.videoEdit.domain.model.VideoEditSummary;
@@ -44,58 +44,13 @@ public class VideoEditRepositoryImpl implements VideoEditRepository {
 
         Pageable pageable = PageRequest.of(0, command.size());
 
-        List<VideoEditEntity> entities = switch (command.direction()) {
+        List<VideoEditEntity> result = jpaRepository.search(command, pageable);
 
-            case INIT -> jpaRepository.findInitPage(
-                    command.userId(),
-                    command.baseDateEnd(),
-                    pageable
-            );
+        if (command.direction() == ScrollDirection.UP) {
+            Collections.reverse(result);
+        }
 
-            case DOWN -> jpaRepository.findNextPage(
-                    command.userId(),
-                    command.cursorSaveTime(),
-                    command.cursorCreatedAt(),
-                    command.cursorId(),
-                    pageable
-            );
-
-            case UP -> {
-                List<VideoEditEntity> result =
-                        jpaRepository.findPrevPage(
-                                command.userId(),
-                                command.cursorSaveTime(),
-                                command.cursorCreatedAt(),
-                                command.cursorId(),
-                                pageable
-                        );
-                yield reverse(result);
-            }
-        };
-
-        return entities.stream()
-                .map(VideoEditEntity::toDomain)
-                .toList();
-    }
-
-    private List<VideoEditEntity> reverse(List<VideoEditEntity> list) {
-        Collections.reverse(list);
-        return list;
-    }
-
-    @Override
-    public List<VideoEdit> bookmarkSearch(SearchBookmarkVideoEditCommand command) {
-
-        Pageable pageable = PageRequest.of(0, command.size());
-
-        List<VideoEditEntity> entities = jpaRepository.findBookmarkedByCursor(
-                        command.userId(),
-                        command.cursorDate(),
-                        command.cursorId(),
-                        pageable
-                );
-
-        return entities.stream()
+        return result.stream()
                 .map(VideoEditEntity::toDomain)
                 .toList();
     }
