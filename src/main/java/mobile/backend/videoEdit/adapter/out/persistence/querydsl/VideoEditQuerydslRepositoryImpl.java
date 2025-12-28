@@ -9,7 +9,6 @@ import mobile.backend.videoEdit.adapter.out.persistence.entity.VideoEditEntity;
 import mobile.backend.videoEdit.application.service.Cursor;
 import mobile.backend.videoEdit.domain.command.ScrollDirection;
 import mobile.backend.videoEdit.domain.command.SearchVideoEditCommand;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -22,7 +21,7 @@ public class VideoEditQuerydslRepositoryImpl implements VideoEditQuerydslReposit
     private static final QVideoEditEntity v = QVideoEditEntity.videoEditEntity;
 
     @Override
-    public List<VideoEditEntity> search(SearchVideoEditCommand command, Pageable pageable) {
+    public List<VideoEditEntity> search(SearchVideoEditCommand command, int sizePlusOne) {
 
         return queryFactory
                 .selectFrom(v)
@@ -33,8 +32,52 @@ public class VideoEditQuerydslRepositoryImpl implements VideoEditQuerydslReposit
                         cursorCondition(command)
                 )
                 .orderBy(orderSpecifiers(command.direction()))
-                .limit(pageable.getPageSize())
+                .limit(sizePlusOne)
                 .fetch();
+    }
+
+    @Override
+    public boolean existsBefore(SearchVideoEditCommand command, VideoEditEntity first) {
+
+        Integer result = queryFactory
+                .selectOne()
+                .from(v)
+                .where(
+                        v.userId.eq(command.userId()),
+                        bookmarkCondition(command.onlyBookMarked()),
+                        v.saveTime.gt(first.getSaveTime())
+                                .or(v.saveTime.eq(first.getSaveTime())
+                                        .and(v.createdAt.gt(first.getCreatedAt()))
+                                        .or(v.saveTime.eq(first.getSaveTime())
+                                                .and(v.createdAt.eq(first.getCreatedAt()))
+                                                .and(v.id.gt(first.getId()))))
+                )
+                .limit(1)
+                .fetchFirst();
+
+        return result != null;
+    }
+
+    @Override
+    public boolean existsAfter(SearchVideoEditCommand command, VideoEditEntity last) {
+
+        Integer result = queryFactory
+                .selectOne()
+                .from(v)
+                .where(
+                        v.userId.eq(command.userId()),
+                        bookmarkCondition(command.onlyBookMarked()),
+                        v.saveTime.lt(last.getSaveTime())
+                                .or(v.saveTime.eq(last.getSaveTime())
+                                        .and(v.createdAt.lt(last.getCreatedAt()))
+                                        .or(v.saveTime.eq(last.getSaveTime())
+                                                .and(v.createdAt.eq(last.getCreatedAt()))
+                                                .and(v.id.lt(last.getId()))))
+                )
+                .limit(1)
+                .fetchFirst();
+
+        return result != null;
     }
 
     private BooleanExpression bookmarkCondition(boolean onlyBookMarked) {
