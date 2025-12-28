@@ -57,15 +57,8 @@ public class VideoEditService implements VideoEditCommandUseCase, VideoEditQuery
     }
 
     @Override
-    public List<VideoEdit> search(SearchVideoEditCommand command) {
-
-        List<VideoEdit> result = videoEditRepository.search(command);
-
-        if (command.direction() == ScrollDirection.INIT && result.isEmpty()) {
-            return List.of();
-        }
-
-        return result;
+    public CursorPageResult<VideoEdit> search(SearchVideoEditCommand command) {
+        return videoEditRepository.search(command);
     }
 
     @Override

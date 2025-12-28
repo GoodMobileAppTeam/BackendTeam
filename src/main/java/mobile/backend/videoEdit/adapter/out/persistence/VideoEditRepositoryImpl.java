@@ -5,15 +5,15 @@ import mobile.backend.global.exception.CustomException;
 import mobile.backend.videoEdit.adapter.out.persistence.entity.VideoEditEntity;
 import mobile.backend.videoEdit.adapter.out.persistence.jpa.VideoDailySummaryProjection;
 import mobile.backend.videoEdit.adapter.out.persistence.jpa.VideoEditJpaRepository;
+import mobile.backend.videoEdit.adapter.out.persistence.querydsl.VideoEditQuerydslRepository;
 import mobile.backend.videoEdit.application.port.out.VideoEditRepository;
+import mobile.backend.videoEdit.application.service.CursorPageResult;
 import mobile.backend.videoEdit.domain.command.ScrollDirection;
 import mobile.backend.videoEdit.domain.command.SearchSummaryVideoEditCommand;
 import mobile.backend.videoEdit.domain.command.SearchVideoEditCommand;
 import mobile.backend.videoEdit.domain.model.VideoEditSummary;
 import mobile.backend.videoEdit.domain.model.VideoEdit;
 import mobile.backend.videoEdit.exception.VideoErrorCode;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import java.util.Collections;
@@ -24,6 +24,7 @@ import java.util.List;
 public class VideoEditRepositoryImpl implements VideoEditRepository {
 
     private final VideoEditJpaRepository jpaRepository;
+    private final VideoEditQuerydslRepository querydslRepository;
 
     @Override
     public VideoEdit save(VideoEdit videoEdit) {
@@ -40,19 +41,33 @@ public class VideoEditRepositoryImpl implements VideoEditRepository {
     }
 
     @Override
-    public List<VideoEdit> search(SearchVideoEditCommand command) {
+    public CursorPageResult<VideoEdit> search(SearchVideoEditCommand command) {
 
-        Pageable pageable = PageRequest.of(0, command.size());
+        int sizePlusOne = command.size() + 1;
 
-        List<VideoEditEntity> result = jpaRepository.search(command, pageable);
+        List<VideoEditEntity> entities = querydslRepository.search(command, sizePlusOne);
 
-        if (command.direction() == ScrollDirection.UP) {
-            Collections.reverse(result);
+        boolean hasNext = entities.size() > command.size();
+
+        if (hasNext) {
+            entities = entities.subList(0, command.size());
         }
 
-        return result.stream()
-                .map(VideoEditEntity::toDomain)
-                .toList();
+        if (command.direction() == ScrollDirection.UP) {
+            Collections.reverse(entities);
+        }
+
+        boolean hasPrev = !entities.isEmpty() && querydslRepository.existsBefore(command, entities.get(0));
+
+        boolean hasAfter = !entities.isEmpty() && querydslRepository.existsAfter(command, entities.get(entities.size() - 1));
+
+        return new CursorPageResult<>(
+                entities.stream()
+                        .map(VideoEditEntity::toDomain)
+                        .toList(),
+                hasAfter,
+                hasPrev
+        );
     }
 
     @Override
