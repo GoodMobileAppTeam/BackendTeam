@@ -9,9 +9,18 @@ import org.springframework.http.HttpStatus;
 @AllArgsConstructor
 public enum VideoErrorCode implements BaseErrorCode {
 
-    VIDEO_NOT_FOUND("영상 편집 정보를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
+    VIDEO_NOT_FOUND("영상 정보를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
     VIDEO_ACCESS_DENIED("해당 영상에 대한 접근 권한이 없습니다.", HttpStatus.FORBIDDEN),
-    FILE_STORAGE_ERROR("파일 처리 중 오류가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
+    FILE_STORAGE_ERROR("파일 처리 중 오류가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
+
+    INVALID_DATE_RANGE("startDate는 endDate보다 이후일 수 없습니다.", HttpStatus.BAD_REQUEST),
+    FUTURE_DATE_NOT_ALLOWED("미래 날짜는 조회할 수 없습니다.", HttpStatus.BAD_REQUEST),
+
+    PLACE_NAME_NOT_FOUND("좌표에 해당하는 장소 정보를 찾을 수 없습니다.", HttpStatus.BAD_REQUEST),
+    INVALID_KAKAO_RESPONSE("카카오 지도 API 응답이 올바르지 않습니다.", HttpStatus.BAD_REQUEST);
+
+
+
 
     private final String message;
     private final HttpStatus status;
