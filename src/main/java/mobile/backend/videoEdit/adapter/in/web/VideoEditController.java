@@ -12,12 +12,16 @@ import mobile.backend.videoEdit.adapter.in.web.request.CreateVideoEditRequest;
 import mobile.backend.videoEdit.adapter.in.web.request.VideoEditBookmarkSearchRequest;
 import mobile.backend.videoEdit.adapter.in.web.request.VideoEditSearchRequest;
 import mobile.backend.videoEdit.adapter.in.web.request.VideoEditSummaryRequest;
+import mobile.backend.videoEdit.adapter.in.web.response.VideoEditSearchResponse;
 import mobile.backend.videoEdit.adapter.in.web.request.bgm.SetVideoEditBgmRequest;
 import mobile.backend.videoEdit.adapter.in.web.request.place.PlaceNameSearchRequest;
 import mobile.backend.videoEdit.adapter.in.web.response.VideoEditBookmarkSearchResponse;
 import mobile.backend.videoEdit.adapter.in.web.response.VideoEditListResponse;
 import mobile.backend.videoEdit.adapter.in.web.response.VideoEditResponse;
 import mobile.backend.videoEdit.adapter.in.web.response.VideoEditSummaryResponse;
+import mobile.backend.videoEdit.application.port.in.*;
+import mobile.backend.videoEdit.application.service.CursorPageResult;
+import mobile.backend.videoEdit.adapter.in.web.response.place.PlaceNameResponse;
 import mobile.backend.videoEdit.adapter.in.web.response.bgm.BgmListResponse;
 import mobile.backend.videoEdit.adapter.in.web.response.place.PlaceNameSearchResponse;
 import mobile.backend.videoEdit.application.port.in.BgmCommandUseCase;
@@ -26,7 +30,6 @@ import mobile.backend.videoEdit.application.port.in.PlaceNameQueryUseCase;
 import mobile.backend.videoEdit.application.port.in.VideoEditCommandUseCase;
 import mobile.backend.videoEdit.application.port.in.VideoEditQueryUseCase;
 import mobile.backend.videoEdit.domain.command.CreateVideoEditCommand;
-import mobile.backend.videoEdit.domain.command.SearchBookmarkVideoEditCommand;
 import mobile.backend.videoEdit.domain.command.SearchSummaryVideoEditCommand;
 import mobile.backend.videoEdit.domain.command.SearchVideoEditCommand;
 import mobile.backend.videoEdit.domain.model.VideoEdit;
@@ -59,8 +62,6 @@ public class VideoEditController {
   private final VideoEditCommandUseCase videoEditCommandUseCase;
   private final VideoEditQueryUseCase videoEditQueryUseCase;
   private final PlaceNameQueryUseCase placeNameQueryUseCase;
-  private final BgmQueryUseCase bgmQueryUseCase;
-  private final BgmCommandUseCase bgmCommandUseCase;
 
     @Operation(
             summary = "영상 등록",
@@ -99,15 +100,15 @@ public class VideoEditController {
             description = "사용자의 영상 목록을 커서 페이징하여 조회합니다."
     )
     @GetMapping
-    public ResponseEntity<BaseResponse<VideoEditListResponse>> search(
+    public ResponseEntity<BaseResponse<VideoEditSearchResponse>> search(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @Valid @ModelAttribute VideoEditSearchRequest request) {
 
-        SearchVideoEditCommand command = request.toCommand(userDetails.getUserId());
+        SearchVideoEditCommand command = request.toCommand(userDetails.getUserId(), false);
 
         List<VideoEdit> result = videoEditQueryUseCase.search(command);
 
-        return ResponseEntity.ok(BaseResponse.success(VideoEditListResponse.from(result, request.size())));
+        return ResponseEntity.ok(BaseResponse.success(VideoEditSearchResponse.from(result, request.size())));
     }
 
     @Operation(
@@ -115,15 +116,15 @@ public class VideoEditController {
             description = "사용자가 북마크한 영상 목록을 커서 페이징하여 조회합니다."
     )
     @GetMapping("/bookmarks")
-    public ResponseEntity<BaseResponse<VideoEditBookmarkSearchResponse>> getBookmarked(
+    public ResponseEntity<BaseResponse<VideoEditSearchResponse>> getBookmarked(
             @AuthenticationPrincipal CustomUserDetails userDetails,
-            @Valid @ModelAttribute VideoEditBookmarkSearchRequest request) {
+            @Valid @ModelAttribute VideoEditSearchRequest request) {
 
-        SearchBookmarkVideoEditCommand command = request.toCommand(userDetails.getUserId());
+        SearchVideoEditCommand command = request.toCommand(userDetails.getUserId(), true);
 
         List<VideoEdit> result = videoEditQueryUseCase.search(command);
 
-        return ResponseEntity.ok(BaseResponse.success(VideoEditListResponse.from(result, request.size())));
+        return ResponseEntity.ok(BaseResponse.success(VideoEditSearchResponse.from(result, request.size())));
     }
 
     @Operation(
@@ -164,9 +165,9 @@ public class VideoEditController {
 
         SearchSummaryVideoEditCommand command = request.toCommand(userDetails.getUserId());
 
-    List<VideoEditSummary> summaries = videoEditQueryUseCase.getDailySummary(command);
+        List<VideoEditSummary> summaries = videoEditQueryUseCase.getDailySummary(command);
 
-    return ResponseEntity.ok(BaseResponse.success(VideoEditSummaryResponse.fromDomainList(summaries)));
+        return ResponseEntity.ok(BaseResponse.success(VideoEditSummaryResponse.fromDomainList(summaries)));
   }
 
   @Operation(
