@@ -1,6 +1,7 @@
 package mobile.backend.videoEdit.adapter.in.web.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import mobile.backend.videoEdit.application.service.CursorPageResult;
 import mobile.backend.videoEdit.domain.model.VideoEdit;
 
 import java.time.LocalDate;
@@ -12,36 +13,46 @@ public record VideoEditSearchResponse(
 
         List<VideoEditResponse> content,
 
+        // NEXT
         LocalDate nextCursorSaveTime,
         LocalDateTime nextCursorCreatedAt,
         Long nextCursorId,
+        boolean hasNext,
 
-        boolean hasNext
+        // PREV
+        LocalDate prevCursorSaveTime,
+        LocalDateTime prevCursorCreatedAt,
+        Long prevCursorId,
+        boolean hasPrev
 ) {
 
-    public static VideoEditSearchResponse from(
-            List<VideoEdit> videos,
-            int size
-    ) {
-        boolean hasNext = videos.size() == size;
+    public static VideoEditSearchResponse from(CursorPageResult<VideoEdit> page) {
 
-        LocalDate saveTime = null;
-        LocalDateTime createdAt = null;
-        Long id = null;
-
-        if (hasNext) {
-            VideoEdit last = videos.get(videos.size() - 1);
-            saveTime = last.getSaveTime();
-            createdAt = last.getCreatedAt();
-            id = last.getId();
+        if (page.content().isEmpty()) {
+            return new VideoEditSearchResponse(
+                    List.of(),
+                    null, null, null, false,
+                    null, null, null, false
+            );
         }
 
+        VideoEdit first = page.content().get(0);
+        VideoEdit last  = page.content().get(page.content().size() - 1);
+
         return new VideoEditSearchResponse(
-                videos.stream().map(VideoEditResponse::from).toList(),
-                saveTime,
-                createdAt,
-                id,
-                hasNext
+                page.content().stream()
+                        .map(VideoEditResponse::from)
+                        .toList(),
+
+                page.hasNext() ? last.getSaveTime() : null,
+                page.hasNext() ? last.getCreatedAt() : null,
+                page.hasNext() ? last.getId() : null,
+                page.hasNext(),
+
+                page.hasPrev() ? first.getSaveTime() : null,
+                page.hasPrev() ? first.getCreatedAt() : null,
+                page.hasPrev() ? first.getId() : null,
+                page.hasPrev()
         );
     }
 }
