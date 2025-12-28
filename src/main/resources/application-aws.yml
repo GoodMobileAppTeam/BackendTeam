@@ -59,6 +59,7 @@ cloud:
       path:
         profile: profile
         record: record
+        bgm: bgm
     region:
       static-region: ap-northeast-2
     stack:
@@ -76,3 +77,8 @@ logging:
           descriptor:
             sql:
               BasicBinder: trace
+
+#Kakao API
+kakao:
+  local:
+    api-key: ${KAKAO_REST_API_KEY}

@@ -65,6 +65,7 @@ cloud:
       path:
         profile: profile
         record: record
+        bgm: bgm
     region:
       static-region: ap-northeast-2
     stack:
