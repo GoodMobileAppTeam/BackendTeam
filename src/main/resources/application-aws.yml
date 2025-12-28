@@ -76,3 +76,8 @@ logging:
           descriptor:
             sql:
               BasicBinder: trace
+
+#Kakao API
+kakao:
+  local:
+    api-key: ${KAKAO_REST_API_KEY}
