@@ -19,9 +19,6 @@ public enum VideoErrorCode implements BaseErrorCode {
     PLACE_NAME_NOT_FOUND("좌표에 해당하는 장소 정보를 찾을 수 없습니다.", HttpStatus.BAD_REQUEST),
     INVALID_KAKAO_RESPONSE("카카오 지도 API 응답이 올바르지 않습니다.", HttpStatus.BAD_REQUEST);
 
-
-
-
     private final String message;
     private final HttpStatus status;
 }
