@@ -106,9 +106,9 @@ public class VideoEditController {
 
         SearchVideoEditCommand command = request.toCommand(userDetails.getUserId(), false);
 
-        List<VideoEdit> result = videoEditQueryUseCase.search(command);
+        CursorPageResult<VideoEdit> pageResult = videoEditQueryUseCase.search(command);
 
-        return ResponseEntity.ok(BaseResponse.success(VideoEditSearchResponse.from(result, request.size())));
+        return ResponseEntity.ok(BaseResponse.success(VideoEditSearchResponse.from(pageResult)));
     }
 
     @Operation(
@@ -122,9 +122,9 @@ public class VideoEditController {
 
         SearchVideoEditCommand command = request.toCommand(userDetails.getUserId(), true);
 
-        List<VideoEdit> result = videoEditQueryUseCase.search(command);
+        CursorPageResult<VideoEdit> pageResult = videoEditQueryUseCase.search(command);
 
-        return ResponseEntity.ok(BaseResponse.success(VideoEditSearchResponse.from(result, request.size())));
+        return ResponseEntity.ok(BaseResponse.success(VideoEditSearchResponse.from(pageResult)));
     }
 
     @Operation(
@@ -148,9 +148,9 @@ public class VideoEditController {
     @DeleteMapping("/{id}")
     public ResponseEntity<BaseResponse<Void>> delete(
             @PathVariable Long id,
-            @AuthenticationPrincipal CustomUserDetails userDetails) {
+            @AuthenticationPrincipal CustomUserDetails customUserDetails) {
 
-        videoEditCommandUseCase.delete(id, userDetails.getUserId());
+        videoEditCommandUseCase.delete(id, customUserDetails.getUserId ());
         return ResponseEntity.ok(BaseResponse.success("영상이 삭제되었습니다.", null));
     }
 
