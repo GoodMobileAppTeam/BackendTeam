@@ -1,7 +1,6 @@
 package mobile.backend.videoEdit.adapter.out.persistence.jpa;
 
 import mobile.backend.videoEdit.adapter.out.persistence.entity.VideoEditEntity;
-import mobile.backend.videoEdit.adapter.out.persistence.querydsl.VideoEditQuerydslRepository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -9,7 +8,7 @@ import org.springframework.data.repository.query.Param;
 import java.time.LocalDate;
 import java.util.List;
 
-public interface VideoEditJpaRepository extends JpaRepository<VideoEditEntity, Long>, VideoEditQuerydslRepository {
+public interface VideoEditJpaRepository extends JpaRepository<VideoEditEntity, Long> {
 
     @Query(value = """
     SELECT 
