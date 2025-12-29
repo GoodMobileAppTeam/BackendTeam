@@ -60,9 +60,12 @@ public class VideoEditEntity extends BaseTimeEntity {
     @Column(name = "description", length = 500)
     private String description;
 
+    @Column(name = "bgm_key")
+    private String bgmKey;
+
     private VideoEditEntity(Long id, Long albumId, Long userId, Integer duration,
                             String videoUrl, LocalDate saveTime,
-                            Boolean isBookMark, String thumbnailUrl, String description) {
+                            Boolean isBookMark, String thumbnailUrl, String description, String bgmKey) {
         this.id = id;
         this.albumId = albumId;
         this.userId = userId;
@@ -72,14 +75,15 @@ public class VideoEditEntity extends BaseTimeEntity {
         this.isBookMark = isBookMark;
         this.thumbnailUrl = thumbnailUrl;
         this.description = description;
+        this.bgmKey = bgmKey;
     }
 
     public static VideoEditEntity from(Long id, Long albumId, Long userId, Integer duration,
                                        String videoUrl,
                                        LocalDate saveTime, Boolean isBookMark,
-                                       String thumbnailUrl, String description) {
+                                       String thumbnailUrl, String description, String bgmKey) {
         return new VideoEditEntity(id, albumId, userId, duration, videoUrl,
-                saveTime, isBookMark, thumbnailUrl, description);
+                saveTime, isBookMark, thumbnailUrl, description, bgmKey);
     }
 
     public static VideoEdit toDomain(VideoEditEntity entity) {
@@ -94,7 +98,8 @@ public class VideoEditEntity extends BaseTimeEntity {
                 entity.getSaveTime(),
                 Boolean.TRUE.equals(entity.getIsBookMark()),
                 entity.getThumbnailUrl(),
-                entity.getDescription()
+                entity.getDescription(),
+                entity.getBgmKey()
         );
 
     }
@@ -111,7 +116,8 @@ public class VideoEditEntity extends BaseTimeEntity {
                 domain.getSaveTime(),
                 domain.isBookMarked(),
                 domain.getThumbnailUrl(),
-                domain.getDescription()
+                domain.getDescription(),
+                domain.getBgmKey()
         );
     }
 }

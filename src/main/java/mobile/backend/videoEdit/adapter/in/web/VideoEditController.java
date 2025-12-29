@@ -12,12 +12,16 @@ import mobile.backend.videoEdit.adapter.in.web.request.CreateVideoEditRequest;
 import mobile.backend.videoEdit.adapter.in.web.request.VideoEditBookmarkSearchRequest;
 import mobile.backend.videoEdit.adapter.in.web.request.VideoEditSearchRequest;
 import mobile.backend.videoEdit.adapter.in.web.request.VideoEditSummaryRequest;
+import mobile.backend.videoEdit.adapter.in.web.request.bgm.SetVideoEditBgmRequest;
 import mobile.backend.videoEdit.adapter.in.web.request.place.PlaceNameListRequest;
 import mobile.backend.videoEdit.adapter.in.web.response.VideoEditBookmarkSearchResponse;
 import mobile.backend.videoEdit.adapter.in.web.response.VideoEditListResponse;
 import mobile.backend.videoEdit.adapter.in.web.response.VideoEditResponse;
 import mobile.backend.videoEdit.adapter.in.web.response.VideoEditSummaryResponse;
+import mobile.backend.videoEdit.adapter.in.web.response.bgm.BgmListResponse;
 import mobile.backend.videoEdit.adapter.in.web.response.place.PlaceNameResponse;
+import mobile.backend.videoEdit.application.port.in.BgmCommandUseCase;
+import mobile.backend.videoEdit.application.port.in.BgmQueryUseCase;
 import mobile.backend.videoEdit.application.port.in.PlaceNameQueryUseCase;
 import mobile.backend.videoEdit.application.port.in.VideoEditCommandUseCase;
 import mobile.backend.videoEdit.application.port.in.VideoEditQueryUseCase;
@@ -52,6 +56,8 @@ public class VideoEditController {
   private final VideoEditCommandUseCase videoEditCommandUseCase;
   private final VideoEditQueryUseCase videoEditQueryUseCase;
   private final PlaceNameQueryUseCase placeNameQueryUseCase;
+  private final BgmQueryUseCase bgmQueryUseCase;
+  private final BgmCommandUseCase bgmCommandUseCase;
 
     @Operation(
             summary = "영상 등록",
@@ -177,4 +183,42 @@ public class VideoEditController {
       @RequestBody PlaceNameListRequest request) {
     return BaseResponse.success(placeNameQueryUseCase.getPlaceNames(request.toCommand()));
   }
+
+  @Operation(
+      summary = "배경음악 목록 조회",
+      description = "S3 bgm/ 폴더의 mp3 목록을 조회하여 반환합니다."
+  )
+  @GetMapping("/bgms")
+  public ResponseEntity<BaseResponse<BgmListResponse>> getBgms() {
+    return ResponseEntity.ok(BaseResponse.success(bgmQueryUseCase.getBgmList()));
+  }
+
+  @Operation(
+      summary = "배경음악 설정",
+      description = "영상에 bgmKey(S3에 저장된 배경음악 파일의 경로(Key)) 를 저장합니다."
+  )
+  @PatchMapping("/{id}/bgm")
+  public ResponseEntity<BaseResponse<Void>> setBgm(
+      @PathVariable Long id,
+      @AuthenticationPrincipal CustomUserDetails userDetails,
+      @Valid @RequestBody SetVideoEditBgmRequest request
+  ) {
+    bgmCommandUseCase.setBgm(request.toCommand(id, userDetails.getUserId()));
+    return ResponseEntity.ok(BaseResponse.success("배경음악이 설정되었습니다.", null));
+  }
+
+  @Operation(
+      summary = "배경음악 해제",
+      description = "영상에 설정된 bgmKey를 제거합니다."
+  )
+  @DeleteMapping("/{id}/bgm")
+  public ResponseEntity<BaseResponse<Void>> clearBgm(
+      @PathVariable Long id,
+      @AuthenticationPrincipal CustomUserDetails userDetails
+  ) {
+    bgmCommandUseCase.clearBgm(id, userDetails.getUserId());
+    return ResponseEntity.ok(BaseResponse.success("배경음악이 해제되었습니다.", null));
+  }
+
+
 }
