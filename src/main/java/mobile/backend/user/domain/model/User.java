@@ -17,22 +17,25 @@ public class User {
 
   private final SocialType socialType;
 
+  private final String password;
+
   private final String profileImageUrl;
 
   private final LocalDateTime createdAt;
 
 
-  private User(Long id, String name, String socialId, SocialType socialType, String profileImageUrl, LocalDateTime createdAt) {
+  private User(Long id, String name, String socialId, SocialType socialType, String password, String profileImageUrl, LocalDateTime createdAt) {
     this.id = id;
     this.name = name;
     this.socialId = socialId;
     this.socialType = socialType;
+    this.password = password;
     this.profileImageUrl = profileImageUrl;
     this.createdAt = createdAt;
   }
 
-  public static User of(Long id, String name, String socialId, SocialType socialType, String profileImageUrl, LocalDateTime createdAt) {
-    return new User(id, name, socialId, socialType, profileImageUrl, createdAt);
+  public static User of(Long id, String name, String socialId, SocialType socialType, String password, String profileImageUrl, LocalDateTime createdAt) {
+    return new User(id, name, socialId, socialType, password, profileImageUrl, createdAt);
   }
 
   public static User fromSocialUserInfo(SocialUserInfo userInfo, SocialType socialType) {
@@ -41,11 +44,23 @@ public class User {
             userInfo.getNickname(),
             userInfo.getSocialId(),
             socialType,
+            null,
             userInfo.getProfileImageUrl(),
             LocalDateTime.now()
     );
   }
 
+  public static User createTestUser(String email, String encodedPassword, String name) {
+    return new User(
+            null,
+            name,
+            email,  // socialId에 email 저장
+            SocialType.TEST,
+            encodedPassword,
+            null,
+            LocalDateTime.now()
+    );
+  }
 
   public static String getProfileImagePath(String uuid) {
     return String.format(PROFILE_IMAGE_PATH, uuid);

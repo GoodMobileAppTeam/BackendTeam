@@ -1,6 +1,7 @@
 package mobile.backend.auth.adapter.in.web;
 
 import jakarta.servlet.http.HttpServletResponse;
+import mobile.backend.global.security.jwt.JwtProperties;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -17,9 +18,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import mobile.backend.global.security.CustomUserDetails;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
 
 
 @Tag(name = "Swagger 테스트용 auth API", description = "Swagger에서 기능 테스트를 위한 테스트용 회원가입, 로그인 API")
@@ -29,6 +27,15 @@ import org.springframework.security.core.context.SecurityContextHolder;
 public class TestAuthController {
 
     private final TestAuthCommandUseCase testAuthCommandUseCase;
+    private final JwtProperties jwtProperties;
+
+    private int getAccessTokenCookieMaxAge() {
+        return (int) (jwtProperties.getAccessTokenExpireTime() / 1000);
+    }
+
+    private int getRefreshTokenCookieMaxAge() {
+        return (int) (jwtProperties.getRefreshTokenExpireTime() / 1000);
+    }
 
     @PostMapping("/test-signup")
     public ResponseEntity<BaseResponse<TestAuthResponse>> signup(
@@ -37,17 +44,11 @@ public class TestAuthController {
 
         AuthToken authToken = testAuthCommandUseCase.signup(request.toCommand());
 
-        CustomUserDetails userDetails = new CustomUserDetails(authToken.getUserId());
-        UsernamePasswordAuthenticationToken authentication =
-                new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-
-
         ResponseCookie accessTokenCookie = ResponseCookie.from("accessToken", authToken.getAccessToken())
                 .httpOnly(true)
                 .secure(false)
                 .path("/")
-                .maxAge(2 * 60 * 60)
+                .maxAge(getAccessTokenCookieMaxAge())
                 .sameSite("Strict")
                 .build();
 
@@ -56,7 +57,7 @@ public class TestAuthController {
                 .httpOnly(true)
                 .secure(false)
                 .path("/")
-                .maxAge(7 * 24 * 60 * 60)
+                .maxAge(getRefreshTokenCookieMaxAge())
                 .sameSite("Strict")
                 .build();
 
@@ -74,16 +75,11 @@ public class TestAuthController {
 
         AuthToken authToken = testAuthCommandUseCase.login(request.toCommand());
 
-        CustomUserDetails userDetails = new CustomUserDetails(authToken.getUserId());
-        UsernamePasswordAuthenticationToken authentication =
-                new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-
         ResponseCookie accessTokenCookie = ResponseCookie.from("accessToken", authToken.getAccessToken())
                 .httpOnly(true)
                 .secure(false)
                 .path("/")
-                .maxAge(2 * 60 * 60)
+                .maxAge(getAccessTokenCookieMaxAge())
                 .sameSite("Strict")
                 .build();
 
@@ -91,7 +87,7 @@ public class TestAuthController {
                 .httpOnly(true)
                 .secure(false)
                 .path("/")
-                .maxAge(7 * 24 * 60 * 60)
+                .maxAge(getRefreshTokenCookieMaxAge())
                 .sameSite("Strict")
                 .build();
 

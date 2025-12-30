@@ -8,4 +8,8 @@ public interface UserRepository {
 
   Optional<User> findBySocialIdAndSocialType(String socialId, SocialType socialType);
   User save(User user);
+  User findById(Long id);
+  void deleteById(Long id);
+  boolean existsBySocialIdAndSocialType(String socialId, SocialType socialType);
+
 }

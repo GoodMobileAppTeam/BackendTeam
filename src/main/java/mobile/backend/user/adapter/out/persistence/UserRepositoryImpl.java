@@ -37,4 +37,21 @@ public class UserRepositoryImpl implements UserRepository {
       throw new CustomException(UserErrorCode.USER_SAVE_FAILED);
     }
   }
+
+  @Override
+  public User findById(Long id) {
+    return userJpaRepository.findById(id)
+            .map(UserEntity::toDomain)
+            .orElseThrow(() -> new CustomException(UserErrorCode.USER_NOT_FOUND));
+  }
+
+  @Override
+  public boolean existsBySocialIdAndSocialType(String socialId, SocialType socialType) {
+    return userJpaRepository.existsBySocialIdAndSocialType(socialId, socialType);
+  }
+
+  @Override
+  public void deleteById(Long id) {
+    userJpaRepository.deleteById(id);
+  }
 }
