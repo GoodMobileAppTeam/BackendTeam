@@ -12,6 +12,7 @@ import mobile.backend.videoEdit.adapter.in.web.request.CreateVideoEditRequest;
 import mobile.backend.videoEdit.adapter.in.web.request.VideoEditBookmarkSearchRequest;
 import mobile.backend.videoEdit.adapter.in.web.request.VideoEditSearchRequest;
 import mobile.backend.videoEdit.adapter.in.web.request.VideoEditSummaryRequest;
+import mobile.backend.videoEdit.adapter.in.web.request.place.PlaceNameListRequest;
 import mobile.backend.videoEdit.adapter.in.web.response.VideoEditSearchResponse;
 import mobile.backend.videoEdit.adapter.in.web.request.bgm.SetVideoEditBgmRequest;
 import mobile.backend.videoEdit.adapter.in.web.request.place.PlaceNameSearchRequest;
