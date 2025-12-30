@@ -1,19 +1,29 @@
 package mobile.backend.videoEdit.domain.command;
 
+import mobile.backend.global.exception.CustomException;
+import mobile.backend.videoEdit.exception.VideoErrorCode;
+
+import java.time.LocalDate;
+
 public record SearchVideoEditCommand(
         Long userId,
-        Integer year,
-        Integer month,
-        Boolean isBookMarked,
-        int page,
+        LocalDate startDate,
+        LocalDate endDate,
+        LocalDate cursorDate,
+        Long cursorId,
         int size
 ) {
-    public static SearchVideoEditCommand of(Long userId, Integer year, Integer month,
-                                            Boolean isBookMarked, int page, int size) {
-        return new SearchVideoEditCommand(userId, year, month, isBookMarked, page, size);
-    }
+    public static SearchVideoEditCommand of(Long userId, LocalDate startDate, LocalDate endDate,
+                                            LocalDate cursorDate, Long cursorId, int size) {
 
-    public static SearchVideoEditCommand bookmarked(Long userId, int page, int size) {
-        return new SearchVideoEditCommand(userId, null, null, true, page, size);
+        if (startDate.isAfter(endDate)) {
+            throw new CustomException(VideoErrorCode.INVALID_DATE_RANGE);
+        }
+
+        if (startDate.isAfter(LocalDate.now()) || endDate.isAfter(LocalDate.now())) {
+            throw new CustomException(VideoErrorCode.FUTURE_DATE_NOT_ALLOWED);
+        }
+
+        return new SearchVideoEditCommand(userId, startDate, endDate, cursorDate, cursorId, size);
     }
 }

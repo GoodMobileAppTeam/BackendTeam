@@ -2,7 +2,6 @@ package mobile.backend.user.application.service;
 
 import lombok.RequiredArgsConstructor;
 import mobile.backend.user.application.port.in.UserQueryUseCase;
-import mobile.backend.user.application.port.out.TestUserRepository;
 import mobile.backend.user.application.port.out.UserRepository;
 import mobile.backend.user.domain.model.User;
 import org.springframework.stereotype.Service;
@@ -14,7 +13,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserService implements UserQueryUseCase {
 
   private final UserRepository userRepository;
-  private final TestUserRepository testUserRepository; //테스트 유저 조회
 
   @Override
   public User getUserInfo(Long userId) {

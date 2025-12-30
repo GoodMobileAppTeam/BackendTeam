@@ -25,7 +25,8 @@ public class SecurityConfig {
     private static final String[] PUBLIC_ENDPOINTS = {
         "/v1/auth/login",
         "/v1/auth/refresh",
-        "/v1/test-auth/**"
+        "/v1/test-auth/**",
+        "/v1/videos/placeNames"
     };
 
     private static final String[] PUBLIC_GET_ENDPOINTS = {
