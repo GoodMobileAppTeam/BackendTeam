@@ -12,14 +12,14 @@ public record SearchVideoEditCommand(
 
         Cursor cursor,
 
-        boolean onlyBookMarked,
+        boolean bookMarkApi,
 
         int size
 ) {
     public static SearchVideoEditCommand init(
             Long userId,
             LocalDate baseDateEnd,
-            boolean onlyBookMarked,
+            boolean bookMarkApi,
             int size
     ) {
         return new SearchVideoEditCommand(
@@ -27,7 +27,7 @@ public record SearchVideoEditCommand(
                 ScrollDirection.INIT,
                 baseDateEnd,
                 null,
-                onlyBookMarked,
+                bookMarkApi,
                 size
         );
     }
@@ -36,7 +36,7 @@ public record SearchVideoEditCommand(
             Long userId,
             ScrollDirection direction,
             Cursor cursor,
-            boolean onlyBookMarked,
+            boolean bookMarkApi,
             int size
     ) {
         return new SearchVideoEditCommand(
@@ -44,7 +44,7 @@ public record SearchVideoEditCommand(
                 direction,
                 null,
                 cursor,
-                onlyBookMarked,
+                bookMarkApi,
                 size
         );
     }

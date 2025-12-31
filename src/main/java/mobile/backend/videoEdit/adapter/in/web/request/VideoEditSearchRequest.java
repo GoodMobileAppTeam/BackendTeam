@@ -36,13 +36,13 @@ public record VideoEditSearchRequest(
         int size
 ) {
 
-    public SearchVideoEditCommand toCommand(Long userId, boolean onlyBookMarked) {
+    public SearchVideoEditCommand toCommand(Long userId, boolean bookMarkApi) {
 
         return switch (direction) {
             case INIT -> SearchVideoEditCommand.init(
                     userId,
                     baseDateEnd,
-                    onlyBookMarked,
+                    bookMarkApi,
                     size
             );
 
@@ -50,7 +50,7 @@ public record VideoEditSearchRequest(
                     userId,
                     direction,
                     Cursor.of(cursorSaveTime, cursorCreatedAt, cursorId),
-                    onlyBookMarked,
+                    bookMarkApi,
                     size
             );
         };
