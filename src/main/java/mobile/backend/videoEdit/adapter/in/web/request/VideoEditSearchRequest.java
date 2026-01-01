@@ -16,13 +16,13 @@ import java.time.LocalDateTime;
 public record VideoEditSearchRequest(
 
         @NotNull
-        ScrollDirection direction,
+        String direction,
 
-        // INIT
+        // INIT - INIT 동작에만 baseDateEnd 사용
         @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
         LocalDate baseDateEnd,
 
-        // CURSOR
+        // CURSOR - UP, DOWN 동작 모두 사용
         @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
         LocalDate cursorSaveTime,
 
@@ -38,7 +38,9 @@ public record VideoEditSearchRequest(
 
     public SearchVideoEditCommand toCommand(Long userId, boolean bookMarkApi) {
 
-        return switch (direction) {
+        ScrollDirection scrollDirection = ScrollDirection.valueOf(direction.toUpperCase());
+
+        return switch (scrollDirection) {
             case INIT -> SearchVideoEditCommand.init(
                     userId,
                     baseDateEnd,
@@ -48,7 +50,7 @@ public record VideoEditSearchRequest(
 
             case DOWN, UP -> SearchVideoEditCommand.scroll(
                     userId,
-                    direction,
+                    scrollDirection,
                     Cursor.of(cursorSaveTime, cursorCreatedAt, cursorId),
                     bookMarkApi,
                     size
@@ -56,5 +58,6 @@ public record VideoEditSearchRequest(
         };
     }
 }
+
 
 
