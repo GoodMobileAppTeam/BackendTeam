@@ -7,7 +7,7 @@ import mobile.backend.videoEdit.adapter.out.persistence.jpa.VideoDailySummaryPro
 import mobile.backend.videoEdit.adapter.out.persistence.jpa.VideoEditJpaRepository;
 import mobile.backend.videoEdit.adapter.out.persistence.querydsl.VideoEditQuerydslRepository;
 import mobile.backend.videoEdit.application.port.out.VideoEditRepository;
-import mobile.backend.videoEdit.application.service.CursorPageResult;
+import mobile.backend.videoEdit.application.service.querymodel.CursorPageResult;
 import mobile.backend.videoEdit.domain.command.SearchSummaryVideoEditCommand;
 import mobile.backend.videoEdit.domain.command.SearchVideoEditCommand;
 import mobile.backend.videoEdit.domain.model.VideoEdit;

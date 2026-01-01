@@ -1,4 +1,4 @@
-package mobile.backend.videoEdit.application.service;
+package mobile.backend.videoEdit.application.service.querymodel;
 
 import java.util.List;
 

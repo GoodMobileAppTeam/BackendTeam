@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
-import mobile.backend.videoEdit.application.service.Cursor;
+import mobile.backend.videoEdit.application.service.querymodel.Cursor;
 import mobile.backend.videoEdit.domain.command.ScrollDirection;
 import mobile.backend.videoEdit.domain.command.SearchVideoEditCommand;
 import org.springframework.format.annotation.DateTimeFormat;

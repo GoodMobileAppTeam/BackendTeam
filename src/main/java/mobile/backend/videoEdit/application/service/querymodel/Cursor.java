@@ -1,4 +1,4 @@
-package mobile.backend.videoEdit.application.service;
+package mobile.backend.videoEdit.application.service.querymodel;
 
 import mobile.backend.global.exception.CustomException;
 import mobile.backend.videoEdit.exception.VideoErrorCode;

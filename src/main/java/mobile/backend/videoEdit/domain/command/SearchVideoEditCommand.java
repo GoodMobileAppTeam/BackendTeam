@@ -1,6 +1,6 @@
 package mobile.backend.videoEdit.domain.command;
 
-import mobile.backend.videoEdit.application.service.Cursor;
+import mobile.backend.videoEdit.application.service.querymodel.Cursor;
 
 import java.time.LocalDate;
 

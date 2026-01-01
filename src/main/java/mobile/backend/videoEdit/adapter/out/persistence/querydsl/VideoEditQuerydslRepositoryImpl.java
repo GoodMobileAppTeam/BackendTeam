@@ -6,7 +6,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import mobile.backend.videoEdit.adapter.out.persistence.entity.QVideoEditEntity;
 import mobile.backend.videoEdit.adapter.out.persistence.entity.VideoEditEntity;
-import mobile.backend.videoEdit.application.service.Cursor;
+import mobile.backend.videoEdit.application.service.querymodel.Cursor;
 import mobile.backend.videoEdit.domain.command.ScrollDirection;
 import mobile.backend.videoEdit.domain.command.SearchVideoEditCommand;
 import org.springframework.stereotype.Repository;

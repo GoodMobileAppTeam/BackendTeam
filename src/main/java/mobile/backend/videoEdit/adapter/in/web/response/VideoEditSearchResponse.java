@@ -1,7 +1,7 @@
 package mobile.backend.videoEdit.adapter.in.web.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import mobile.backend.videoEdit.application.service.CursorPageResult;
+import mobile.backend.videoEdit.application.service.querymodel.CursorPageResult;
 import mobile.backend.videoEdit.domain.model.VideoEdit;
 
 import java.time.LocalDate;
