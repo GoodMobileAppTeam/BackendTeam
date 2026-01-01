@@ -8,15 +8,13 @@ import mobile.backend.videoEdit.adapter.out.persistence.jpa.VideoEditJpaReposito
 import mobile.backend.videoEdit.adapter.out.persistence.querydsl.VideoEditQuerydslRepository;
 import mobile.backend.videoEdit.application.port.out.VideoEditRepository;
 import mobile.backend.videoEdit.application.service.CursorPageResult;
-import mobile.backend.videoEdit.domain.command.ScrollDirection;
 import mobile.backend.videoEdit.domain.command.SearchSummaryVideoEditCommand;
 import mobile.backend.videoEdit.domain.command.SearchVideoEditCommand;
-import mobile.backend.videoEdit.domain.model.VideoEditSummary;
 import mobile.backend.videoEdit.domain.model.VideoEdit;
+import mobile.backend.videoEdit.domain.model.VideoEditSummary;
 import mobile.backend.videoEdit.exception.VideoErrorCode;
 import org.springframework.stereotype.Repository;
 
-import java.util.Collections;
 import java.util.List;
 
 @Repository
@@ -43,29 +41,27 @@ public class VideoEditRepositoryImpl implements VideoEditRepository {
     @Override
     public CursorPageResult<VideoEdit> search(SearchVideoEditCommand command) {
 
-        int sizePlusOne = command.size() + 1;
+        List<VideoEditEntity> entities = querydslRepository.search(command);
 
-        List<VideoEditEntity> entities = querydslRepository.search(command, sizePlusOne);
+        boolean hasPrev = false;
+        boolean hasNext = false;
 
-        boolean hasNext = entities.size() > command.size();
+        if (!entities.isEmpty()) {
+            VideoEditEntity first = entities.get(0);
+            VideoEditEntity last = entities.get(entities.size() - 1);
 
-        if (hasNext) {
-            entities = entities.subList(0, command.size());
+            // hasPrev = 더 최신 데이터 존재
+            hasPrev = querydslRepository.existsNewer(command, first);
+
+            // hasNext = 더 오래된 데이터 존재
+            hasNext = querydslRepository.existsOlder(command, last);
         }
-
-        if (command.direction() == ScrollDirection.UP) {
-            Collections.reverse(entities);
-        }
-
-        boolean hasPrev = !entities.isEmpty() && querydslRepository.existsBefore(command, entities.get(0));
-
-        boolean hasAfter = !entities.isEmpty() && querydslRepository.existsAfter(command, entities.get(entities.size() - 1));
 
         return new CursorPageResult<>(
                 entities.stream()
                         .map(VideoEditEntity::toDomain)
                         .toList(),
-                hasAfter,
+                hasNext,
                 hasPrev
         );
     }
@@ -78,7 +74,8 @@ public class VideoEditRepositoryImpl implements VideoEditRepository {
     @Override
     public List<VideoEditSummary> findDailySummary(SearchSummaryVideoEditCommand command) {
 
-        List<VideoDailySummaryProjection> results = jpaRepository.findDailySummary(
+        List<VideoDailySummaryProjection> results =
+                jpaRepository.findDailySummary(
                         command.userId(),
                         command.startDate(),
                         command.endDate()

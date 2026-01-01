@@ -7,9 +7,10 @@ import java.util.List;
 
 public interface VideoEditQuerydslRepository {
 
-    List<VideoEditEntity> search(SearchVideoEditCommand command, int sizePlusOne);
+    List<VideoEditEntity> search(SearchVideoEditCommand command);
 
-    boolean existsBefore(SearchVideoEditCommand command, VideoEditEntity first);
+    boolean existsOlder(SearchVideoEditCommand command, VideoEditEntity last);
 
-    boolean existsAfter(SearchVideoEditCommand command, VideoEditEntity last);
+    boolean existsNewer(SearchVideoEditCommand command, VideoEditEntity first);
 }
+
