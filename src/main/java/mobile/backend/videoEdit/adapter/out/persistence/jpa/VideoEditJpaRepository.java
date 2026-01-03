@@ -38,4 +38,6 @@ public interface VideoEditJpaRepository extends JpaRepository<VideoEditEntity, L
             @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate
     );
+
+    List<VideoEditEntity> findAllByUserIdAndSaveTimeOrderByCreatedAtDesc(Long userId, LocalDate saveTime);
 }
