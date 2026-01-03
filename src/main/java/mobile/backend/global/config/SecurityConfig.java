@@ -30,7 +30,8 @@ public class SecurityConfig {
         "/admin/**",
         "/v1/notices",
         "/v1/notices/*",
-        "/v1/videos/bgms"
+        "/v1/videos/bgms",
+        "/v1/videos/placeNames/search"
     };
 
     // PUBLIC_GET_ENDPOINTS랑 겹쳐서 인증이 필요한 엔드포인트

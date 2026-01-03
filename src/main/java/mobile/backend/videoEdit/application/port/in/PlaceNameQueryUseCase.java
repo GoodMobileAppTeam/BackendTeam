@@ -1,9 +1,8 @@
 package mobile.backend.videoEdit.application.port.in;
 
-import java.util.List;
-import mobile.backend.videoEdit.adapter.in.web.response.place.PlaceNameResponse;
-import mobile.backend.videoEdit.domain.command.place.PlaceNameCommand;
+import mobile.backend.videoEdit.adapter.in.web.response.place.PlaceNameSearchResponse;
+import mobile.backend.videoEdit.domain.command.place.PlaceNameSearchCommand;
 
 public interface PlaceNameQueryUseCase {
-  List<PlaceNameResponse> getPlaceNames(PlaceNameCommand command);
+  PlaceNameSearchResponse search(PlaceNameSearchCommand command);
 }
