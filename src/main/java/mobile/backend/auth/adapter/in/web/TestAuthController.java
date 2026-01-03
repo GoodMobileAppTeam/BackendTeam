@@ -1,5 +1,6 @@
 package mobile.backend.auth.adapter.in.web;
 
+import mobile.backend.global.util.CookieUtils;
 import jakarta.servlet.http.HttpServletResponse;
 import mobile.backend.global.security.jwt.JwtProperties;
 import org.springframework.http.HttpHeaders;
@@ -27,15 +28,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class TestAuthController {
 
     private final TestAuthCommandUseCase testAuthCommandUseCase;
-    private final JwtProperties jwtProperties;
+    private final CookieUtils cookieUtils;
 
-    private int getAccessTokenCookieMaxAge() {
-        return (int) (jwtProperties.getAccessTokenExpireTime() / 1000);
-    }
-
-    private int getRefreshTokenCookieMaxAge() {
-        return (int) (jwtProperties.getRefreshTokenExpireTime() / 1000);
-    }
 
     @PostMapping("/test-signup")
     public ResponseEntity<BaseResponse<TestAuthResponse>> signup(
@@ -44,22 +38,8 @@ public class TestAuthController {
 
         AuthToken authToken = testAuthCommandUseCase.signup(request.toCommand());
 
-        ResponseCookie accessTokenCookie = ResponseCookie.from("accessToken", authToken.getAccessToken())
-                .httpOnly(true)
-                .secure(false)
-                .path("/")
-                .maxAge(getAccessTokenCookieMaxAge())
-                .sameSite("Strict")
-                .build();
-
-
-        ResponseCookie refreshTokenCookie = ResponseCookie.from("refreshToken", authToken.getRefreshToken())
-                .httpOnly(true)
-                .secure(false)
-                .path("/")
-                .maxAge(getRefreshTokenCookieMaxAge())
-                .sameSite("Strict")
-                .build();
+        ResponseCookie accessTokenCookie = cookieUtils.createAccessTokenCookie(authToken.getAccessToken());
+        ResponseCookie refreshTokenCookie = cookieUtils.createRefreshTokenCookie(authToken.getRefreshToken());
 
         httpResponse.addHeader(HttpHeaders.SET_COOKIE, accessTokenCookie.toString());
         httpResponse.addHeader(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString());
@@ -75,21 +55,8 @@ public class TestAuthController {
 
         AuthToken authToken = testAuthCommandUseCase.login(request.toCommand());
 
-        ResponseCookie accessTokenCookie = ResponseCookie.from("accessToken", authToken.getAccessToken())
-                .httpOnly(true)
-                .secure(false)
-                .path("/")
-                .maxAge(getAccessTokenCookieMaxAge())
-                .sameSite("Strict")
-                .build();
-
-        ResponseCookie refreshTokenCookie = ResponseCookie.from("refreshToken", authToken.getRefreshToken())
-                .httpOnly(true)
-                .secure(false)
-                .path("/")
-                .maxAge(getRefreshTokenCookieMaxAge())
-                .sameSite("Strict")
-                .build();
+        ResponseCookie accessTokenCookie = cookieUtils.createAccessTokenCookie(authToken.getAccessToken());
+        ResponseCookie refreshTokenCookie = cookieUtils.createRefreshTokenCookie(authToken.getRefreshToken());
 
         httpResponse.addHeader(HttpHeaders.SET_COOKIE, accessTokenCookie.toString());
         httpResponse.addHeader(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString());

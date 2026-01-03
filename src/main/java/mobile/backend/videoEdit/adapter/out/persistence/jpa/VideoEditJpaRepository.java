@@ -13,7 +13,7 @@ public interface VideoEditJpaRepository extends JpaRepository<VideoEditEntity, L
 
     @Query("""
         SELECT v FROM VideoEditEntity v
-        WHERE v.userId = :userId
+        WHERE v.user.id = :userId
         AND v.saveTime BETWEEN :startDate AND :endDate
             AND (
                 :cursorDate IS NULL
@@ -33,7 +33,7 @@ public interface VideoEditJpaRepository extends JpaRepository<VideoEditEntity, L
 
     @Query("""
         SELECT v FROM VideoEditEntity v
-        WHERE v.userId = :userId
+        WHERE v.user.id = :userId
             AND v.isBookMark = true
             AND (
                 :cursorDate IS NULL
