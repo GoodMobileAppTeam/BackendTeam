@@ -29,7 +29,9 @@ public record CreateVideoEditRequest(
         @JsonFormat(pattern = "yyyy-MM-dd")
         LocalDate saveTime,
 
-        String description
+        String description,
+
+        String bgmKey
 ) {
     public CreateVideoEditCommand toCommand(Long userId, MultipartFile thumbnail) {
         return CreateVideoEditCommand.of(
@@ -40,7 +42,8 @@ public record CreateVideoEditRequest(
                 thumbnail,
                 thumbnail != null ? thumbnail.getOriginalFilename() : null,
                 saveTime,
-                description
+                description,
+                bgmKey
         );
     }
 }

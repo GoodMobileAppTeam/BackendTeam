@@ -1,8 +1,8 @@
 package mobile.backend.videoEdit.application.port.out;
 
-import mobile.backend.videoEdit.adapter.in.web.response.place.PlaceNameResponse;
-import mobile.backend.videoEdit.domain.command.place.LocationPointCommand;
+import mobile.backend.videoEdit.application.port.out.dto.PlaceSearchResult;
+import mobile.backend.videoEdit.domain.command.place.PlaceNameSearchCommand;
 
 public interface PlaceNameExternalApi {
-  PlaceNameResponse findPlaceName(LocationPointCommand command);
+  PlaceSearchResult searchByKeyword(PlaceNameSearchCommand command);
 }

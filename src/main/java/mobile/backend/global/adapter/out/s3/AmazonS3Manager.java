@@ -3,6 +3,8 @@ package mobile.backend.global.adapter.out.s3;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import mobile.backend.global.config.S3.S3Properties;
@@ -12,7 +14,10 @@ import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetUrlRequest;
+import software.amazon.awssdk.services.s3.model.ListObjectsV2Request;
+import software.amazon.awssdk.services.s3.model.ListObjectsV2Response;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import software.amazon.awssdk.services.s3.model.S3Object;
 
 @Slf4j
 @Component
@@ -34,14 +39,7 @@ public class AmazonS3Manager {
             s3Client.putObject(putRequest,
                 RequestBody.fromInputStream(file.getInputStream(), file.getSize()));
 
-            String url = s3Client.utilities()
-                .getUrl(GetUrlRequest.builder()
-                    .bucket(s3Properties.getBucket())
-                    .key(keyName)
-                    .build())
-                .toExternalForm();
-
-            return url;
+            return getPublicUrl(keyName);
         } catch (IOException e) {
             log.error("error at AmazonS3Manager uploadFile", e);
             throw new RuntimeException("S3 업로드 중 오류 발생", e);
@@ -68,6 +66,46 @@ public class AmazonS3Manager {
             log.error("S3 객체 삭제 중 오류 발생: {}", url, e);
         }
     }
+
+    /**
+     * prefix 하위 모든 객체 key 조회
+     * 예: prefix = "bgm/"
+     */
+    public List<String> listKeys(String prefix) {
+        List<String> keys = new ArrayList<>();
+
+        String continuationToken = null;
+        do {
+            ListObjectsV2Request request = ListObjectsV2Request.builder()
+                .bucket(s3Properties.getBucket())
+                .prefix(prefix)
+                .continuationToken(continuationToken)
+                .build();
+
+            ListObjectsV2Response response = s3Client.listObjectsV2(request);
+
+            for (S3Object obj : response.contents()) {
+                keys.add(obj.key());
+            }
+
+            continuationToken = response.nextContinuationToken();
+        } while (continuationToken != null);
+
+        return keys;
+    }
+
+    /**
+     * S3 key → public URL
+     */
+    public String getPublicUrl(String key) {
+        return s3Client.utilities()
+            .getUrl(GetUrlRequest.builder()
+                .bucket(s3Properties.getBucket())
+                .key(key)
+                .build())
+            .toExternalForm();
+    }
+
 
     private String extractKeyFromUrl(String fileUrl) {
         try {
