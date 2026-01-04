@@ -18,11 +18,13 @@ public class VideoEdit {
     private String thumbnailUrl;
     private String description;
 
+    private String bgmKey;
+
     private static final int MAX_DURATION_SECONDS = 60;
 
     private VideoEdit(Long id, Long albumId, Long userId, Integer duration,
                       String videoUrl, LocalDate saveTime,
-                      boolean isBookMarked, String thumbnailUrl, String description) {
+                      boolean isBookMarked, String thumbnailUrl, String description, String bgmKey) {
         this.id = id;
         this.albumId = albumId;
         this.userId = userId;
@@ -32,17 +34,18 @@ public class VideoEdit {
         this.isBookMarked = isBookMarked;
         this.thumbnailUrl = thumbnailUrl;
         this.description = description;
+        this.bgmKey = bgmKey;
     }
 
     // 새 영상 생성용 팩토리 메서드
     public static VideoEdit create(Long albumId, Long userId, Integer duration,
-                                   String videoUrl, LocalDate saveTime, String thumbnailUrl, String description) {
+                                   String videoUrl, LocalDate saveTime, String thumbnailUrl, String description, String bgmKey) {
         validateDuration(duration);
 
 
         return new VideoEdit(
                 null, albumId, userId, duration, videoUrl,
-                saveTime, false, thumbnailUrl, description
+                saveTime, false, thumbnailUrl, description, bgmKey
         );
     }
 
@@ -50,9 +53,9 @@ public class VideoEdit {
     public static VideoEdit from(Long id, Long albumId, Long userId,
                                          Integer duration, String videoUrl,
                                          LocalDate saveTime,
-                                         boolean isBookMarked, String thumbnailUrl, String description) {
+                                         boolean isBookMarked, String thumbnailUrl, String description, String bgmKey) {
         return new VideoEdit(id, albumId, userId, duration, videoUrl,
-                saveTime, isBookMarked, thumbnailUrl, description);
+                saveTime, isBookMarked, thumbnailUrl, description, bgmKey);
     }
 
     private static void validateDuration(Integer duration) {
@@ -79,5 +82,13 @@ public class VideoEdit {
         if (!videoEdit.isOwnedBy(userId)) {
             throw new CustomException(VideoErrorCode.VIDEO_ACCESS_DENIED);
         }
+    }
+
+    public void setBgm(String bgmKey) {
+        this.bgmKey = bgmKey;
+    }
+
+    public void clearBgm() {
+        this.bgmKey = null;
     }
 }
