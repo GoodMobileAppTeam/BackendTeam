@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
  *   ↓
  * Controller
  *   - 요청 파라미터(cursor 관련 값) 수신
- *   - Cursor.of(...) 생성 ★
+ *   - Cursor.of(...) 생성 - VideoEditSearchRequest의 toCommand에서 동작
  *   ↓
  * Service (Application Layer)
  *   - Cursor를 기준으로 조회 방향(DOWN / UP) 판단
