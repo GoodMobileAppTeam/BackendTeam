@@ -21,7 +21,7 @@ import java.time.LocalDate;
         indexes = {
                 @Index(
                         name = "idx_video_user_cursor_desc",
-                        columnList = "user_id, is_book_mark, save_time DESC, created_at DESC, id DESC"
+                        columnList = "user_id, is_book_mark, user_defined_date DESC, created_at DESC, id DESC"
                 )
         }
 )@Getter

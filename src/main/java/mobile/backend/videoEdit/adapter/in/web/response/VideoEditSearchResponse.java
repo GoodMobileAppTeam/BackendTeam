@@ -14,13 +14,13 @@ public record VideoEditSearchResponse(
         List<VideoEditResponse> content,
 
         // NEXT
-        LocalDate nextCursorSaveTime,
+        LocalDate nextCursorUserDefinedDate,
         LocalDateTime nextCursorCreatedAt,
         Long nextCursorId,
         boolean hasNext,
 
         // PREV
-        LocalDate prevCursorSaveTime,
+        LocalDate prevCursorUserDefinedDate,
         LocalDateTime prevCursorCreatedAt,
         Long prevCursorId,
         boolean hasPrev
