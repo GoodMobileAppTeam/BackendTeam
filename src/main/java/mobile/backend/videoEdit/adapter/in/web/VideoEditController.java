@@ -9,23 +9,16 @@ import lombok.RequiredArgsConstructor;
 import mobile.backend.global.adapter.in.web.response.BaseResponse;
 import mobile.backend.global.security.CustomUserDetails;
 import mobile.backend.videoEdit.adapter.in.web.request.CreateVideoEditRequest;
-import mobile.backend.videoEdit.adapter.in.web.request.VideoEditBookmarkSearchRequest;
 import mobile.backend.videoEdit.adapter.in.web.request.VideoEditSearchRequest;
 import mobile.backend.videoEdit.adapter.in.web.request.VideoEditSummaryRequest;
-import mobile.backend.videoEdit.adapter.in.web.request.place.PlaceNameListRequest;
 import mobile.backend.videoEdit.adapter.in.web.response.VideoEditSearchResponse;
 import mobile.backend.videoEdit.adapter.in.web.request.bgm.SetVideoEditBgmRequest;
 import mobile.backend.videoEdit.adapter.in.web.request.place.PlaceNameSearchRequest;
-import mobile.backend.videoEdit.adapter.in.web.response.VideoEditBookmarkSearchResponse;
-import mobile.backend.videoEdit.adapter.in.web.response.VideoEditListResponse;
 import mobile.backend.videoEdit.adapter.in.web.response.VideoEditResponse;
 import mobile.backend.videoEdit.adapter.in.web.response.VideoEditSummaryResponse;
 import mobile.backend.videoEdit.application.port.in.*;
-import mobile.backend.videoEdit.adapter.in.web.response.place.PlaceNameResponse;
 import mobile.backend.videoEdit.adapter.in.web.response.bgm.BgmListResponse;
 import mobile.backend.videoEdit.adapter.in.web.response.place.PlaceNameSearchResponse;
-import mobile.backend.videoEdit.application.port.in.BgmCommandUseCase;
-import mobile.backend.videoEdit.application.port.in.BgmQueryUseCase;
 import mobile.backend.videoEdit.application.port.in.PlaceNameQueryUseCase;
 import mobile.backend.videoEdit.application.port.in.VideoEditCommandUseCase;
 import mobile.backend.videoEdit.application.port.in.VideoEditQueryUseCase;
@@ -60,9 +53,11 @@ import java.util.List;
 @RequiredArgsConstructor
 public class VideoEditController {
 
-  private final VideoEditCommandUseCase videoEditCommandUseCase;
-  private final VideoEditQueryUseCase videoEditQueryUseCase;
-  private final PlaceNameQueryUseCase placeNameQueryUseCase;
+    private final VideoEditCommandUseCase videoEditCommandUseCase;
+    private final VideoEditQueryUseCase videoEditQueryUseCase;
+    private final PlaceNameQueryUseCase placeNameQueryUseCase;
+    private final BgmQueryUseCase bgmQueryUseCase;
+    private final BgmCommandUseCase bgmCommandUseCase;
 
     @Operation(
             summary = "영상 등록",

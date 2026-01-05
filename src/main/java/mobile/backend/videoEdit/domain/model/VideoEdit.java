@@ -86,4 +86,12 @@ public class VideoEdit {
             throw new CustomException(VideoErrorCode.VIDEO_ACCESS_DENIED);
         }
     }
+
+    public void setBgm(String bgmKey) {
+        this.bgmKey = bgmKey;
+    }
+
+    public void clearBgm() {
+        this.bgmKey = null;
+    }
 }
