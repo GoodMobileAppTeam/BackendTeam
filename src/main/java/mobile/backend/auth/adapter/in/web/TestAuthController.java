@@ -4,6 +4,7 @@ import mobile.backend.global.util.CookieUtils;
 import jakarta.servlet.http.HttpServletResponse;
 import mobile.backend.global.security.jwt.JwtProperties;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -44,7 +45,9 @@ public class TestAuthController {
         httpResponse.addHeader(HttpHeaders.SET_COOKIE, accessTokenCookie.toString());
         httpResponse.addHeader(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString());
 
-        return ResponseEntity.ok(BaseResponse.success(TestAuthResponse.from(authToken)));
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(BaseResponse.success(TestAuthResponse.from(authToken)));
+
     }
 
 
