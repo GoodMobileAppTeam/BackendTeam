@@ -15,6 +15,7 @@ public enum VideoErrorCode implements BaseErrorCode {
 
     INVALID_DATE_RANGE("startDate는 endDate보다 이후일 수 없습니다.", HttpStatus.BAD_REQUEST),
     FUTURE_DATE_NOT_ALLOWED("미래 날짜는 조회할 수 없습니다.", HttpStatus.BAD_REQUEST),
+    INVALID_CURSOR("커서 값이 올바르지 않습니다.", HttpStatus.BAD_REQUEST),
 
     PLACE_NAME_NOT_FOUND("좌표에 해당하는 장소 정보를 찾을 수 없습니다.", HttpStatus.BAD_REQUEST),
     INVALID_KAKAO_RESPONSE("카카오 지도 API 응답이 올바르지 않습니다.", HttpStatus.BAD_REQUEST);
