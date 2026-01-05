@@ -5,13 +5,13 @@ import mobile.backend.videoEdit.adapter.out.persistence.jpa.VideoDailySummaryPro
 import java.time.LocalDate;
 
 public record VideoEditSummary(
-        LocalDate saveTime,
+        LocalDate userDefinedDate,
         String latestThumbnail,
         Long count
 ) {
     public static VideoEditSummary fromProjection(VideoDailySummaryProjection videoDailySummaryProjection) {
         return new VideoEditSummary(
-                videoDailySummaryProjection.saveTime().toLocalDate(),
+                videoDailySummaryProjection.userDefinedDate().toLocalDate(),
                 videoDailySummaryProjection.latestThumbnail(),
                 videoDailySummaryProjection.count()
         );

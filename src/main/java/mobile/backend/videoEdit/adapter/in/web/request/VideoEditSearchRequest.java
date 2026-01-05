@@ -4,34 +4,65 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
+import mobile.backend.videoEdit.application.service.querymodel.Cursor;
+import mobile.backend.videoEdit.domain.command.ScrollDirection;
 import mobile.backend.videoEdit.domain.command.SearchVideoEditCommand;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Schema(description = "영상 검색 요청 DTO")
 public record VideoEditSearchRequest(
 
         @NotNull
-        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-        LocalDate startDate,
+        String direction,
 
-        @NotNull
+        // INIT - INIT 동작에만 baseDateEnd 사용
         @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-        LocalDate endDate,
+        LocalDate baseDateEnd,
 
+        /*
+         * CURSOR - UP, DOWN 동작 모두 사용
+         * cursorUserDefinedDate - 찾으려고 하는 커서 데이터의 기록 날짜
+         * cursorCreatedAt - 찾으려고 하는 커서 데이터의 db 저장 날짜
+         * cursorId - 찾으려고 하는 커서의 id
+         */
         @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-        LocalDate cursorDate,
+        LocalDate cursorUserDefinedDate,
+
+        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+        LocalDateTime cursorCreatedAt,
 
         Long cursorId,
 
-        @NotNull
         @Min(1)
         @Max(50)
-        Integer size
+        int size
 ) {
-    public SearchVideoEditCommand toCommand(Long userId) {
 
-        return SearchVideoEditCommand.of(userId, startDate, endDate, cursorDate, cursorId, size);
+    public SearchVideoEditCommand toCommand(Long userId, boolean bookMarkApi) {
+
+        ScrollDirection scrollDirection = ScrollDirection.valueOf(direction.toUpperCase());
+
+        return switch (scrollDirection) {
+            case INIT -> SearchVideoEditCommand.init(
+                    userId,
+                    baseDateEnd,
+                    bookMarkApi,
+                    size
+            );
+
+            case DOWN, UP -> SearchVideoEditCommand.scroll(
+                    userId,
+                    scrollDirection,
+                    Cursor.of(cursorUserDefinedDate, cursorCreatedAt, cursorId),
+                    bookMarkApi,
+                    size
+            );
+        };
     }
 }
+
+
+

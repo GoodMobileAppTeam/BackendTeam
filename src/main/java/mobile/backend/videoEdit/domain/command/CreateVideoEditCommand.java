@@ -7,34 +7,34 @@ import java.time.LocalDate;
 public record CreateVideoEditCommand(
         Long albumId,
         Long userId,
+        String title,
         Integer duration,
         String videoUrl,
         MultipartFile thumbnailData,
         String thumbnailFileName,
         LocalDate saveTime,
-        String description,
         String bgmKey
 ) {
     public static CreateVideoEditCommand of(
             Long albumId,
             Long userId,
+            String title,
             Integer duration,
             String videoUrl,
             MultipartFile thumbnailData,
             String thumbnailFileName,
             LocalDate saveTime,
-            String description,
             String bgmKey
     ) {
         return new CreateVideoEditCommand(
                 albumId,
                 userId,
+                title,
                 duration,
                 videoUrl,
                 thumbnailData,
                 thumbnailFileName,
                 saveTime,
-                description,
                 bgmKey
         );
     }

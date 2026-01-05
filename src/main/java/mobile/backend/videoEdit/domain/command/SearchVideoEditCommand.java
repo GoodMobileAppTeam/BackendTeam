@@ -1,29 +1,52 @@
 package mobile.backend.videoEdit.domain.command;
 
-import mobile.backend.global.exception.CustomException;
-import mobile.backend.videoEdit.exception.VideoErrorCode;
+import mobile.backend.videoEdit.application.service.querymodel.Cursor;
 
 import java.time.LocalDate;
 
 public record SearchVideoEditCommand(
         Long userId,
-        LocalDate startDate,
-        LocalDate endDate,
-        LocalDate cursorDate,
-        Long cursorId,
+        ScrollDirection direction,
+
+        LocalDate baseDateEnd,
+
+        Cursor cursor,
+
+        boolean bookMarkApi,
+
         int size
 ) {
-    public static SearchVideoEditCommand of(Long userId, LocalDate startDate, LocalDate endDate,
-                                            LocalDate cursorDate, Long cursorId, int size) {
+    public static SearchVideoEditCommand init(
+            Long userId,
+            LocalDate baseDateEnd,
+            boolean bookMarkApi,
+            int size
+    ) {
+        return new SearchVideoEditCommand(
+                userId,
+                ScrollDirection.INIT,
+                baseDateEnd,
+                null,
+                bookMarkApi,
+                size
+        );
+    }
 
-        if (startDate.isAfter(endDate)) {
-            throw new CustomException(VideoErrorCode.INVALID_DATE_RANGE);
-        }
-
-        if (startDate.isAfter(LocalDate.now()) || endDate.isAfter(LocalDate.now())) {
-            throw new CustomException(VideoErrorCode.FUTURE_DATE_NOT_ALLOWED);
-        }
-
-        return new SearchVideoEditCommand(userId, startDate, endDate, cursorDate, cursorId, size);
+    public static SearchVideoEditCommand scroll(
+            Long userId,
+            ScrollDirection direction,
+            Cursor cursor,
+            boolean bookMarkApi,
+            int size
+    ) {
+        return new SearchVideoEditCommand(
+                userId,
+                direction,
+                null,
+                cursor,
+                bookMarkApi,
+                size
+        );
     }
 }
+
