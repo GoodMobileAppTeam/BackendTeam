@@ -34,7 +34,7 @@ import java.time.LocalDateTime;
  *
  * [왜 이 객체가 필요한가]
  * - cursor 페이징은 단일 id 기준으로는 안정성이 떨어진다.
- * - createdAt, saveTime 등 정렬 기준 컬럼을 함께 묶어
+ * - createdAt, userDefinedDate 등 정렬 기준 컬럼을 함께 묶어
  *   조회 기준을 고정해야 중복/누락을 방지할 수 있다.
  * - 여러 파라미터를 의미 단위로 묶기 위한 객체다.
  *
@@ -47,19 +47,19 @@ import java.time.LocalDateTime;
  * - Repository: Cursor 필드를 쿼리에만 활용
  */
 public record Cursor(
-        LocalDate saveTime,
+        LocalDate userDefinedDate,
         LocalDateTime createdAt,
         Long id
 ) {
 
     public static Cursor of(
-            LocalDate saveTime,
+            LocalDate userDefinedDate,
             LocalDateTime createdAt,
             Long id
     ) {
-        if (saveTime == null || createdAt == null || id == null) {
+        if (userDefinedDate == null || createdAt == null || id == null) {
             throw new CustomException(VideoErrorCode.INVALID_CURSOR);
         }
-        return new Cursor(saveTime, createdAt, id);
+        return new Cursor(userDefinedDate, createdAt, id);
     }
 }

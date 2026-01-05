@@ -47,8 +47,8 @@ public class VideoEditEntity extends BaseTimeEntity {
     @Column(name = "video_url", nullable = false)
     private String videoUrl;
 
-    @Column(name = "save_time", nullable = false)
-    private LocalDate saveTime;
+    @Column(name = "user_defined_date", nullable = false)
+    private LocalDate userDefinedDate;
 
     @Column(name = "is_book_mark", nullable = false)
     private Boolean isBookMark;
@@ -59,8 +59,8 @@ public class VideoEditEntity extends BaseTimeEntity {
     @Column(name = "bgm_key")
     private String bgmKey;
 
-    private VideoEditEntity(Long id, Long albumId, Long userId, Integer duration,
-                            String videoUrl, LocalDate saveTime,
+    private VideoEditEntity(Long id, Long albumId, Long userId, String title, Integer duration,
+                            String videoUrl, LocalDate userDefinedDate,
                             Boolean isBookMark, String thumbnailUrl, String bgmKey) {
         this.id = id;
         this.albumId = albumId;
@@ -68,7 +68,7 @@ public class VideoEditEntity extends BaseTimeEntity {
         this.userId = userId;
         this.duration = duration;
         this.videoUrl = videoUrl;
-        this.saveTime = saveTime;
+        this.userDefinedDate = userDefinedDate;
         this.isBookMark = isBookMark;
         this.thumbnailUrl = thumbnailUrl;
         this.bgmKey = bgmKey;
@@ -76,10 +76,10 @@ public class VideoEditEntity extends BaseTimeEntity {
 
     public static VideoEditEntity from(Long id, Long albumId, Long userId, String title, Integer duration,
                                        String videoUrl,
-                                       LocalDate saveTime, Boolean isBookMark,
+                                       LocalDate userDefinedDate, Boolean isBookMark,
                                        String thumbnailUrl, String bgmKey) {
         return new VideoEditEntity(id, albumId, userId, title, duration, videoUrl,
-                saveTime, isBookMark, thumbnailUrl, bgmKey);
+                userDefinedDate, isBookMark, thumbnailUrl, bgmKey);
     }
 
     public static VideoEdit toDomain(VideoEditEntity entity) {
@@ -92,7 +92,7 @@ public class VideoEditEntity extends BaseTimeEntity {
                 entity.getTitle(),
                 entity.getDuration(),
                 entity.getVideoUrl(),
-                entity.getSaveTime(),
+                entity.getUserDefinedDate(),
                 entity.getCreatedAt(),
                 Boolean.TRUE.equals(entity.getIsBookMark()),
                 entity.getThumbnailUrl(),
@@ -111,7 +111,7 @@ public class VideoEditEntity extends BaseTimeEntity {
                 domain.getTitle(),
                 domain.getDuration(),
                 domain.getVideoUrl(),
-                domain.getSaveTime(),
+                domain.getUserDefinedDate(),
                 domain.isBookMarked(),
                 domain.getThumbnailUrl(),
                 domain.getBgmKey()

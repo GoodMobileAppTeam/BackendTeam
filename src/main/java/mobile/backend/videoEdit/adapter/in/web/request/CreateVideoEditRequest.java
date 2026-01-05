@@ -32,19 +32,21 @@ public record CreateVideoEditRequest(
 
         @NotNull(message = "저장 시간은 필수입니다.")
         @JsonFormat(pattern = "yyyy-MM-dd")
-        LocalDate saveTime,
+        LocalDate userDefinedDate,
 
         String bgmKey
+
 ) {
     public CreateVideoEditCommand toCommand(Long userId, MultipartFile thumbnail) {
         return CreateVideoEditCommand.of(
                 albumId,
                 userId,
+                title,
                 duration,
                 videoUrl,
                 thumbnail,
                 thumbnail != null ? thumbnail.getOriginalFilename() : null,
-                saveTime,
+                userDefinedDate,
                 bgmKey
         );
     }

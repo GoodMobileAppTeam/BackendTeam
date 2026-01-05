@@ -121,7 +121,7 @@ public class VideoEditQuerydslRepositoryImpl implements VideoEditQuerydslReposit
         if (command.direction() != ScrollDirection.INIT) {
             return null;
         }
-        return v.saveTime.loe(command.baseDateEnd());
+        return v.userDefinedDate.loe(command.baseDateEnd());
     }
 
     /**
@@ -148,17 +148,17 @@ public class VideoEditQuerydslRepositoryImpl implements VideoEditQuerydslReposit
      * (DESC 정렬 기준)
      */
     private BooleanExpression olderThan(Cursor c) {
-        return v.saveTime.lt(c.saveTime())
-                .or(v.saveTime.eq(c.saveTime())
+        return v.userDefinedDate.lt(c.userDefinedDate())
+                .or(v.userDefinedDate.eq(c.userDefinedDate())
                         .and(v.createdAt.lt(c.createdAt())))
-                .or(v.saveTime.eq(c.saveTime())
+                .or(v.userDefinedDate.eq(c.userDefinedDate())
                         .and(v.createdAt.eq(c.createdAt()))
                         .and(v.id.lt(c.id())));
     }
 
     private BooleanExpression olderThan(VideoEditEntity e) {
         return olderThan(new Cursor(
-                e.getSaveTime(),
+                e.getUserDefinedDate(),
                 e.getCreatedAt(),
                 e.getId()
         ));
@@ -168,17 +168,17 @@ public class VideoEditQuerydslRepositoryImpl implements VideoEditQuerydslReposit
      * cursor 보다 최신 데이터
      */
     private BooleanExpression newerThan(Cursor c) {
-        return v.saveTime.gt(c.saveTime())
-                .or(v.saveTime.eq(c.saveTime())
+        return v.userDefinedDate.gt(c.userDefinedDate())
+                .or(v.userDefinedDate.eq(c.userDefinedDate())
                         .and(v.createdAt.gt(c.createdAt())))
-                .or(v.saveTime.eq(c.saveTime())
+                .or(v.userDefinedDate.eq(c.userDefinedDate())
                         .and(v.createdAt.eq(c.createdAt()))
                         .and(v.id.gt(c.id())));
     }
 
     private BooleanExpression newerThan(VideoEditEntity e) {
         return newerThan(new Cursor(
-                e.getSaveTime(),
+                e.getUserDefinedDate(),
                 e.getCreatedAt(),
                 e.getId()
         ));
@@ -186,7 +186,7 @@ public class VideoEditQuerydslRepositoryImpl implements VideoEditQuerydslReposit
 
     private OrderSpecifier<?>[] orderByDesc() {
         return new OrderSpecifier[]{
-                v.saveTime.desc(),
+                v.userDefinedDate.desc(),
                 v.createdAt.desc(),
                 v.id.desc()
         };

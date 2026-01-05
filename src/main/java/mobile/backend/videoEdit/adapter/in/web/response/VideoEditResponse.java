@@ -30,7 +30,7 @@ public record VideoEditResponse(
 
         @Schema(description = "사용자가 선택한 기록 날짜", example = "2024-01-15")
         @JsonFormat(pattern = "yyyy-MM-dd")
-        LocalDate saveTime,
+        LocalDate userDefinedDate,
 
         @Schema(description = "실제 db에 저장된 날자", example = "2025-04-01T00:10:00")
         @JsonFormat(
@@ -55,7 +55,7 @@ public record VideoEditResponse(
                 domain.getTitle(),
                 domain.getDuration(),
                 domain.getVideoUrl(),
-                domain.getSaveTime(),
+                domain.getUserDefinedDate(),
                 domain.getCreatedAt(),
                 domain.isBookMarked(),
                 domain.getThumbnailUrl()

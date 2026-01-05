@@ -24,12 +24,12 @@ public record VideoEditSearchRequest(
 
         /*
          * CURSOR - UP, DOWN 동작 모두 사용
-         * cursorSaveTime - 찾으려고 하는 커서 데이터의 기록 날짜
+         * cursorUserDefinedDate - 찾으려고 하는 커서 데이터의 기록 날짜
          * cursorCreatedAt - 찾으려고 하는 커서 데이터의 db 저장 날짜
          * cursorId - 찾으려고 하는 커서의 id
          */
         @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-        LocalDate cursorSaveTime,
+        LocalDate cursorUserDefinedDate,
 
         @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
         LocalDateTime cursorCreatedAt,
@@ -56,7 +56,7 @@ public record VideoEditSearchRequest(
             case DOWN, UP -> SearchVideoEditCommand.scroll(
                     userId,
                     scrollDirection,
-                    Cursor.of(cursorSaveTime, cursorCreatedAt, cursorId),
+                    Cursor.of(cursorUserDefinedDate, cursorCreatedAt, cursorId),
                     bookMarkApi,
                     size
             );

@@ -44,12 +44,12 @@ public record VideoEditSearchResponse(
                         .map(VideoEditResponse::from)
                         .toList(),
 
-                page.hasNext() ? last.getSaveTime() : null,
+                page.hasNext() ? last.getUserDefinedDate() : null,
                 page.hasNext() ? last.getCreatedAt() : null,
                 page.hasNext() ? last.getId() : null,
                 page.hasNext(),
 
-                page.hasPrev() ? first.getSaveTime() : null,
+                page.hasPrev() ? first.getUserDefinedDate() : null,
                 page.hasPrev() ? first.getCreatedAt() : null,
                 page.hasPrev() ? first.getId() : null,
                 page.hasPrev()

@@ -14,7 +14,7 @@ public record VideoEditSummaryResponse(
 ) {
     public static VideoEditSummaryResponse fromDomain(VideoEditSummary summary) {
         return new VideoEditSummaryResponse(
-                summary.saveTime(),
+                summary.userDefinedDate(),
                 summary.latestThumbnail(),
                 summary.count()
         );

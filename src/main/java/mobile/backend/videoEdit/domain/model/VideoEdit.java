@@ -15,7 +15,7 @@ public class VideoEdit {
     private final String title;
     private final Integer duration;
     private final String videoUrl;
-    private final LocalDate saveTime;
+    private final LocalDate userDefinedDate;
     private final LocalDateTime createdAt;
     private boolean isBookMarked;
     private String thumbnailUrl;
@@ -25,7 +25,7 @@ public class VideoEdit {
     private static final int MAX_DURATION_SECONDS = 60;
 
     private VideoEdit(Long id, Long albumId, Long userId, String title, Integer duration,
-                      String videoUrl, LocalDate saveTime, LocalDateTime createdAt,
+                      String videoUrl, LocalDate userDefinedDate, LocalDateTime createdAt,
                       boolean isBookMarked, String thumbnailUrl, String bgmKey) {
         this.id = id;
         this.albumId = albumId;
@@ -33,7 +33,7 @@ public class VideoEdit {
         this.title = title;
         this.duration = duration;
         this.videoUrl = videoUrl;
-        this.saveTime = saveTime;
+        this.userDefinedDate = userDefinedDate;
         this.createdAt = createdAt;
         this.isBookMarked = isBookMarked;
         this.thumbnailUrl = thumbnailUrl;
@@ -42,23 +42,23 @@ public class VideoEdit {
 
     // 새 영상 생성용 팩토리 메서드
     public static VideoEdit create(Long albumId, Long userId, String title, Integer duration,
-                                   String videoUrl, LocalDate saveTime, String thumbnailUrl, String bgmKey) {
+                                   String videoUrl, LocalDate userDefinedDate, String thumbnailUrl, String bgmKey) {
         validateDuration(duration);
 
 
         return new VideoEdit(
                 null, albumId, userId, title, duration, videoUrl,
-                saveTime, null, false, thumbnailUrl, bgmKey
+                userDefinedDate, null, false, thumbnailUrl, bgmKey
         );
     }
 
     // DB에서 복원용 팩토리 메서드
     public static VideoEdit from(Long id, Long albumId, Long userId, String title,
                                          Integer duration, String videoUrl,
-                                         LocalDate saveTime, LocalDateTime createdAt,
+                                         LocalDate userDefinedDate, LocalDateTime createdAt,
                                          boolean isBookMarked, String thumbnailUrl, String bgmKey) {
         return new VideoEdit(id, albumId, userId, title, duration, videoUrl,
-                saveTime, createdAt, isBookMarked, thumbnailUrl, bgmKey);
+                userDefinedDate, createdAt, isBookMarked, thumbnailUrl, bgmKey);
     }
 
     private static void validateDuration(Integer duration) {
