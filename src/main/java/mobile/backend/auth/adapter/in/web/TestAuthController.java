@@ -1,8 +1,9 @@
 package mobile.backend.auth.adapter.in.web;
 
+import mobile.backend.auth.adapter.in.web.response.TestSignupResponse;
 import mobile.backend.global.util.CookieUtils;
 import jakarta.servlet.http.HttpServletResponse;
-import mobile.backend.global.security.jwt.JwtProperties;
+import mobile.backend.user.domain.model.User;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
@@ -33,20 +34,13 @@ public class TestAuthController {
 
 
     @PostMapping("/test-signup")
-    public ResponseEntity<BaseResponse<TestAuthResponse>> signup(
-            @Valid @RequestBody TestSignupRequest request,
-            HttpServletResponse httpResponse) {
+    public ResponseEntity<BaseResponse<TestSignupResponse>> signup(
+            @Valid @RequestBody TestSignupRequest request) {
 
-        AuthToken authToken = testAuthCommandUseCase.signup(request.toCommand());
-
-        ResponseCookie accessTokenCookie = cookieUtils.createAccessTokenCookie(authToken.getAccessToken());
-        ResponseCookie refreshTokenCookie = cookieUtils.createRefreshTokenCookie(authToken.getRefreshToken());
-
-        httpResponse.addHeader(HttpHeaders.SET_COOKIE, accessTokenCookie.toString());
-        httpResponse.addHeader(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString());
+        User user = testAuthCommandUseCase.signup(request.toCommand());
 
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(BaseResponse.success(TestAuthResponse.from(authToken)));
+                .body(BaseResponse.success(TestSignupResponse.from(user)));
 
     }
 

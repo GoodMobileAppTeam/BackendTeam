@@ -33,7 +33,7 @@ public class TestAuthService implements TestAuthCommandUseCase {
 
     @Override
     @Transactional
-    public AuthToken signup(TestSignupCommand command) {
+    public User signup(TestSignupCommand command) {
         // 1. 이메일 중복 체크
         if (userRepository.existsBySocialIdAndSocialType(command.getEmail(), SocialType.TEST)) {
             throw new CustomException(AuthErrorCode.EMAIL_ALREADY_EXISTS);
@@ -46,16 +46,7 @@ public class TestAuthService implements TestAuthCommandUseCase {
         User user = User.createTestUser(command.getEmail(), encodedPassword, command.getName());
         User savedUser = userRepository.save(user);
 
-        // 4. JWT 토큰 생성
-        String accessToken = jwtProvider.generateAccessToken(savedUser.getId());
-        String refreshToken = jwtProvider.generateRefreshToken(savedUser.getId());
-
-        // 5. RefreshToken 저장
-        refreshTokenRepository.save(
-                RefreshToken.create(savedUser.getId(), refreshToken, jwtProperties.getRefreshTokenExpireTime())
-        );
-
-        return AuthToken.of(savedUser.getId(), accessToken, refreshToken);
+        return savedUser;
     }
 
     @Override

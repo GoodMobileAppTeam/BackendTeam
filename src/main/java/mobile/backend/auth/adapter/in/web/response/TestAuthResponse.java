@@ -9,14 +9,8 @@ import mobile.backend.auth.domain.model.AuthToken;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class TestAuthResponse {
     private final Long userId;
-    private final String accessToken;
-    private final String refreshToken;
 
     public static TestAuthResponse from(AuthToken authToken) {
-        return new TestAuthResponse(
-                authToken.getUserId(),
-                authToken.getAccessToken(),
-                authToken.getRefreshToken()
-        );
+        return new TestAuthResponse(authToken.getUserId());
     }
 }
