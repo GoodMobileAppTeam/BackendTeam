@@ -6,7 +6,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import mobile.backend.global.adapter.in.web.response.BaseResponse;
 import mobile.backend.global.security.CustomUserDetails;
-import mobile.backend.user.application.service.UserService;
+import mobile.backend.user.application.port.in.UserQueryUseCase;
+import mobile.backend.user.application.port.in.UserQueryUseCase;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
@@ -22,14 +23,14 @@ import mobile.backend.user.domain.model.User;
 @RequiredArgsConstructor
 public class UserController {
 
-    private final UserService userService;
+    private final UserQueryUseCase userQueryUseCase;
 
     @Operation(summary = "내 정보 조회", description = "현재 로그인한 사용자의 정보를 조회합니다.")
     @GetMapping("/me")
     public ResponseEntity<BaseResponse<UserResponse>> getMyInfo(
             @AuthenticationPrincipal CustomUserDetails userDetails) {
 
-        User user = userService.getUserInfo(userDetails.getUserId());
+        User user = userQueryUseCase.getUserInfo(userDetails.getUserId());
 
         return ResponseEntity.ok(BaseResponse.success(UserResponse.from(user)));
     }
@@ -41,7 +42,7 @@ public class UserController {
             @AuthenticationPrincipal CustomUserDetails userDetails,
             HttpServletResponse httpResponse) {
 
-        userService.deleteUser(userDetails.getUserId());
+        userQueryUseCase.deleteUser(userDetails.getUserId());
 
         // RefreshToken 쿠키 삭제
         ResponseCookie deleteCookie = ResponseCookie.from("refreshToken", "")
