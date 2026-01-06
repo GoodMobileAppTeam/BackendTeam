@@ -20,6 +20,7 @@ public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
+    // 모든 메소드 API
     private static final String[] PUBLIC_ENDPOINTS = {
         "/admin/**",
         "/v1/auth/login",
@@ -28,6 +29,7 @@ public class SecurityConfig {
         "/v1/notices/**"
     };
 
+    // GET 메소드 API
     private static final String[] PUBLIC_GET_ENDPOINTS = {
         "/v1/notices",
         "/v1/notices/*",
