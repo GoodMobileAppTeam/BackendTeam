@@ -21,13 +21,13 @@ public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
     private static final String[] PUBLIC_ENDPOINTS = {
+        "/admin/**",
         "/v1/auth/login",
         "/v1/auth/refresh",
         "/v1/videos/placeNames"
     };
 
     private static final String[] PUBLIC_GET_ENDPOINTS = {
-        "/admin/**",
         "/v1/notices",
         "/v1/notices/*",
         "/v1/videos/bgms",
