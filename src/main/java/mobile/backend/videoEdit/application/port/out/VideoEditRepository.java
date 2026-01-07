@@ -12,7 +12,7 @@ import java.util.List;
 
 public interface VideoEditRepository {
     VideoEdit save(VideoEdit videoEdit);
-    List<VideoEdit> getDailyVideos(Long userId, LocalDate saveTime);
+    List<VideoEdit> getDailyVideos(Long userId, LocalDate userDefinedDate);
     VideoEdit findById(Long id);
     CursorPageResult<VideoEdit> search(SearchVideoEditCommand command);
     void delete(VideoEdit videoEdit);

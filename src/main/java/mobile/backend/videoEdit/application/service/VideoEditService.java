@@ -42,7 +42,7 @@ public class VideoEditService implements VideoEditCommandUseCase, VideoEditQuery
                 command.title(),
                 command.duration(),
                 command.videoUrl(),
-                command.saveTime(),
+                command.userDefinedDate(),
                 thumbnailUrl,
                 command.bgmKey()
         );
@@ -51,8 +51,8 @@ public class VideoEditService implements VideoEditCommandUseCase, VideoEditQuery
     }
 
     @Override
-    public List<VideoEdit> getDailyVideos(Long userId, LocalDate saveTime) {
-        return videoEditRepository.getDailyVideos(userId, saveTime);
+    public List<VideoEdit> getDailyVideos(Long userId, LocalDate userDefinedDate) {
+        return videoEditRepository.getDailyVideos(userId, userDefinedDate);
     }
 
     @Override

@@ -40,9 +40,9 @@ public class VideoEditRepositoryImpl implements VideoEditRepository {
     }
 
     @Override
-    public List<VideoEdit> getDailyVideos(Long userId, LocalDate saveTime) {
+    public List<VideoEdit> getDailyVideos(Long userId, LocalDate userDefinedDate) {
         return jpaRepository
-                .findAllByUserIdAndSaveTimeOrderByCreatedAtDesc(userId, saveTime)
+                .findAllByUserIdAndUserDefinedDateOrderByCreatedAtDesc(userId, userDefinedDate)
                 .stream()
                 .map(VideoEditEntity::toDomain)
                 .toList();

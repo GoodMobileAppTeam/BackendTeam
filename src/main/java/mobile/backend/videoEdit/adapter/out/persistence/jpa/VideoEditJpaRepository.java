@@ -11,25 +11,25 @@ import java.util.List;
 public interface VideoEditJpaRepository extends JpaRepository<VideoEditEntity, Long> {
     @Query(value = """
     SELECT 
-        v.save_time AS saveTime,
+        v.userDefinedDate AS userDefinedDate,
         v.thumbnail_url AS latestThumbnail,
         t.cnt AS count
     FROM video_edit v
     INNER JOIN (
         SELECT 
-            save_time,
+            user_defined_date,
             COUNT(*) AS cnt,
             MAX(created_at) AS latestCreatedAt
         FROM video_edit
         WHERE user_id = :userId
-          AND save_time BETWEEN :startDate AND :endDate
-        GROUP BY save_time
+          AND user_defined_date BETWEEN :startDate AND :endDate
+        GROUP BY user_defined_date
     ) t
-        ON v.save_time = t.save_time
+        ON v.user_defined_date = t.user_defined_date
        AND v.created_at = t.latestCreatedAt
     WHERE v.user_id = :userId
-      AND v.save_time BETWEEN :startDate AND :endDate
-    ORDER BY v.save_time DESC
+      AND v.user_defined_date BETWEEN :startDate AND :endDate
+    ORDER BY v.user_defined_date DESC
     """,
             nativeQuery = true
     )
@@ -39,5 +39,5 @@ public interface VideoEditJpaRepository extends JpaRepository<VideoEditEntity, L
             @Param("endDate") LocalDate endDate
     );
 
-    List<VideoEditEntity> findAllByUserIdAndSaveTimeOrderByCreatedAtDesc(Long userId, LocalDate saveTime);
+    List<VideoEditEntity> findAllByUserIdAndUserDefinedDateOrderByCreatedAtDesc(Long userId, LocalDate userDefinedDate);
 }
