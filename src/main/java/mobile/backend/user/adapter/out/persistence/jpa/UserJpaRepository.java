@@ -8,4 +8,6 @@ import java.util.Optional;
 
 public interface UserJpaRepository extends JpaRepository<UserEntity, Long> {
     Optional<UserEntity> findBySocialIdAndSocialType(String socialId, SocialType socialType);
+    boolean existsBySocialIdAndSocialType(String socialId, SocialType socialType);
+
 }

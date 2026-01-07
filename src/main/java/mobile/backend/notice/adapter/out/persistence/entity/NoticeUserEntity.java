@@ -1,5 +1,10 @@
 package mobile.backend.notice.adapter.out.persistence.entity;
 
+import jakarta.persistence.FetchType;
+import jakarta.persistence.ForeignKey;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import mobile.backend.user.adapter.out.persistence.entity.UserEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -29,8 +34,13 @@ public class NoticeUserEntity {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  @Column(nullable = false)
-  private Long userId;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "userId", nullable = false,
+          foreignKey = @ForeignKey(
+                  name = "fk_notice_user_user",
+                  foreignKeyDefinition = "FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE"
+          ))
+  private UserEntity user;
 
   @Column(nullable = false)
   private Long noticeId;
@@ -39,8 +49,9 @@ public class NoticeUserEntity {
   private boolean ignored;
 
   public static NoticeUserEntity of(Long userId, Long noticeId, boolean ignored) {
+    UserEntity user = UserEntity.builder().id(userId).build();
     return NoticeUserEntity.builder()
-        .userId(userId)
+        .user(user)
         .noticeId(noticeId)
         .ignored(ignored)
         .build();
@@ -49,7 +60,7 @@ public class NoticeUserEntity {
   public static NoticeUserEntity updateIgnored(NoticeUserEntity entity) {
     return NoticeUserEntity.builder()
         .id(entity.getId())
-        .userId(entity.getUserId())
+        .user(entity.getUser())
         .noticeId(entity.getNoticeId())
         .ignored(true)
         .build();
