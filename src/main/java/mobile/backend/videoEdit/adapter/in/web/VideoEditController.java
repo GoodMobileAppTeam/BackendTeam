@@ -9,20 +9,21 @@ import lombok.RequiredArgsConstructor;
 import mobile.backend.global.adapter.in.web.response.BaseResponse;
 import mobile.backend.global.security.CustomUserDetails;
 import mobile.backend.videoEdit.adapter.in.web.request.CreateVideoEditRequest;
-import mobile.backend.videoEdit.adapter.in.web.request.VideoEditBookmarkSearchRequest;
 import mobile.backend.videoEdit.adapter.in.web.request.VideoEditSearchRequest;
 import mobile.backend.videoEdit.adapter.in.web.request.VideoEditSummaryRequest;
-import mobile.backend.videoEdit.adapter.in.web.request.place.PlaceNameListRequest;
-import mobile.backend.videoEdit.adapter.in.web.response.VideoEditBookmarkSearchResponse;
-import mobile.backend.videoEdit.adapter.in.web.response.VideoEditListResponse;
+import mobile.backend.videoEdit.adapter.in.web.response.VideoEditSearchResponse;
+import mobile.backend.videoEdit.adapter.in.web.request.bgm.SetVideoEditBgmRequest;
+import mobile.backend.videoEdit.adapter.in.web.request.place.PlaceNameSearchRequest;
 import mobile.backend.videoEdit.adapter.in.web.response.VideoEditResponse;
 import mobile.backend.videoEdit.adapter.in.web.response.VideoEditSummaryResponse;
-import mobile.backend.videoEdit.adapter.in.web.response.place.PlaceNameResponse;
+import mobile.backend.videoEdit.application.port.in.*;
+import mobile.backend.videoEdit.adapter.in.web.response.bgm.BgmListResponse;
+import mobile.backend.videoEdit.adapter.in.web.response.place.PlaceNameSearchResponse;
 import mobile.backend.videoEdit.application.port.in.PlaceNameQueryUseCase;
 import mobile.backend.videoEdit.application.port.in.VideoEditCommandUseCase;
 import mobile.backend.videoEdit.application.port.in.VideoEditQueryUseCase;
+import mobile.backend.videoEdit.application.service.querymodel.CursorPageResult;
 import mobile.backend.videoEdit.domain.command.CreateVideoEditCommand;
-import mobile.backend.videoEdit.domain.command.SearchBookmarkVideoEditCommand;
 import mobile.backend.videoEdit.domain.command.SearchSummaryVideoEditCommand;
 import mobile.backend.videoEdit.domain.command.SearchVideoEditCommand;
 import mobile.backend.videoEdit.domain.model.VideoEdit;
@@ -43,15 +44,20 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.util.List;
+
 @Tag(name = "Video Edit", description = "영상 편집 관리 API")
 @RestController
 @RequestMapping("/v1/videos")
 @RequiredArgsConstructor
 public class VideoEditController {
 
-  private final VideoEditCommandUseCase videoEditCommandUseCase;
-  private final VideoEditQueryUseCase videoEditQueryUseCase;
-  private final PlaceNameQueryUseCase placeNameQueryUseCase;
+    private final VideoEditCommandUseCase videoEditCommandUseCase;
+    private final VideoEditQueryUseCase videoEditQueryUseCase;
+    private final PlaceNameQueryUseCase placeNameQueryUseCase;
+    private final BgmQueryUseCase bgmQueryUseCase;
+    private final BgmCommandUseCase bgmCommandUseCase;
 
     @Operation(
             summary = "영상 등록",
@@ -86,18 +92,19 @@ public class VideoEditController {
     }
 
     @Operation(
-            summary = "영상 목록 조회",
-            description = "날짜 범위에 맞는 목록을 반환 (yyyy-MM-dd 형식 사용, 커서 페이징 사용)"
+            summary = "보드 영상 목록 조회",
+            description = "사용자의 영상 목록을 커서 페이징하여 조회합니다."
     )
     @GetMapping
-    public ResponseEntity<BaseResponse<VideoEditListResponse>> search(
+    public ResponseEntity<BaseResponse<VideoEditSearchResponse>> search(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @Valid @ModelAttribute VideoEditSearchRequest request) {
 
-        SearchVideoEditCommand criteria = request.toCommand(userDetails.getUserId());
+        SearchVideoEditCommand command = request.toCommand(userDetails.getUserId(), false);
 
-        List<VideoEdit> result = videoEditQueryUseCase.search(criteria);
-        return ResponseEntity.ok(BaseResponse.success(VideoEditListResponse.from(result, request.size())));
+        CursorPageResult<VideoEdit> pageResult = videoEditQueryUseCase.search(command);
+
+        return ResponseEntity.ok(BaseResponse.success(VideoEditSearchResponse.from(pageResult)));
     }
 
     @Operation(
@@ -105,16 +112,15 @@ public class VideoEditController {
             description = "사용자가 북마크한 영상 목록을 커서 페이징하여 조회합니다."
     )
     @GetMapping("/bookmarks")
-    public ResponseEntity<BaseResponse<VideoEditBookmarkSearchResponse>> getBookmarked(
+    public ResponseEntity<BaseResponse<VideoEditSearchResponse>> getBookmarked(
             @AuthenticationPrincipal CustomUserDetails userDetails,
-            @Valid @ModelAttribute VideoEditBookmarkSearchRequest request) {
+            @Valid @ModelAttribute VideoEditSearchRequest request) {
 
-        SearchBookmarkVideoEditCommand command = request.toCommand(userDetails.getUserId());
+        SearchVideoEditCommand command = request.toCommand(userDetails.getUserId(), true);
 
-        List<VideoEdit> result = videoEditQueryUseCase.getBookmarkedVideos(command);
+        CursorPageResult<VideoEdit> pageResult = videoEditQueryUseCase.search(command);
 
-        return ResponseEntity.ok(BaseResponse.success(VideoEditBookmarkSearchResponse.from(result, request.size()))
-        );
+        return ResponseEntity.ok(BaseResponse.success(VideoEditSearchResponse.from(pageResult)));
     }
 
     @Operation(
@@ -138,9 +144,9 @@ public class VideoEditController {
     @DeleteMapping("/{id}")
     public ResponseEntity<BaseResponse<Void>> delete(
             @PathVariable Long id,
-            @AuthenticationPrincipal CustomUserDetails userDetails) {
+            @AuthenticationPrincipal CustomUserDetails customUserDetails) {
 
-        videoEditCommandUseCase.delete(id, userDetails.getUserId());
+        videoEditCommandUseCase.delete(id, customUserDetails.getUserId ());
         return ResponseEntity.ok(BaseResponse.success("영상이 삭제되었습니다.", null));
     }
 
@@ -155,26 +161,64 @@ public class VideoEditController {
 
         SearchSummaryVideoEditCommand command = request.toCommand(userDetails.getUserId());
 
-    List<VideoEditSummary> summaries = videoEditQueryUseCase.getDailySummary(command);
+        List<VideoEditSummary> summaries = videoEditQueryUseCase.getDailySummary(command);
 
-    return ResponseEntity.ok(BaseResponse.success(VideoEditSummaryResponse.fromDomainList(summaries)));
+        return ResponseEntity.ok(BaseResponse.success(VideoEditSummaryResponse.fromDomainList(summaries)));
   }
 
   @Operation(
-      summary = "영상들 gps 정보(위도,경도) -> 상호명 반환",
+      summary = "키워드 기반 장소 검색",
       description = """
-          영상들의 위도와 경도를 리스트로 요청하면 상호명을 리스트 순서대로 반환합니다.<br>
-          placeName 우선순위<br>
-          - 1순위 : 건물명 반환<br>
-          - 2순위 : 도로명 주소 반환(시/도 + 군까지)<br>
-          - 3순위 : 지번 주소 반환(시/도 + 군까지)<br>
+          입력한 키워드(query)로 키워드 장소 검색을 수행합니다.<br>
+          응답은 placeName + address(도로명 우선, 없으면 지번) 형태로 반환합니다.<br>
           
-          1순위 없으면 -> 2순위, 2순위 없으면 -> 3순위
+          페이징: <br>
+           - page: 1 ~ 45
+           - size: 1 ~ 15
           """
   )
-  @PostMapping("/placeNames")
-  public BaseResponse<List<PlaceNameResponse>> getPlaceNames(
-      @RequestBody PlaceNameListRequest request) {
-    return BaseResponse.success(placeNameQueryUseCase.getPlaceNames(request.toCommand()));
+  @GetMapping("/placeNames/search")
+  public BaseResponse<PlaceNameSearchResponse> getPlaceNames(
+      @Valid @ModelAttribute PlaceNameSearchRequest request
+  ) {
+    return BaseResponse.success(placeNameQueryUseCase.search(request.toCommand()));
   }
+
+  @Operation(
+      summary = "배경음악 목록 조회",
+      description = "S3 bgm/ 폴더의 mp3 목록을 조회하여 반환합니다."
+  )
+  @GetMapping("/bgms")
+  public ResponseEntity<BaseResponse<BgmListResponse>> getBgms() {
+    return ResponseEntity.ok(BaseResponse.success(bgmQueryUseCase.getBgmList()));
+  }
+
+  @Operation(
+      summary = "배경음악 설정",
+      description = "영상에 bgmKey(S3에 저장된 배경음악 파일의 경로(Key)) 를 저장합니다."
+  )
+  @PatchMapping("/{id}/bgm")
+  public ResponseEntity<BaseResponse<Void>> setBgm(
+      @PathVariable Long id,
+      @AuthenticationPrincipal CustomUserDetails userDetails,
+      @Valid @RequestBody SetVideoEditBgmRequest request
+  ) {
+    bgmCommandUseCase.setBgm(request.toCommand(id, userDetails.getUserId()));
+    return ResponseEntity.ok(BaseResponse.success("배경음악이 설정되었습니다.", null));
+  }
+
+  @Operation(
+      summary = "배경음악 해제",
+      description = "영상에 설정된 bgmKey를 제거합니다."
+  )
+  @DeleteMapping("/{id}/bgm")
+  public ResponseEntity<BaseResponse<Void>> clearBgm(
+      @PathVariable Long id,
+      @AuthenticationPrincipal CustomUserDetails userDetails
+  ) {
+    bgmCommandUseCase.clearBgm(id, userDetails.getUserId());
+    return ResponseEntity.ok(BaseResponse.success("배경음악이 해제되었습니다.", null));
+  }
+
+
 }

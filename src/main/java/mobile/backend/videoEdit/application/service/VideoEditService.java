@@ -6,8 +6,8 @@ import mobile.backend.global.adapter.out.s3.AmazonS3Manager;
 import mobile.backend.videoEdit.application.port.in.VideoEditCommandUseCase;
 import mobile.backend.videoEdit.application.port.in.VideoEditQueryUseCase;
 import mobile.backend.videoEdit.application.port.out.VideoEditRepository;
+import mobile.backend.videoEdit.application.service.querymodel.CursorPageResult;
 import mobile.backend.videoEdit.domain.command.CreateVideoEditCommand;
-import mobile.backend.videoEdit.domain.command.SearchBookmarkVideoEditCommand;
 import mobile.backend.videoEdit.domain.command.SearchSummaryVideoEditCommand;
 import mobile.backend.videoEdit.domain.command.SearchVideoEditCommand;
 import mobile.backend.videoEdit.domain.model.VideoEditSummary;
@@ -38,11 +38,12 @@ public class VideoEditService implements VideoEditCommandUseCase, VideoEditQuery
         VideoEdit videoEdit = VideoEdit.create(
                 command.albumId(),
                 command.userId(),
+                command.title(),
                 command.duration(),
                 command.videoUrl(),
                 command.saveTime(),
                 thumbnailUrl,
-                command.description()
+                command.bgmKey()
         );
 
         return videoEditRepository.save(videoEdit);
@@ -56,13 +57,8 @@ public class VideoEditService implements VideoEditCommandUseCase, VideoEditQuery
     }
 
     @Override
-    public List<VideoEdit> search(SearchVideoEditCommand criteria) {
-        return videoEditRepository.search(criteria);
-    }
-
-    @Override
-    public List<VideoEdit> getBookmarkedVideos(SearchBookmarkVideoEditCommand command) {
-        return videoEditRepository.bookmarkSearch(command);
+    public CursorPageResult<VideoEdit> search(SearchVideoEditCommand command) {
+        return videoEditRepository.search(command);
     }
 
     @Override
