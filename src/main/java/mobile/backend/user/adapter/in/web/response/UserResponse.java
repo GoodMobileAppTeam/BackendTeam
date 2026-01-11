@@ -1,5 +1,6 @@
 package mobile.backend.user.adapter.in.web.response;
 
+import mobile.backend.user.domain.model.SocialType;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
 import mobile.backend.user.domain.model.User;
@@ -18,6 +19,9 @@ public record UserResponse(
         @Schema(description = "프로필 이미지 URL", example = "https://bucket.s3.amazonaws.com/profile/uuid.jpg")
         String profileImageUrl,
 
+        @Schema(description = "소셜 로그인 타입", example = "GOOGLE")
+        SocialType socialType,
+
         @Schema(description = "가입 일시", example = "2024-01-15T10:30:00")
         @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
         LocalDateTime createdAt
@@ -28,6 +32,7 @@ public record UserResponse(
                 domain.getId(),
                 domain.getName(),
                 domain.getProfileImageUrl(),
+                domain.getSocialType(),
                 domain.getCreatedAt()
         );
     }

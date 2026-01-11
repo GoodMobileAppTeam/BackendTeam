@@ -7,7 +7,6 @@ import lombok.RequiredArgsConstructor;
 import mobile.backend.global.adapter.in.web.response.BaseResponse;
 import mobile.backend.global.security.CustomUserDetails;
 import mobile.backend.user.application.port.in.UserQueryUseCase;
-import mobile.backend.user.application.port.in.UserQueryUseCase;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +14,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import mobile.backend.user.adapter.in.web.response.UserResponse;
 import mobile.backend.user.domain.model.User;
+import org.springframework.web.multipart.MultipartFile;
 
 
 @Tag(name = "User API", description = "회원 관련 API")
@@ -56,6 +56,29 @@ public class UserController {
 
         return ResponseEntity.ok(BaseResponse.success("User deleted", null));
     }
+
+    @Operation(summary = "이름 수정", description = "현재 로그인한 사용자의 이름을 수정합니다.")
+    @PatchMapping(value = "/me/name")
+    public ResponseEntity<BaseResponse<UserResponse>> updateMyName(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @RequestParam String name) {
+
+        User updatedUser = userQueryUseCase.updateUserName(userDetails.getUserId(), name);
+
+        return ResponseEntity.ok(BaseResponse.success(UserResponse.from(updatedUser)));
+    }
+
+    @Operation(summary = "프로필 이미지 수정", description = "현재 로그인한 사용자의 프로필 이미지를 수정합니다.")
+    @PatchMapping(value = "/me/profile-image", consumes = "multipart/form-data")
+    public ResponseEntity<BaseResponse<UserResponse>> updateMyProfileImage(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @RequestParam MultipartFile profileImage) {
+
+        User updatedUser = userQueryUseCase.updateUserProfileImage(userDetails.getUserId(), profileImage);
+
+        return ResponseEntity.ok(BaseResponse.success(UserResponse.from(updatedUser)));
+    }
+
 }
 
 

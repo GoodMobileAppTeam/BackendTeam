@@ -11,5 +11,5 @@ public interface UserRepository {
   User findById(Long id);
   void deleteById(Long id);
   boolean existsBySocialIdAndSocialType(String socialId, SocialType socialType);
-
+  User update(User user);
 }
