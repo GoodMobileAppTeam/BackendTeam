@@ -12,11 +12,10 @@ import mobile.backend.videoEdit.adapter.in.web.request.CreateVideoEditRequest;
 import mobile.backend.videoEdit.adapter.in.web.request.VideoEditSearchRequest;
 import mobile.backend.videoEdit.adapter.in.web.request.VideoEditSummaryRequest;
 import mobile.backend.videoEdit.adapter.in.web.response.VideoEditSearchResponse;
-import mobile.backend.videoEdit.adapter.in.web.request.bgm.SetVideoEditBgmRequest;
 import mobile.backend.videoEdit.adapter.in.web.request.place.PlaceNameSearchRequest;
 import mobile.backend.videoEdit.adapter.in.web.response.VideoEditResponse;
 import mobile.backend.videoEdit.adapter.in.web.response.VideoEditSummaryResponse;
-import mobile.backend.videoEdit.application.port.in.*;
+import mobile.backend.videoEdit.application.port.in.BgmQueryUseCase;
 import mobile.backend.videoEdit.adapter.in.web.response.bgm.BgmListResponse;
 import mobile.backend.videoEdit.adapter.in.web.response.place.PlaceNameSearchResponse;
 import mobile.backend.videoEdit.application.port.in.PlaceNameQueryUseCase;
@@ -38,14 +37,10 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.io.IOException;
-import java.util.List;
 
 @Tag(name = "Video Edit", description = "영상 편집 관리 API")
 @RestController
@@ -57,7 +52,6 @@ public class VideoEditController {
     private final VideoEditQueryUseCase videoEditQueryUseCase;
     private final PlaceNameQueryUseCase placeNameQueryUseCase;
     private final BgmQueryUseCase bgmQueryUseCase;
-    private final BgmCommandUseCase bgmCommandUseCase;
 
     @Operation(
             summary = "영상 등록",
@@ -171,7 +165,7 @@ public class VideoEditController {
       description = """
           입력한 키워드(query)로 키워드 장소 검색을 수행합니다.<br>
           응답은 placeName + address(도로명 우선, 없으면 지번) 형태로 반환합니다.<br>
-          
+
           페이징: <br>
            - page: 1 ~ 45
            - size: 1 ~ 15
@@ -192,33 +186,5 @@ public class VideoEditController {
   public ResponseEntity<BaseResponse<BgmListResponse>> getBgms() {
     return ResponseEntity.ok(BaseResponse.success(bgmQueryUseCase.getBgmList()));
   }
-
-  @Operation(
-      summary = "배경음악 설정",
-      description = "영상에 bgmKey(S3에 저장된 배경음악 파일의 경로(Key)) 를 저장합니다."
-  )
-  @PatchMapping("/{id}/bgm")
-  public ResponseEntity<BaseResponse<Void>> setBgm(
-      @PathVariable Long id,
-      @AuthenticationPrincipal CustomUserDetails userDetails,
-      @Valid @RequestBody SetVideoEditBgmRequest request
-  ) {
-    bgmCommandUseCase.setBgm(request.toCommand(id, userDetails.getUserId()));
-    return ResponseEntity.ok(BaseResponse.success("배경음악이 설정되었습니다.", null));
-  }
-
-  @Operation(
-      summary = "배경음악 해제",
-      description = "영상에 설정된 bgmKey를 제거합니다."
-  )
-  @DeleteMapping("/{id}/bgm")
-  public ResponseEntity<BaseResponse<Void>> clearBgm(
-      @PathVariable Long id,
-      @AuthenticationPrincipal CustomUserDetails userDetails
-  ) {
-    bgmCommandUseCase.clearBgm(id, userDetails.getUserId());
-    return ResponseEntity.ok(BaseResponse.success("배경음악이 해제되었습니다.", null));
-  }
-
 
 }

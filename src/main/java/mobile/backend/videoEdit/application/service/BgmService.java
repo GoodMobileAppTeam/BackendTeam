@@ -7,51 +7,20 @@ import mobile.backend.global.adapter.out.s3.AmazonS3Manager;
 import mobile.backend.global.config.S3.S3Properties;
 import mobile.backend.videoEdit.adapter.in.web.response.bgm.BgmItemResponse;
 import mobile.backend.videoEdit.adapter.in.web.response.bgm.BgmListResponse;
-import mobile.backend.videoEdit.application.port.in.BgmCommandUseCase;
 import mobile.backend.videoEdit.application.port.in.BgmQueryUseCase;
-import mobile.backend.videoEdit.application.port.out.VideoEditRepository;
-import mobile.backend.videoEdit.domain.command.bgm.SetVideoEditBgmCommand;
-import mobile.backend.videoEdit.domain.model.VideoEdit;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class BgmService implements BgmCommandUseCase, BgmQueryUseCase {
+public class BgmService implements BgmQueryUseCase {
 
   // 음악 파일 정보
   private record FileMeta(String title, String artist) {}
 
-  private final VideoEditRepository videoEditRepository;
-
   private final AmazonS3Manager amazonS3Manager;
   private final S3Properties s3Properties;
-
-  @Override
-  @Transactional
-  public void setBgm(SetVideoEditBgmCommand command) {
-    VideoEdit videoEdit = videoEditRepository.findById(command.getVideoId());
-
-    VideoEdit.validateOwnership(videoEdit, command.getUserId());
-
-    videoEdit.setBgm(command.getBgmKey());
-
-    videoEditRepository.save(videoEdit);
-  }
-
-  @Override
-  @Transactional
-  public void clearBgm(Long videoId, Long userId) {
-    VideoEdit videoEdit = videoEditRepository.findById(videoId);
-
-    VideoEdit.validateOwnership(videoEdit, userId);
-
-    videoEdit.clearBgm();
-
-    videoEditRepository.save(videoEdit);
-
-  }
 
   @Override
   public BgmListResponse getBgmList() {
@@ -61,25 +30,63 @@ public class BgmService implements BgmCommandUseCase, BgmQueryUseCase {
 
     List<String> keys = amazonS3Manager.listKeys(prefix);
 
+    // thumbnail 폴더의 모든 파일 목록 가져오기
+    String thumbnailPrefix = s3Properties.getPath().getThumbnail() + "/"; //  bgm/thumbnail/
+    List<String> thumbnailKeys = amazonS3Manager.listKeys(thumbnailPrefix);
+
     List<BgmItemResponse> bgms = new ArrayList<>();
 
     for (String key : keys) {
       if (!key.toLowerCase().endsWith(".mp3")) continue;
 
       FileMeta meta = parseFileName(key);
+      String thumbnailUrl = getThumbnailUrl(meta.title, thumbnailKeys);
 
       bgms.add(
           BgmItemResponse.builder()
-              .bgmKey(key) // bgm/hope.mp3
               .title(meta.title)
               .artist(meta.artist)
-              .thumbnailUrl(null) // 지금은 없음
+              .thumbnailUrl(thumbnailUrl)
               .audioUrl(amazonS3Manager.getPublicUrl(key))
               .build()
       );
     }
 
     return BgmListResponse.from(bgms);
+  }
+
+  /**
+   * <pre>
+   * BGM 제목에 대응하는 썸네일 URL을 반환
+   *
+   * 썸네일 파일 규칙:
+   * - BGM 파일명: "Scandinavianz - Chill Guy.mp3"
+   * - BGM title: "Chill Guy"
+   * - 썸네일 파일명: "Chill Guy.jpg" (title과 동일, .jpg/.jpeg)
+   *
+   * 예시:
+   * - title: "Chill Guy" → 썸네일: "Chill Guy.jpg"
+   * - title: "Bicycles" → 썸네일: "Bicycles.jpg"
+   * - title: "hope" → 썸네일: "hope.jpg"
+   *
+   * 썸네일이 없으면 null 반환
+   * </pre>
+   */
+  private String getThumbnailUrl(String title, List<String> thumbnailKeys) {
+    for (String thumbnailKey : thumbnailKeys) {
+      // "bgm/thumbnail/Chill Guy.jpg" → "Chill Guy.jpg"
+      String thumbnailFileName = thumbnailKey.substring(thumbnailKey.lastIndexOf("/") + 1);
+      
+      // 확장자 제거: "Chill Guy.jpg" → "Chill Guy"
+      String thumbnailNameWithoutExt = thumbnailFileName.replaceAll("(?i)\\.(jpg|jpeg)$", "");
+      
+      // 대소문자 구분 없이 비교
+      if (thumbnailNameWithoutExt.equalsIgnoreCase(title)) {
+        return amazonS3Manager.getPublicUrl(thumbnailKey);
+      }
+    }
+    
+    return null; // 썸네일이 없으면 null
   }
 
   /**
@@ -99,21 +106,21 @@ public class BgmService implements BgmCommandUseCase, BgmQueryUseCase {
    *
    * 예시
    *
-   * 1) "Scandinavianz - Chill Guy mp3.mp3"
+   * 1) "Scandinavianz - Chill Guy.mp3"
    *    → artist = "Scandinavianz"
-   *    → title  = "Chill Guy mp3"
+   *    → title  = "Chill Guy"
    *
-   * 2) "Tokiwae - jellyfish (mp3).mp3"
-   *    → artist = "Tokiwae"
-   *    → title  = "jellyfish (mp3)"
+   * 2) "Tokiwave - jellyfish.mp3"
+   *    → artist = "Tokiwave"
+   *    → title  = "jellyfish"
    *
    * 3) "hope.mp3"
    *    → artist = "Unknown"
    *    → title  = "hope"
    *
-   * 4) "Bubble.MP3"
-   *    → artist = "Unknown"
-   *    → title  = "Bubble"
+   * 4) "MaxKoMusic - Happy commercial.mp3"
+   *    → artist = "MaxKoMusic"
+   *    → title  = "Happy commercial"
    *</pre>
    */
   private FileMeta parseFileName(String key) {
@@ -128,15 +135,15 @@ public class BgmService implements BgmCommandUseCase, BgmQueryUseCase {
     if (fileName.contains(" - ")) {
       String[] parts = fileName.split(" - ", 2);
       return new FileMeta(
-          parts[0].trim(), // artist
-          parts[1].trim()  // title
+          parts[1].trim(),  // title
+          parts[0].trim()   // artist
       );
     }
 
     // 아티스트 정보가 없는 경우
     return new FileMeta(
-        "Unknown",         // artist
-        fileName.trim()    // title
+        fileName.trim(),   // title
+        "Unknown"          // artist
     );
   }
 }
