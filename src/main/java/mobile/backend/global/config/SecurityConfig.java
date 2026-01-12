@@ -9,8 +9,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -22,14 +20,16 @@ public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
+    // 모든 메소드 API
     private static final String[] PUBLIC_ENDPOINTS = {
         "/admin/**",
         "/v1/auth/login",
         "/v1/auth/refresh",
-        "/v1/test-auth/**",
-        "/v1/videos/placeNames"
+        "/v1/videos/placeNames",
+        "/v1/notices/**"
     };
 
+    // GET 메소드 API
     private static final String[] PUBLIC_GET_ENDPOINTS = {
         "/v1/notices",
         "/v1/notices/*",
@@ -41,12 +41,6 @@ public class SecurityConfig {
     private static final String[] AUTHENTICATED_GET_ENDPOINTS = {
         "/v1/notices/home"
     };
-
-    //테스트 로그인용 비밀번호 암호화
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
 
 
     @Bean
