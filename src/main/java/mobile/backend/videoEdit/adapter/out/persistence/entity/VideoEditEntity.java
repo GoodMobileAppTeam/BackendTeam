@@ -1,5 +1,10 @@
 package mobile.backend.videoEdit.adapter.out.persistence.entity;
 
+import jakarta.persistence.FetchType;
+import jakarta.persistence.ForeignKey;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import mobile.backend.user.adapter.out.persistence.entity.UserEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -35,8 +40,13 @@ public class VideoEditEntity extends BaseTimeEntity {
     @Column(name = "album_id", nullable = false)
     private Long albumId;
 
-    @Column(name = "user_id", nullable = false)
-    private Long userId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false,
+            foreignKey = @ForeignKey(
+                    name = "fk_video_edit_user",
+                    foreignKeyDefinition = "FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE"
+            ))
+    private UserEntity user;
 
     @Column(name = "title", nullable = false, length = 10)
     private String title;
@@ -59,13 +69,14 @@ public class VideoEditEntity extends BaseTimeEntity {
     @Column(name = "bgm_key")
     private String bgmKey;
 
-    private VideoEditEntity(Long id, Long albumId, Long userId, String title, Integer duration,
+
+    private VideoEditEntity(Long id, Long albumId, UserEntity user, String title, Integer duration,
                             String videoUrl, LocalDate userDefinedDate,
                             Boolean isBookMark, String thumbnailUrl, String bgmKey) {
         this.id = id;
         this.albumId = albumId;
         this.title = title;
-        this.userId = userId;
+        this.user = user;
         this.duration = duration;
         this.videoUrl = videoUrl;
         this.userDefinedDate = userDefinedDate;
@@ -78,9 +89,11 @@ public class VideoEditEntity extends BaseTimeEntity {
                                        String videoUrl,
                                        LocalDate userDefinedDate, Boolean isBookMark,
                                        String thumbnailUrl, String bgmKey) {
-        return new VideoEditEntity(id, albumId, userId, title, duration, videoUrl,
-                userDefinedDate, isBookMark, thumbnailUrl, bgmKey);
+        UserEntity user = UserEntity.builder().id(userId).build();
+        return new VideoEditEntity(id, albumId, user, title, duration, videoUrl,
+                        userDefinedDate, isBookMark, thumbnailUrl, bgmKey);
     }
+
 
     public static VideoEdit toDomain(VideoEditEntity entity) {
         if (entity == null) return null;
@@ -88,7 +101,7 @@ public class VideoEditEntity extends BaseTimeEntity {
         return VideoEdit.from(
                 entity.getId(),
                 entity.getAlbumId(),
-                entity.getUserId(),
+                entity.getUser().getId(),
                 entity.getTitle(),
                 entity.getDuration(),
                 entity.getVideoUrl(),

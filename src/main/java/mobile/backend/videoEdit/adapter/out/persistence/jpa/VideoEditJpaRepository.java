@@ -9,7 +9,6 @@ import java.time.LocalDate;
 import java.util.List;
 
 public interface VideoEditJpaRepository extends JpaRepository<VideoEditEntity, Long> {
-
     @Query(value = """
     SELECT 
         v.save_time AS saveTime,

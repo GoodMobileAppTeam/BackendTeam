@@ -47,17 +47,22 @@ public class UserEntity {
   @Column(name = "social_type", nullable = false)
   private SocialType socialType;
 
+  @Column(name = "password")
+  private String password;
+
   @Column(name = "profile_image_url")
   private String profileImageUrl;
 
   @Column(name = "created_at")
   private LocalDateTime createdAt;
 
+
   public static UserEntity from(User user) {
     return UserEntity.builder()
             .name(user.getName())
             .socialId(user.getSocialId())
             .socialType(user.getSocialType())
+            .password(user.getPassword())
             .profileImageUrl(user.getProfileImageUrl())
             .createdAt(user.getCreatedAt())
             .build();
@@ -69,6 +74,7 @@ public class UserEntity {
         this.name,
         this.socialId,
         this.socialType,
+        this.password,
         this.profileImageUrl,
         this.createdAt
     );
