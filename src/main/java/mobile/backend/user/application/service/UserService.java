@@ -33,44 +33,41 @@ public class UserService implements UserQueryUseCase {
     userRepository.deleteById(userId);
   }
 
-  public User updateUserName(Long userId, String name) {
+  @Override
+  @Transactional
+  public User updateUserProfile(Long userId, String name, MultipartFile profileImage) {
     // 1. 기존 사용자 조회
     User existingUser = userRepository.findById(userId);
+    User updatedUser = existingUser;
 
-    // 2. 이름 업데이트
-    User updatedUser = existingUser.updateName(name);
-
-    // 3. DB 저장 및 반환
-    return userRepository.update(updatedUser);
-  }
-
-  public User updateUserProfileImage(Long userId, MultipartFile profileImage) {
-    // 1. 기존 사용자 조회
-    User existingUser = userRepository.findById(userId);
-
-    // 2. 기존 프로필 이미지가 S3 URL이면 삭제
-    if (existingUser.getProfileImageUrl() != null && !existingUser.getProfileImageUrl().isBlank()) {
-      if (isUserUploadedImage(existingUser.getProfileImageUrl(), userId)) {
-        amazonS3Manager.deleteObjectByUrl(existingUser.getProfileImageUrl());
-      }
+    // 2. 이름 업데이트 (name이 null이 아닌 경우에만)
+    if (name != null && !name.isBlank()) {
+      updatedUser = updatedUser.updateName(name);
     }
 
-    // 3. 새 이미지 S3 업로드
-    String uuid = java.util.UUID.randomUUID().toString();
-    String keyName = User.getProfileImagePath(userId, uuid);
-    String newProfileImageUrl = amazonS3Manager.uploadFile(keyName, profileImage);
+    // 3. 프로필 이미지 업데이트 (profileImage가 null이 아닌 경우에만)
+    if (profileImage != null && !profileImage.isEmpty()) {
+      // 기존 프로필 이미지가 S3 URL이면 삭제
+      if (existingUser.getProfileImageUrl() != null && !existingUser.getProfileImageUrl().isBlank()) {
+        if (isUserUploadedImage(existingUser.getProfileImageUrl(), userId)) {
+          amazonS3Manager.deleteObjectByUrl(existingUser.getProfileImageUrl());
+        }
+      }
 
-    // 4. 프로필 이미지 업데이트
-    User updatedUser = existingUser.updateProfileImage(newProfileImageUrl);
+      // 새 이미지 S3 업로드
+      String uuid = java.util.UUID.randomUUID().toString();
+      String keyName = User.getProfileImagePath(userId, uuid);
+      String newProfileImageUrl = amazonS3Manager.uploadFile(keyName, profileImage);
 
-    // 5. DB 저장 및 반환
+      updatedUser = updatedUser.updateProfileImage(newProfileImageUrl);
+    }
+
+    // 4. DB 저장 및 반환
     return userRepository.update(updatedUser);
   }
 
   private boolean isUserUploadedImage(String url, Long userId) {
     return url != null && url.contains("amazonaws.com") && url.contains("profile/" + userId);
   }
-
-
 
 }

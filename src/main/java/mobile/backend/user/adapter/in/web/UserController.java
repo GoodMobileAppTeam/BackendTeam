@@ -57,29 +57,23 @@ public class UserController {
         return ResponseEntity.ok(BaseResponse.success("User deleted", null));
     }
 
-    @Operation(summary = "이름 수정", description = "현재 로그인한 사용자의 이름을 수정합니다.")
-    @PatchMapping(value = "/me/name")
-    public ResponseEntity<BaseResponse<UserResponse>> updateMyName(
+    @Operation(
+            summary = "프로필 수정",
+            description = "현재 로그인한 사용자의 이름 및 프로필 이미지를 수정합니다. 이름만, 이미지만, 또는 둘 다 수정할 수 있습니다."
+    )
+    @PatchMapping(value = "/me", consumes = "multipart/form-data")
+    public ResponseEntity<BaseResponse<UserResponse>> updateMyProfile(
             @AuthenticationPrincipal CustomUserDetails userDetails,
-            @RequestParam String name) {
+            @RequestParam(required = false) String name,
+            @RequestPart(required = false) MultipartFile profileImage) {
 
-        User updatedUser = userQueryUseCase.updateUserName(userDetails.getUserId(), name);
-
-        return ResponseEntity.ok(BaseResponse.success(UserResponse.from(updatedUser)));
-    }
-
-    @Operation(summary = "프로필 이미지 수정", description = "현재 로그인한 사용자의 프로필 이미지를 수정합니다.")
-    @PatchMapping(value = "/me/image", consumes = "multipart/form-data")
-    public ResponseEntity<BaseResponse<UserResponse>> updateMyProfileImage(
-            @AuthenticationPrincipal CustomUserDetails userDetails,
-            @RequestParam MultipartFile profileImage) {
-
-        User updatedUser = userQueryUseCase.updateUserProfileImage(userDetails.getUserId(), profileImage);
+        User updatedUser = userQueryUseCase.updateUserProfile(
+                userDetails.getUserId(),
+                name,
+                profileImage
+        );
 
         return ResponseEntity.ok(BaseResponse.success(UserResponse.from(updatedUser)));
     }
 
 }
-
-
-

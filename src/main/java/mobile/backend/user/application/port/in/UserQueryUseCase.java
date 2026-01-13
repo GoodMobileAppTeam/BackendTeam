@@ -6,6 +6,5 @@ import org.springframework.web.multipart.MultipartFile;
 public interface UserQueryUseCase {
     User getUserInfo(Long userId);
     void deleteUser(Long userId);
-    User updateUserName(Long userId, String name);
-    User updateUserProfileImage(Long userId, MultipartFile profileImage);
+    User updateUserProfile(Long userId, String name, MultipartFile profileImage);
 }
