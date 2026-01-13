@@ -8,7 +8,7 @@ import java.util.List;
 
 @Schema(description = "영상 요약 정보 목록 응답 DTO")
 public record VideoEditSummaryResponse(
-        LocalDate saveTime,
+        LocalDate userDefinedDate,
         String latestThumbnail,
         Long count
 ) {
