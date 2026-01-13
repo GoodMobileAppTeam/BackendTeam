@@ -9,6 +9,8 @@ import java.time.LocalDate;
 import java.util.List;
 
 public interface VideoEditJpaRepository extends JpaRepository<VideoEditEntity, Long> {
+
+    // 이후 유저 사용량에 따라 수정 여부 결정(유지 : queryDsl, 개선 : 테이블 분리 등 추가 방안 모색)
     @Query(value = """
         SELECT 
             v.user_defined_date AS userDefinedDate,
@@ -37,5 +39,6 @@ public interface VideoEditJpaRepository extends JpaRepository<VideoEditEntity, L
             @Param("endDate") LocalDate endDate
     );
 
+    // 일일 영상 목록 반환 메서드 (CreatedAt을 기준으로 정렬)
     List<VideoEditEntity> findAllByUserIdAndUserDefinedDateOrderByCreatedAtDesc(Long userId, LocalDate userDefinedDate);
 }
