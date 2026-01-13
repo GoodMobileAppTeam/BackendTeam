@@ -39,6 +39,19 @@ public interface VideoEditJpaRepository extends JpaRepository<VideoEditEntity, L
             @Param("endDate") LocalDate endDate
     );
 
-    // 일일 영상 목록 반환 메서드 (CreatedAt을 기준으로 정렬)
+    /**
+     * 특정 사용자가 지정한 날짜(userDefinedDate)에 해당하는 영상 데이터들을 조회한다.
+     *
+     * - 조회 조건
+     *   1) userId가 일치하는 데이터
+     *   2) userDefinedDate가 전달된 날짜와 동일한 데이터
+     *
+     * - 정렬 방식
+     *   createdAt 기준 내림차순 (가장 최근에 생성된 영상이 먼저 조회됨)
+     *
+     * - 반환 값
+     *   조건에 맞는 VideoEditEntity 목록
+     *   (조건에 맞는 데이터가 없을 경우 빈 리스트 반환)
+     */
     List<VideoEditEntity> findAllByUserIdAndUserDefinedDateOrderByCreatedAtDesc(Long userId, LocalDate userDefinedDate);
 }
