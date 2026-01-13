@@ -24,9 +24,16 @@ import java.time.LocalDate;
 @Table(
         name = "video_edit",
         indexes = {
+                // 보드 & 북마크 조회
                 @Index(
                         name = "idx_video_user_cursor_desc",
                         columnList = "user_id, is_book_mark, user_defined_date DESC, created_at DESC, id DESC"
+                ),
+
+                // 캘린더 조회
+                @Index(
+                        name = "idx_video_daily_summary",
+                        columnList = "user_id, user_defined_date DESC, created_at DESC"
                 )
         }
 )@Getter

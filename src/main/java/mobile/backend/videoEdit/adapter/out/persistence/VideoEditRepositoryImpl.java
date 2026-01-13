@@ -15,6 +15,7 @@ import mobile.backend.videoEdit.domain.model.VideoEditSummary;
 import mobile.backend.videoEdit.exception.VideoErrorCode;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Repository
@@ -36,6 +37,15 @@ public class VideoEditRepositoryImpl implements VideoEditRepository {
         return jpaRepository.findById(id)
                 .map(VideoEditEntity::toDomain)
                 .orElseThrow(() -> new CustomException(VideoErrorCode.VIDEO_NOT_FOUND));
+    }
+
+    @Override
+    public List<VideoEdit> getDailyVideos(Long userId, LocalDate userDefinedDate) {
+        return jpaRepository
+                .findAllByUserIdAndUserDefinedDateOrderByCreatedAtDesc(userId, userDefinedDate)
+                .stream()
+                .map(VideoEditEntity::toDomain)
+                .toList();
     }
 
     @Override

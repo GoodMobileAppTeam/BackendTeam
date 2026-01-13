@@ -36,7 +36,7 @@ public class VideoEditQuerydslRepositoryImpl implements VideoEditQuerydslReposit
         return queryFactory
                 .selectFrom(v)
                 .where(
-                        v.userId.eq(command.userId()),
+                        v.user.id.eq(command.userId()),
                         bookmarkCondition(command.bookMarkApi()),
                         initCondition(command),
                         cursorCondition(command)
@@ -64,7 +64,7 @@ public class VideoEditQuerydslRepositoryImpl implements VideoEditQuerydslReposit
                 .selectOne()
                 .from(v)
                 .where(
-                        v.userId.eq(command.userId()),
+                        v.user.id.eq(command.userId()),
                         bookmarkCondition(command.bookMarkApi()),
                         olderThan(last)
                 )
@@ -92,7 +92,7 @@ public class VideoEditQuerydslRepositoryImpl implements VideoEditQuerydslReposit
                 .selectOne()
                 .from(v)
                 .where(
-                        v.userId.eq(command.userId()),
+                        v.user.id.eq(command.userId()),
                         bookmarkCondition(command.bookMarkApi()),
                         newerThan(first)
                 )
