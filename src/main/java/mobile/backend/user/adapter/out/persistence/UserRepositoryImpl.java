@@ -54,4 +54,28 @@ public class UserRepositoryImpl implements UserRepository {
   public void deleteById(Long id) {
     userJpaRepository.deleteById(id);
   }
+
+  public User update(User user) {
+    try {
+      UserEntity existingEntity = userJpaRepository.findById(user.getId())
+              .orElseThrow(() -> new CustomException(UserErrorCode.USER_NOT_FOUND));
+
+      // 업데이트할 필드만 변경
+      UserEntity updatedEntity = UserEntity.builder()
+              .id(existingEntity.getId())
+              .name(user.getName())
+              .socialId(existingEntity.getSocialId())
+              .socialType(existingEntity.getSocialType())
+              .password(existingEntity.getPassword())
+              .profileImageUrl(user.getProfileImageUrl())
+              .createdAt(existingEntity.getCreatedAt())
+              .build();
+
+      UserEntity savedEntity = userJpaRepository.save(updatedEntity);
+      return savedEntity.toDomain();
+    } catch (DataIntegrityViolationException e) {
+      throw new CustomException(UserErrorCode.USER_SAVE_FAILED);
+    }
+  }
+
 }
