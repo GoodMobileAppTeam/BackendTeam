@@ -11,19 +11,15 @@ import lombok.Getter;
 @Schema(title = "BgmItemResponse : bgm 한개의 응답 DTO")
 public class BgmItemResponse {
 
-  private String bgmKey;
   private String title;
   private String artist;
-  private Integer durationSec;
   private String thumbnailUrl;
   private String audioUrl;
 
-  public static BgmItemResponse from(String bgmKey, String title, String artist, Integer durationSec, String thumbnailUrl, String audioUrl) {
+  public static BgmItemResponse from(String title, String artist, String thumbnailUrl, String audioUrl) {
     return BgmItemResponse.builder()
-        .bgmKey(bgmKey)
         .title(title)
         .artist(artist)
-        .durationSec(durationSec)
         .thumbnailUrl(thumbnailUrl)
         .audioUrl(audioUrl)
         .build();

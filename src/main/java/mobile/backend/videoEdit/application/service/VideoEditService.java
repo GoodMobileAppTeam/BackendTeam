@@ -43,8 +43,7 @@ public class VideoEditService implements VideoEditCommandUseCase, VideoEditQuery
                 command.duration(),
                 command.videoUrl(),
                 command.userDefinedDate(),
-                thumbnailUrl,
-                command.bgmKey()
+                thumbnailUrl
         );
 
         return videoEditRepository.save(videoEdit);
