@@ -7,7 +7,7 @@ import lombok.Getter;
 @Getter
 public class User {
 
-  private static final String PROFILE_IMAGE_PATH = "profile/%s";
+  private static final String PROFILE_IMAGE_PATH = "profile/%d/%s";
 
   private final Long id;
 
@@ -62,8 +62,30 @@ public class User {
     );
   }
 
-  public static String getProfileImagePath(String uuid) {
-    return String.format(PROFILE_IMAGE_PATH, uuid);
+  public static String getProfileImagePath(Long userId, String uuid) {
+    return String.format(PROFILE_IMAGE_PATH, userId, uuid);
   }
 
+  public User updateName(String newName) {
+    return new User(
+            this.id,
+            newName,
+            this.socialId,
+            this.socialType,
+            this.password,
+            this.profileImageUrl,
+            this.createdAt
+    );
+  }
+  public User updateProfileImage(String newProfileImageUrl) {
+    return new User(
+            this.id,
+            this.name,
+            this.socialId,
+            this.socialType,
+            this.password,
+            newProfileImageUrl,
+            this.createdAt
+    );
+  }
 }
