@@ -12,7 +12,7 @@ public record CreateVideoEditCommand(
         String videoUrl,
         MultipartFile thumbnailData,
         String thumbnailFileName,
-        LocalDate saveTime
+        LocalDate userDefinedDate
 ) {
     public static CreateVideoEditCommand of(
             Long albumId,
@@ -22,7 +22,7 @@ public record CreateVideoEditCommand(
             String videoUrl,
             MultipartFile thumbnailData,
             String thumbnailFileName,
-            LocalDate saveTime
+            LocalDate userDefinedDate
     ) {
         return new CreateVideoEditCommand(
                 albumId,
@@ -32,7 +32,7 @@ public record CreateVideoEditCommand(
                 videoUrl,
                 thumbnailData,
                 thumbnailFileName,
-                saveTime
+                userDefinedDate
         );
     }
 }

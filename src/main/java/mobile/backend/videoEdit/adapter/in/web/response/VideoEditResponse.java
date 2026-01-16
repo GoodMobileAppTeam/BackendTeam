@@ -6,6 +6,7 @@ import mobile.backend.videoEdit.domain.model.VideoEdit;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Schema(description = "영상 응답 DTO")
 public record VideoEditResponse(
@@ -60,5 +61,11 @@ public record VideoEditResponse(
                 domain.isBookMarked(),
                 domain.getThumbnailUrl()
         );
+    }
+
+    public static List<VideoEditResponse> from(List<VideoEdit> domains) {
+        return domains.stream()
+                .map(VideoEditResponse::from)
+                .toList();
     }
 }

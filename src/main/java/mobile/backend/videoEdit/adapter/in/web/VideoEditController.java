@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import mobile.backend.global.adapter.in.web.response.BaseResponse;
@@ -27,6 +28,7 @@ import mobile.backend.videoEdit.domain.command.SearchSummaryVideoEditCommand;
 import mobile.backend.videoEdit.domain.command.SearchVideoEditCommand;
 import mobile.backend.videoEdit.domain.model.VideoEdit;
 import mobile.backend.videoEdit.domain.model.VideoEditSummary;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -70,19 +72,6 @@ public class VideoEditController {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(BaseResponse.success("영상이 등록되었습니다.", VideoEditResponse.from(created)));
-    }
-
-    @Operation(
-            summary = "영상 단건 조회",
-            description = "영상 ID로 특정 영상의 상세 정보를 조회합니다. 본인이 등록한 영상만 조회 가능합니다."
-    )
-    @GetMapping("/{id}")
-    public ResponseEntity<BaseResponse<VideoEditResponse>> getById(
-            @PathVariable Long id,
-            @AuthenticationPrincipal CustomUserDetails userDetails) {
-
-        VideoEdit videoEdit = videoEditQueryUseCase.getById(id, userDetails.getUserId());
-        return ResponseEntity.ok(BaseResponse.success(VideoEditResponse.from(videoEdit)));
     }
 
     @Operation(
@@ -159,6 +148,21 @@ public class VideoEditController {
 
         return ResponseEntity.ok(BaseResponse.success(VideoEditSummaryResponse.fromDomainList(summaries)));
   }
+
+    @Operation(
+            summary = "날짜별 영상 목록 조회",
+            description = "특정 날짜에 사용자가 저장한 영상 목록을 조회합니다."
+    )
+    @GetMapping("/daily/{userDefinedDate}")
+    public ResponseEntity<BaseResponse<List<VideoEditResponse>>> getDailyVideos(
+            @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate userDefinedDate,
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+
+        List<VideoEdit> videos = videoEditQueryUseCase.getDailyVideos(userDetails.getUserId(), userDefinedDate);
+
+        return ResponseEntity.ok(BaseResponse.success(VideoEditResponse.from(videos)));
+    }
+
 
   @Operation(
       summary = "키워드 기반 장소 검색",

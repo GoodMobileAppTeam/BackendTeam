@@ -15,6 +15,7 @@ import mobile.backend.videoEdit.domain.model.VideoEdit;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Slf4j
@@ -41,7 +42,7 @@ public class VideoEditService implements VideoEditCommandUseCase, VideoEditQuery
                 command.title(),
                 command.duration(),
                 command.videoUrl(),
-                command.saveTime(),
+                command.userDefinedDate(),
                 thumbnailUrl
         );
 
@@ -49,10 +50,8 @@ public class VideoEditService implements VideoEditCommandUseCase, VideoEditQuery
     }
 
     @Override
-    public VideoEdit getById(Long id, Long userId) {
-        VideoEdit videoEdit = videoEditRepository.findById(id);
-        VideoEdit.validateOwnership(videoEdit, userId);
-        return videoEdit;
+    public List<VideoEdit> getDailyVideos(Long userId, LocalDate userDefinedDate) {
+        return videoEditRepository.getDailyVideos(userId, userDefinedDate);
     }
 
     @Override
