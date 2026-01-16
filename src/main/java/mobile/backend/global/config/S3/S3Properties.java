@@ -20,11 +20,13 @@ public class S3Properties {
         private final String profile;
         private final String record;
         private final String bgm;
+        private final String thumbnail;
 
-        public Path(String profile, String record, String bgm) {
+        public Path(String profile, String record, String bgm, String thumbnail) {
             this.profile = profile;
             this.record = record;
             this.bgm = bgm;
+            this.thumbnail = thumbnail;
         }
 
     }

@@ -73,13 +73,11 @@ public class VideoEditEntity extends BaseTimeEntity {
     @Column(name = "thumbnail_url")
     private String thumbnailUrl;
 
-    @Column(name = "bgm_key")
-    private String bgmKey;
 
 
     private VideoEditEntity(Long id, Long albumId, UserEntity user, String title, Integer duration,
                             String videoUrl, LocalDate userDefinedDate,
-                            Boolean isBookMark, String thumbnailUrl, String bgmKey) {
+                            Boolean isBookMark, String thumbnailUrl) {
         this.id = id;
         this.albumId = albumId;
         this.title = title;
@@ -89,16 +87,15 @@ public class VideoEditEntity extends BaseTimeEntity {
         this.userDefinedDate = userDefinedDate;
         this.isBookMark = isBookMark;
         this.thumbnailUrl = thumbnailUrl;
-        this.bgmKey = bgmKey;
     }
 
     public static VideoEditEntity from(Long id, Long albumId, Long userId, String title, Integer duration,
                                        String videoUrl,
                                        LocalDate userDefinedDate, Boolean isBookMark,
-                                       String thumbnailUrl, String bgmKey) {
+                                       String thumbnailUrl) {
         UserEntity user = UserEntity.builder().id(userId).build();
         return new VideoEditEntity(id, albumId, user, title, duration, videoUrl,
-                        userDefinedDate, isBookMark, thumbnailUrl, bgmKey);
+                        userDefinedDate, isBookMark, thumbnailUrl);
     }
 
 
@@ -115,8 +112,7 @@ public class VideoEditEntity extends BaseTimeEntity {
                 entity.getUserDefinedDate(),
                 entity.getCreatedAt(),
                 Boolean.TRUE.equals(entity.getIsBookMark()),
-                entity.getThumbnailUrl(),
-                entity.getBgmKey()
+                entity.getThumbnailUrl()
         );
 
     }
@@ -133,8 +129,7 @@ public class VideoEditEntity extends BaseTimeEntity {
                 domain.getVideoUrl(),
                 domain.getUserDefinedDate(),
                 domain.isBookMarked(),
-                domain.getThumbnailUrl(),
-                domain.getBgmKey()
+                domain.getThumbnailUrl()
         );
     }
 }
