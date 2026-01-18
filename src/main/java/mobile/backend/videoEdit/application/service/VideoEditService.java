@@ -3,6 +3,7 @@ package mobile.backend.videoEdit.application.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import mobile.backend.global.adapter.out.s3.AmazonS3Manager;
+import mobile.backend.global.exception.CustomException;
 import mobile.backend.videoEdit.application.port.in.VideoEditCommandUseCase;
 import mobile.backend.videoEdit.application.port.in.VideoEditQueryUseCase;
 import mobile.backend.videoEdit.application.port.out.VideoEditRepository;
@@ -12,6 +13,7 @@ import mobile.backend.videoEdit.domain.command.SearchSummaryVideoEditCommand;
 import mobile.backend.videoEdit.domain.command.SearchVideoEditCommand;
 import mobile.backend.videoEdit.domain.model.VideoEditSummary;
 import mobile.backend.videoEdit.domain.model.VideoEdit;
+import mobile.backend.videoEdit.exception.VideoErrorCode;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,6 +32,12 @@ public class VideoEditService implements VideoEditCommandUseCase, VideoEditQuery
     @Override
     @Transactional
     public VideoEdit create(CreateVideoEditCommand command) {
+
+        int count = videoEditRepository.countByUserIdAndUserDefinedDate(command.userId(), command.userDefinedDate());
+
+        if (count > 5) {
+            throw new CustomException(VideoErrorCode.OVER_VIDEO_COUNT);
+        }
 
         String thumbnailUrl = s3Manager.uploadFile(
                 command.thumbnailFileName(),
