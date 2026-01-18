@@ -95,4 +95,9 @@ public class VideoEditRepositoryImpl implements VideoEditRepository {
                 .map(VideoEditSummary::fromProjection)
                 .toList();
     }
+
+    @Override
+    public int countByUserIdAndUserDefinedDate(Long userId, LocalDate userDefinedDate) {
+        return jpaRepository.countByUserIdAndUserDefinedDate(userId, userDefinedDate);
+    }
 }

@@ -92,4 +92,18 @@ public interface VideoEditJpaRepository extends JpaRepository<VideoEditEntity, L
      *   (조건에 맞는 데이터가 없을 경우 빈 리스트 반환)
      */
     List<VideoEditEntity> findAllByUserIdAndUserDefinedDateOrderByCreatedAtDesc(Long userId, LocalDate userDefinedDate);
+
+    @Query(
+            value = """
+        SELECT COUNT(*)
+        FROM video_edit
+        WHERE user_id = :userId
+          AND user_defined_date = :userDefinedDate
+        """,
+            nativeQuery = true
+    )
+    int countByUserIdAndUserDefinedDate(
+            @Param("userId") Long userId,
+            @Param("userDefinedDate") LocalDate userDefinedDate
+    );
 }
