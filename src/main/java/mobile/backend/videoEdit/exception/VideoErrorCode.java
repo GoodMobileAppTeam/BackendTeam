@@ -18,7 +18,9 @@ public enum VideoErrorCode implements BaseErrorCode {
     INVALID_CURSOR("커서 값이 올바르지 않습니다.", HttpStatus.BAD_REQUEST),
 
     PLACE_NAME_NOT_FOUND("좌표에 해당하는 장소 정보를 찾을 수 없습니다.", HttpStatus.BAD_REQUEST),
-    INVALID_KAKAO_RESPONSE("카카오 지도 API 응답이 올바르지 않습니다.", HttpStatus.BAD_REQUEST);
+    INVALID_KAKAO_RESPONSE("카카오 지도 API 응답이 올바르지 않습니다.", HttpStatus.BAD_REQUEST),
+
+    OVER_VIDEO_COUNT("하루에 저장할 수 있는 영상 개수(5개)를 초과했습니다.", HttpStatus.CONFLICT);
 
     private final String message;
     private final HttpStatus status;
