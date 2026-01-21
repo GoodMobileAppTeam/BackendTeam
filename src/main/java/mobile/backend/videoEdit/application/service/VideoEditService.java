@@ -35,7 +35,7 @@ public class VideoEditService implements VideoEditCommandUseCase, VideoEditQuery
 
         int count = videoEditRepository.countByUserIdAndUserDefinedDate(command.userId(), command.userDefinedDate());
 
-        if (count > 5) {
+        if (count >= 5) {
             throw new CustomException(VideoErrorCode.OVER_VIDEO_COUNT);
         }
 
