@@ -13,7 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.time.LocalDate;
 
 
-@Schema(description = "영상 등록 요청 DTO")
+@Schema(title = "CreateVideoEditRequest : 영상 등록 요청 DTO")
 public record CreateVideoEditRequest(
         @NotNull(message = "앨범 ID는 필수입니다.")
         Long albumId,

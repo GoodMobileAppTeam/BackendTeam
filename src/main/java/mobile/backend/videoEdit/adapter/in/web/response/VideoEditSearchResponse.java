@@ -8,23 +8,38 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Schema(description = "영상 목록 응답 DTO")
+@Schema(title = "VideoEditSearchResponse : 영상 목록 응답 DTO")
 public record VideoEditSearchResponse(
 
+        @Schema(description = "영상 목록 (null able)", nullable = true)
         List<VideoEditResponse> content,
 
         // NEXT
+        @Schema(description = "다음 페이지 커서 - 사용자 지정 날짜 (null able)", nullable = true)
         LocalDate nextCursorUserDefinedDate,
+
+        @Schema(description = "다음 페이지 커서 - 생성 시각 (null able)", nullable = true)
         LocalDateTime nextCursorCreatedAt,
+
+        @Schema(description = "다음 페이지 커서 - ID (null able)", nullable = true)
         Long nextCursorId,
+
+        @Schema(description = "다음 페이지 존재 여부 (null able)", nullable = true)
         boolean hasNext,
 
         // PREV
+        @Schema(description = "이전 페이지 커서 - 사용자 지정 날짜 (null able)", nullable = true)
         LocalDate prevCursorUserDefinedDate,
+
+        @Schema(description = "이전 페이지 커서 - 생성 시각 (null able)", nullable = true)
         LocalDateTime prevCursorCreatedAt,
+
+        @Schema(description = "이전 페이지 커서 - ID (null able)", nullable = true)
         Long prevCursorId,
+
+        @Schema(description = "이전 페이지 존재 여부 (null able)", nullable = true)
         boolean hasPrev
-) {
+)  {
 
     public static VideoEditSearchResponse from(CursorPageResult<VideoEdit> page) {
 
