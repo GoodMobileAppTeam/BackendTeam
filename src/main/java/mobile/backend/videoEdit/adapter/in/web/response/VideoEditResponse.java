@@ -8,8 +8,23 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Schema(title = "VideoEditResponse : 영상 응답 DTO")
-public record VideoEditResponse(
+@Schema(
+        title = "VideoEditResponse : 영상 응답 DTO",
+        description = """
+        단일 영상 정보를 표현하는 응답 DTO입니다.
+
+        - 이 DTO는 목록 형태(List)로 응답될 수 있습니다.
+        - 조회 결과가 없는 경우, 이 DTO를 요소로 갖는 목록은
+          빈 배열([])로 반환됩니다.
+
+        예시 (데이터가 없는 경우):
+        {
+          "success": true,
+          "message": "요청이 성공적으로 처리되었습니다.",
+          "data": []
+        }
+        """
+)public record VideoEditResponse(
 
         @Schema(description = "영상 ID", example = "1", nullable = false)
         Long id,
