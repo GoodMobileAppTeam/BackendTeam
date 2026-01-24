@@ -41,7 +41,7 @@ public class VideoEditQuerydslRepositoryImpl implements VideoEditQuerydslReposit
                         initCondition(command),
                         cursorCondition(command)
                 )
-                .orderBy(orderByDesc())
+                .orderBy(orderBy(command))
                 .limit(command.size())
                 .fetch();
     }
@@ -184,7 +184,22 @@ public class VideoEditQuerydslRepositoryImpl implements VideoEditQuerydslReposit
         ));
     }
 
-    private OrderSpecifier<?>[] orderByDesc() {
+    /**
+     * 정렬 분기
+     *
+     * - INIT / DOWN : DESC
+     * - UP          : ASC (조회 후 서비스단에서 reverse)
+     */
+    private OrderSpecifier<?>[] orderBy(SearchVideoEditCommand command) {
+
+        if (command.direction() == ScrollDirection.UP) {
+            return new OrderSpecifier[]{
+                    v.userDefinedDate.asc(),
+                    v.createdAt.asc(),
+                    v.id.asc()
+            };
+        }
+
         return new OrderSpecifier[]{
                 v.userDefinedDate.desc(),
                 v.createdAt.desc(),
