@@ -7,7 +7,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
 
-@Schema(description = "영상 요약 정보 요청 DTO")
+@Schema(title = "VideoEditSummaryRequest : 영상 요약 정보 요청 DTO")
 public record VideoEditSummaryRequest(
 
         @NotNull

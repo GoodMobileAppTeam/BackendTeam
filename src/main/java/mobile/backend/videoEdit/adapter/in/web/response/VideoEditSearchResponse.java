@@ -8,23 +8,54 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Schema(description = "영상 목록 응답 DTO")
+@Schema(
+        title = "VideoEditSearchResponse : 영상 목록 응답 DTO",
+        description = """
+        영상 목록 조회 응답 DTO입니다.
+
+        - 조회 결과가 존재하는 경우: 영상 목록과 커서 정보가 함께 반환됩니다.
+        - 조회 결과가 없는 경우: content는 빈 배열([])이며, 모든 커서 정보는 null,
+          hasNext / hasPrev 는 false로 반환됩니다.
+
+        예시 (데이터가 없는 경우):
+        {
+          "success": true,
+          "message": "요청이 성공적으로 처리되었습니다.",
+          "data": []
+        }
+        """
+)
 public record VideoEditSearchResponse(
 
+        @Schema(description = "영상 목록 (null able)")
         List<VideoEditResponse> content,
 
         // NEXT
+        @Schema(description = "다음 페이지 커서 - 사용자 지정 날짜 (null able)")
         LocalDate nextCursorUserDefinedDate,
+
+        @Schema(description = "다음 페이지 커서 - 생성 시각 (null able)")
         LocalDateTime nextCursorCreatedAt,
+
+        @Schema(description = "다음 페이지 커서 - ID (null able)")
         Long nextCursorId,
+
+        @Schema(description = "다음 페이지 존재 여부")
         boolean hasNext,
 
         // PREV
+        @Schema(description = "이전 페이지 커서 - 사용자 지정 날짜 (null able)")
         LocalDate prevCursorUserDefinedDate,
+
+        @Schema(description = "이전 페이지 커서 - 생성 시각 (null able)")
         LocalDateTime prevCursorCreatedAt,
+
+        @Schema(description = "이전 페이지 커서 - ID (null able)")
         Long prevCursorId,
+
+        @Schema(description = "이전 페이지 존재 여부")
         boolean hasPrev
-) {
+)  {
 
     public static VideoEditSearchResponse from(CursorPageResult<VideoEdit> page) {
 

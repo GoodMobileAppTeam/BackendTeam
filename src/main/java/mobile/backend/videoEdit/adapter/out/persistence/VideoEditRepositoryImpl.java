@@ -8,6 +8,7 @@ import mobile.backend.videoEdit.adapter.out.persistence.jpa.VideoEditJpaReposito
 import mobile.backend.videoEdit.adapter.out.persistence.querydsl.VideoEditQuerydslRepository;
 import mobile.backend.videoEdit.application.port.out.VideoEditRepository;
 import mobile.backend.videoEdit.application.service.querymodel.CursorPageResult;
+import mobile.backend.videoEdit.domain.command.ScrollDirection;
 import mobile.backend.videoEdit.domain.command.SearchSummaryVideoEditCommand;
 import mobile.backend.videoEdit.domain.command.SearchVideoEditCommand;
 import mobile.backend.videoEdit.domain.model.VideoEdit;
@@ -16,6 +17,7 @@ import mobile.backend.videoEdit.exception.VideoErrorCode;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
 
 @Repository
@@ -52,6 +54,10 @@ public class VideoEditRepositoryImpl implements VideoEditRepository {
     public CursorPageResult<VideoEdit> search(SearchVideoEditCommand command) {
 
         List<VideoEditEntity> entities = querydslRepository.search(command);
+
+        if (command.direction() == ScrollDirection.UP) {
+            Collections.reverse(entities);
+        }
 
         boolean hasPrev = false;
         boolean hasNext = false;

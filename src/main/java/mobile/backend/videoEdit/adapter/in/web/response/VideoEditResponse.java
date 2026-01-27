@@ -8,8 +8,23 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Schema(description = "영상 응답 DTO")
-public record VideoEditResponse(
+@Schema(
+        title = "VideoEditResponse : 영상 응답 DTO",
+        description = """
+        단일 영상 정보를 표현하는 응답 DTO입니다.
+
+        - 이 DTO는 목록 형태(List)로 응답될 수 있습니다.
+        - 조회 결과가 없는 경우, 이 DTO를 요소로 갖는 목록은
+          빈 배열([])로 반환됩니다.
+
+        예시 (데이터가 없는 경우):
+        {
+          "success": true,
+          "message": "요청이 성공적으로 처리되었습니다.",
+          "data": []
+        }
+        """
+)public record VideoEditResponse(
 
         @Schema(description = "영상 ID", example = "1")
         Long id,
@@ -26,14 +41,23 @@ public record VideoEditResponse(
         @Schema(description = "영상 길이 (초)", example = "45")
         Integer duration,
 
-        @Schema(description = "영상 URL", example = "https://bucket.s3.amazonaws.com/videos/sample.mp4")
+        @Schema(
+                description = "영상 URL",
+                example = "https://bucket.s3.amazonaws.com/videos/sample.mp4"
+        )
         String videoUrl,
 
-        @Schema(description = "사용자가 선택한 기록 날짜", example = "2024-01-15")
+        @Schema(
+                description = "사용자가 선택한 기록 날짜 (선택값)",
+                example = "2024-01-15"
+        )
         @JsonFormat(pattern = "yyyy-MM-dd")
         LocalDate userDefinedDate,
 
-        @Schema(description = "실제 db에 저장된 날자", example = "2025-04-01T00:10:00")
+        @Schema(
+                description = "실제 DB에 저장된 생성 시각 (null able)",
+                example = "2025-04-01T00:10:00"
+        )
         @JsonFormat(
                 shape = JsonFormat.Shape.STRING,
                 pattern = "yyyy-MM-dd'T'HH:mm:ss"
@@ -43,10 +67,11 @@ public record VideoEditResponse(
         @Schema(description = "북마크 여부", example = "false")
         boolean isBookMarked,
 
-        @Schema(description = "썸네일 URL", example = "https://bucket.s3.amazonaws.com/thumbnails/uuid.jpg")
+        @Schema(
+                description = "썸네일 URL",
+                example = "https://bucket.s3.amazonaws.com/thumbnails/uuid.jpg"
+        )
         String thumbnailUrl
-
-
 ) {
     public static VideoEditResponse from(VideoEdit domain) {
         return new VideoEditResponse(
