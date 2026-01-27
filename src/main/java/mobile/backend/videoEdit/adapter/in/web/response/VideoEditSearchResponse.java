@@ -27,33 +27,33 @@ import java.util.List;
 )
 public record VideoEditSearchResponse(
 
-        @Schema(description = "영상 목록 (null able)", nullable = true)
+        @Schema(description = "영상 목록 (null able)")
         List<VideoEditResponse> content,
 
         // NEXT
-        @Schema(description = "다음 페이지 커서 - 사용자 지정 날짜 (null able)", nullable = true)
+        @Schema(description = "다음 페이지 커서 - 사용자 지정 날짜 (null able)")
         LocalDate nextCursorUserDefinedDate,
 
-        @Schema(description = "다음 페이지 커서 - 생성 시각 (null able)", nullable = true)
+        @Schema(description = "다음 페이지 커서 - 생성 시각 (null able)")
         LocalDateTime nextCursorCreatedAt,
 
-        @Schema(description = "다음 페이지 커서 - ID (null able)", nullable = true)
+        @Schema(description = "다음 페이지 커서 - ID (null able)")
         Long nextCursorId,
 
-        @Schema(description = "다음 페이지 존재 여부", nullable = true)
+        @Schema(description = "다음 페이지 존재 여부")
         boolean hasNext,
 
         // PREV
-        @Schema(description = "이전 페이지 커서 - 사용자 지정 날짜 (null able)", nullable = true)
+        @Schema(description = "이전 페이지 커서 - 사용자 지정 날짜 (null able)")
         LocalDate prevCursorUserDefinedDate,
 
-        @Schema(description = "이전 페이지 커서 - 생성 시각 (null able)", nullable = true)
+        @Schema(description = "이전 페이지 커서 - 생성 시각 (null able)")
         LocalDateTime prevCursorCreatedAt,
 
-        @Schema(description = "이전 페이지 커서 - ID (null able)", nullable = true)
+        @Schema(description = "이전 페이지 커서 - ID (null able)")
         Long prevCursorId,
 
-        @Schema(description = "이전 페이지 존재 여부", nullable = true)
+        @Schema(description = "이전 페이지 존재 여부")
         boolean hasPrev
 )  {
 

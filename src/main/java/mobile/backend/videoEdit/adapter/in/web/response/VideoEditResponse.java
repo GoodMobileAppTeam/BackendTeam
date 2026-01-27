@@ -26,40 +26,37 @@ import java.util.List;
         """
 )public record VideoEditResponse(
 
-        @Schema(description = "영상 ID", example = "1", nullable = false)
+        @Schema(description = "영상 ID", example = "1")
         Long id,
 
-        @Schema(description = "앨범 ID", example = "1", nullable = false)
+        @Schema(description = "앨범 ID", example = "1")
         Long albumId,
 
-        @Schema(description = "사용자 ID", example = "1", nullable = false)
+        @Schema(description = "사용자 ID", example = "1")
         Long userId,
 
-        @Schema(description = "영상 제목", example = "오늘의 영상", nullable = false)
+        @Schema(description = "영상 제목", example = "오늘의 영상")
         String title,
 
-        @Schema(description = "영상 길이 (초)", example = "45", nullable = false)
+        @Schema(description = "영상 길이 (초)", example = "45")
         Integer duration,
 
         @Schema(
                 description = "영상 URL",
-                example = "https://bucket.s3.amazonaws.com/videos/sample.mp4",
-                nullable = false
+                example = "https://bucket.s3.amazonaws.com/videos/sample.mp4"
         )
         String videoUrl,
 
         @Schema(
                 description = "사용자가 선택한 기록 날짜 (선택값)",
-                example = "2024-01-15",
-                nullable = false
+                example = "2024-01-15"
         )
         @JsonFormat(pattern = "yyyy-MM-dd")
         LocalDate userDefinedDate,
 
         @Schema(
                 description = "실제 DB에 저장된 생성 시각 (null able)",
-                example = "2025-04-01T00:10:00",
-                nullable = true
+                example = "2025-04-01T00:10:00"
         )
         @JsonFormat(
                 shape = JsonFormat.Shape.STRING,
@@ -67,13 +64,12 @@ import java.util.List;
         )
         LocalDateTime createdAt,
 
-        @Schema(description = "북마크 여부", example = "false", nullable = false)
+        @Schema(description = "북마크 여부", example = "false")
         boolean isBookMarked,
 
         @Schema(
                 description = "썸네일 URL",
-                example = "https://bucket.s3.amazonaws.com/thumbnails/uuid.jpg",
-                nullable = false
+                example = "https://bucket.s3.amazonaws.com/thumbnails/uuid.jpg"
         )
         String thumbnailUrl
 ) {

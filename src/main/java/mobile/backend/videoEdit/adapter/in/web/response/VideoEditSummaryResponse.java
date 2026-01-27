@@ -25,22 +25,19 @@ import java.util.List;
 
         @Schema(
                 description = "사용자 지정 날짜",
-                example = "2024-01-15",
-                nullable = false
+                example = "2024-01-15"
         )
         LocalDate userDefinedDate,
 
         @Schema(
                 description = "가장 최근 썸네일 URL",
-                example = "https://bucket.s3.amazonaws.com/thumbnails/uuid.jpg",
-                nullable = false
+                example = "https://bucket.s3.amazonaws.com/thumbnails/uuid.jpg"
         )
         String latestThumbnail,
 
         @Schema(
                 description = "해당 날짜의 영상 개수",
-                example = "3",
-                nullable = false
+                example = "3"
         )
         Long count
 ) {
