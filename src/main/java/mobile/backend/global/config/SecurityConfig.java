@@ -1,6 +1,7 @@
 package mobile.backend.global.config;
 
 import lombok.RequiredArgsConstructor;
+import mobile.backend.global.security.CustomAuthenticationEntryPoint;
 import mobile.backend.global.security.jwt.JwtAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,6 +22,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
 
     // 모든 메소드 API
     private static final String[] PUBLIC_ENDPOINTS = {
@@ -82,6 +84,10 @@ public class SecurityConfig {
 
                     // 그 외 모든 요청은 인증 필요
                     .anyRequest().authenticated()
+                )
+                // 401 반환을 위한 exceptionHandling
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint(customAuthenticationEntryPoint)
                 )
 
                 // JWT 인증 필터 추가

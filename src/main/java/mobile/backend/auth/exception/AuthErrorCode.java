@@ -18,6 +18,8 @@ public enum AuthErrorCode implements BaseErrorCode {
     INVALID_REFRESH_TOKEN(HttpStatus.UNAUTHORIZED, "Refresh token invalid"),
     EXPIRED_REFRESH_TOKEN(HttpStatus.UNAUTHORIZED, "Refresh token expired"),
     INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "토큰 검증 실패"),
+    EXPIRED_ACCESS_TOKEN(HttpStatus.UNAUTHORIZED, "Access token 만료"),
+
     // 테스트 로그인용
     INVALID_CREDENTIALS(HttpStatus.UNAUTHORIZED, "이메일 또는 비밀번호가 올바르지 않습니다."),
 
