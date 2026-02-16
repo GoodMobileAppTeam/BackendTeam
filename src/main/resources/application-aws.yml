@@ -23,6 +23,37 @@ spring:
     url: ${AWS_MYSQL_URL}
     username: ${AWS_MYSQL_USERNAME}
     password: ${AWS_MYSQL_PASSWORD}
+    hikari:
+      pool-name: HikariPool-1
+      # 최대 커넥션 수 (너무 크면 DB 부하, 너무 작으면 대기 발생)
+      maximum-pool-size: 10
+      # 유휴 상태로 유지할 최소 커넥션 수
+      minimum-idle: 5
+      # 유휴 커넥션 유지 시간 (5분) - 이 시간 후 minimum-idle 초과분 제거
+      idle-timeout: 300000
+      # 커넥션 최대 수명 (20분) - AWS RDS 기본 타임아웃(30분)보다 짧게 설정해야 함
+      max-lifetime: 1200000
+      # 풀에서 커넥션 얻기 위한 최대 대기 시간 (30초)
+      connection-timeout: 30000
+      # 커넥션 유효성 검사 타임아웃 (5초)
+      validation-timeout: 5000
+      # 유휴 커넥션에 주기적으로 ping 보내 연결 유지 (30초) - RDS 연결 끊김 방지
+      keepalive-time: 30000
+      # 커넥션 유효성 검사 쿼리
+      connection-test-query: SELECT 1
+      # 커넥션 누수 감지 임계값 (60초) - 이 시간 동안 반환 안되면 경고 로그
+      leak-detection-threshold: 60000
+      # MySQL 드라이버 최적화 설정
+      data-source-properties:
+        # PreparedStatement 캐싱 활성화
+        cachePrepStmts: true
+        prepStmtCacheSize: 250
+        prepStmtCacheSqlLimit: 2048
+        useServerPrepStmts: true
+        # 소켓 읽기 타임아웃 (60초) - 쿼리 응답 대기 최대 시간
+        socketTimeout: 60000
+        # DB 연결 시도 타임아웃 (30초)
+        connectTimeout: 30000
 
   data:
     redis:
