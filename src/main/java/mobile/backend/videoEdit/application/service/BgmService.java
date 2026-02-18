@@ -1,8 +1,11 @@
 package mobile.backend.videoEdit.application.service;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import mobile.backend.global.adapter.out.s3.AmazonS3Manager;
 import mobile.backend.global.config.S3.S3Properties;
 import mobile.backend.videoEdit.adapter.in.web.response.bgm.BgmItemResponse;
@@ -11,6 +14,7 @@ import mobile.backend.videoEdit.application.port.in.BgmQueryUseCase;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -18,6 +22,29 @@ public class BgmService implements BgmQueryUseCase {
 
   // 음악 파일 정보
   private record FileMeta(String title, String artist) {}
+
+  /**
+   * 곡별 태그 매핑 (key: 곡명 소문자)
+   *
+   * Map.ofEntries() : Java 9+ 불변(immutable) Map 생성 메서드. 10개 초과 엔트리도 가능.
+   *                   (10개 이하는 Map.of(k1,v1, k2,v2, ...) 도 사용 가능)
+   * Map.entry(K, V) : Map.ofEntries()에 넣을 key-value 쌍 하나를 생성
+   * List.of(...)     : Java 9+ 불변(immutable) List 생성
+   *
+   * 생성된 Map과 List 모두 수정 불가(put/add 시 UnsupportedOperationException 발생)
+   */
+  private static final Map<String, List<String>> TAG_MAP = Map.ofEntries(
+      Map.entry("bicycles", List.of("발랄한", "귀여운", "활발한")),
+      Map.entry("cappuccino", List.of("로맨틱", "사랑스러운", "아늑한")),
+      Map.entry("chill guy", List.of("힙한", "다이나믹한", "신나는")),
+      Map.entry("jellyfish", List.of("발랄한", "귀여운", "활발한")),
+      Map.entry("hope", List.of("웅장한", "활기찬", "모험적")),
+      Map.entry("bubble", List.of("발랄한", "귀여운", "활발한")),
+      Map.entry("wistful thinking", List.of("감미로운", "감성적인", "슬픈")),
+      Map.entry("smile", List.of("즐거운", "행복한", "활발한")),
+      Map.entry("ukulele and piano", List.of("발랄한", "귀여운", "활기찬")),
+      Map.entry("happy commercial", List.of("발랄한", "귀여운", "활기찬"))
+  );
 
   private final AmazonS3Manager amazonS3Manager;
   private final S3Properties s3Properties;
@@ -42,12 +69,18 @@ public class BgmService implements BgmQueryUseCase {
       FileMeta meta = parseFileName(key);
       String thumbnailUrl = getThumbnailUrl(meta.title, thumbnailKeys);
 
+      // getOrDefault: TAG_MAP에 해당 곡명이 있으면 태그 리스트 반환, 없으면 두 번째 인자 반환
+      // Collections.emptyList(): null 대신 빈 리스트 [] 를 반환 → 프론트에서 "tags": [] 로 응답되어 null 체크 불필요
+      List<String> tags = TAG_MAP.getOrDefault(
+          meta.title.toLowerCase(), Collections.emptyList());
+
       bgms.add(
           BgmItemResponse.builder()
               .title(meta.title)
               .artist(meta.artist)
               .thumbnailUrl(thumbnailUrl)
               .audioUrl(amazonS3Manager.getPublicUrl(key))
+              .tags(tags)
               .build()
       );
     }

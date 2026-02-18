@@ -1,6 +1,7 @@
 package mobile.backend.videoEdit.adapter.in.web.response.bgm;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -15,13 +16,5 @@ public class BgmItemResponse {
   private String artist;
   private String thumbnailUrl;
   private String audioUrl;
-
-  public static BgmItemResponse from(String title, String artist, String thumbnailUrl, String audioUrl) {
-    return BgmItemResponse.builder()
-        .title(title)
-        .artist(artist)
-        .thumbnailUrl(thumbnailUrl)
-        .audioUrl(audioUrl)
-        .build();
-  }
+  private List<String> tags;
 }
