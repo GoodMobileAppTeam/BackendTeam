@@ -104,6 +104,7 @@ jobs:
             AWS_REDIS_PORT=${{ secrets.AWS_REDIS_PORT }}
             AWS_REDIS_PASSWORD=${{ secrets.AWS_REDIS_PASSWORD }}
             KAKAO_REST_API_KEY=${{ secrets.KAKAO_REST_API_KEY }}
+            AWS_S3_BUCKET=${{ secrets.AWS_S3_BUCKET }}
             EOF
             
             echo "=== Generate docker-compose.yml from Secret ==="
