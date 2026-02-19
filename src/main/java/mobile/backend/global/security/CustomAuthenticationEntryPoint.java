@@ -5,6 +5,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import mobile.backend.auth.exception.AuthErrorCode;
+import mobile.backend.auth.exception.JwtAuthenticationException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
@@ -21,14 +22,12 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
     public void commence(HttpServletRequest request,
                          HttpServletResponse response,
                          AuthenticationException authException)
-            throws IOException, ServletException {
+            throws IOException {
 
-        AuthErrorCode errorCode;
+        AuthErrorCode errorCode = AuthErrorCode.AUTHENTICATION_FAILED;
 
-        if ("EXPIRED_ACCESS_TOKEN".equals(authException.getMessage())) {
-            errorCode = AuthErrorCode.EXPIRED_ACCESS_TOKEN;
-        } else {
-            errorCode = AuthErrorCode.INVALID_TOKEN;
+        if (authException instanceof JwtAuthenticationException jwtEx) {
+            errorCode = jwtEx.getErrorCode();
         }
 
         response.setStatus(errorCode.getStatus().value());
