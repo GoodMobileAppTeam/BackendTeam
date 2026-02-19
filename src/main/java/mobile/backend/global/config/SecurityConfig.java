@@ -85,10 +85,9 @@ public class SecurityConfig {
                     // 그 외 모든 요청은 인증 필요
                     .anyRequest().authenticated()
                 )
+
                 // 401 반환을 위한 exceptionHandling
-                .exceptionHandling(exception -> exception
-                        .authenticationEntryPoint(customAuthenticationEntryPoint)
-                )
+                .exceptionHandling(exception -> exception.authenticationEntryPoint(customAuthenticationEntryPoint))
 
                 // JWT 인증 필터 추가
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
