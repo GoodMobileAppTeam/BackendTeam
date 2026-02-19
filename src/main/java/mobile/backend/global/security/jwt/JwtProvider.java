@@ -21,7 +21,7 @@ public class JwtProvider {
         );
     }
 
-    // Access Token 생성d
+    // Access Token 생성
     public String generateAccessToken(Long userId) {
         Date now = new Date();
         Date expiration = new Date(
