@@ -60,8 +60,13 @@ public class AuthService implements AuthCommandUseCase {
 
     @Override
     public String refreshAccessToken(RefreshTokenCommand command) {
-        // 1. RefreshToken 검증
-        if (!jwtProvider.validateToken(command.getRefreshToken())) {
+
+        try {
+            // 1. RefreshToken 서명 및 만료 검증 (예외 발생 시 catch)
+            jwtProvider.validateToken(command.getRefreshToken());
+        } catch (io.jsonwebtoken.ExpiredJwtException e) {
+            throw new CustomException(AuthErrorCode.EXPIRED_REFRESH_TOKEN);
+        } catch (io.jsonwebtoken.JwtException | IllegalArgumentException e) {
             throw new CustomException(AuthErrorCode.INVALID_REFRESH_TOKEN);
         }
 
@@ -76,7 +81,7 @@ public class AuthService implements AuthCommandUseCase {
             throw new CustomException(AuthErrorCode.INVALID_REFRESH_TOKEN);
         }
 
-        // 5. 만료 확인
+        // 5. Redis TTL 기반 만료 확인
         if (storedToken.isExpired()) {
             refreshTokenRepository.deleteByUserId(userId);
             throw new CustomException(AuthErrorCode.EXPIRED_REFRESH_TOKEN);
