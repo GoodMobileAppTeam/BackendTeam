@@ -7,4 +7,5 @@ public interface UserQueryUseCase {
     User getUserInfo(Long userId);
     void deleteUser(Long userId);
     User updateUserProfile(Long userId, String name, MultipartFile profileImage);
+    void deleteMyProfileImage(Long userId);
 }
