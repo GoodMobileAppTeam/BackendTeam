@@ -76,4 +76,15 @@ public class UserController {
         return ResponseEntity.ok(BaseResponse.success(UserResponse.from(updatedUser)));
     }
 
+    @Operation(
+        summary = "프로필 이미지 삭제",
+        description = "현재 로그인한 사용자의 이미지를 삭제합니다."
+    )
+    @DeleteMapping("/me/profile-image")
+    public ResponseEntity<BaseResponse<Void>> deleteMyImage(@AuthenticationPrincipal CustomUserDetails userDetails) {
+
+        userQueryUseCase.deleteMyProfileImage(userDetails.getUserId());
+        return ResponseEntity.ok(BaseResponse.success("프로필의 이미지가 삭제되었습니다.", null));
+    }
+
 }
