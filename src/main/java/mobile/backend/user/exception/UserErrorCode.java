@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 public enum UserErrorCode implements BaseErrorCode {
   USER_NOT_FOUND("유저를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
   USER_SAVE_FAILED("유저 저장에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
+  USER_PROFILE_IMAGE_NOT_DELETED("유저 프로필 이미지가 삭제되지 않았습니다.", HttpStatus.BAD_REQUEST),
   ;
 
   private final String message;
