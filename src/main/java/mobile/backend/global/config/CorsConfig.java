@@ -10,7 +10,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @Configuration
 public class CorsConfig {
 
-  private static final List<String> ALLOWED_ORIGINS = List.of("http://localhost:3000", "http://localhost:5173", "https://bikoo.shop");
+  private static final List<String> ALLOWED_ORIGINS = List.of("http://localhost:3000", "http://localhost:5173", "https://bikoo.shop", "https://recordadmin.netlify.app");
 
   @Bean
   public UrlBasedCorsConfigurationSource corsConfigurationSource() {
