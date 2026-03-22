@@ -4,6 +4,11 @@ server:
       on-profile: aws
   servlet:
     context-path: /api
+    session:
+      cookie:
+        secure: true
+        http-only: true
+        same-site: none
   tomcat:
     max-swallow-size: -1
 
