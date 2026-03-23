@@ -1,7 +1,7 @@
 package mobile.backend.notice.adapter.in.web.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import lombok.Builder;
 import lombok.Getter;
 import mobile.backend.notice.domain.model.Notice;
@@ -21,14 +21,14 @@ public class NoticeResponse {
   private String content;
 
   @Schema(description = "공지 올린 시각", example = "2025-11-25")
-  private LocalDateTime createdAt;
+  private LocalDate createdAt;
 
   public static NoticeResponse from(Notice notice) {
     return NoticeResponse.builder()
         .id(notice.getId())
         .title(notice.getTitle())
         .content(notice.getContent())
-        .createdAt(notice.getCreatedAt())
+        .createdAt(notice.getCreatedAt().toLocalDate())
         .build();
   }
 }
