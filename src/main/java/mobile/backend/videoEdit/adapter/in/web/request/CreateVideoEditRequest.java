@@ -19,7 +19,7 @@ public record CreateVideoEditRequest(
         Long albumId,
 
         @NotBlank(message = "영상 제목은 필수입니다.")
-        @Size(max = 10, message = "영상 제목은 최대 10자까지 가능합니다.")
+        @Size(max = 15, message = "영상 제목은 최대 15자까지 가능합니다.")
         String title,
 
         @NotNull(message = "영상 길이는 필수입니다.")
