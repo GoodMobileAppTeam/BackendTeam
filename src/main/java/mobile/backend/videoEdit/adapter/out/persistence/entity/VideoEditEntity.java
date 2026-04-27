@@ -55,7 +55,7 @@ public class VideoEditEntity extends BaseTimeEntity {
             ))
     private UserEntity user;
 
-    @Column(name = "title", nullable = false, length = 10)
+    @Column(name = "title", nullable = false, length = 15)
     private String title;
 
     @Column(name = "duration", nullable = false)
