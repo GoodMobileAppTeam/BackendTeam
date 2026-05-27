@@ -10,7 +10,10 @@ import mobile.backend.notice.application.service.NoticeService;
 import mobile.backend.notice.domain.model.Notice;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -35,5 +38,34 @@ public class AdminNoticeController {
 
     Notice notice = noticeService.createNotice(noticeRequest.toCommand());
     return ResponseEntity.ok(BaseResponse.success(NoticeResponse.from(notice)));
+  }
+
+  @PutMapping("/{noticeId}")
+  public ResponseEntity<BaseResponse<NoticeResponse>> updateNotice(
+      @PathVariable Long noticeId,
+      @RequestBody NoticeRequest noticeRequest,
+      HttpSession session
+  ) {
+    if (session.getAttribute("ADMIN_AUTH") == null) {
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+          .body(BaseResponse.error(401, "관리자 로그인이 필요합니다."));
+    }
+
+    Notice notice = noticeService.updateNotice(noticeId, noticeRequest.toCommand());
+    return ResponseEntity.ok(BaseResponse.success(NoticeResponse.from(notice)));
+  }
+
+  @DeleteMapping("/{noticeId}")
+  public ResponseEntity<BaseResponse<Void>> deleteNotice(
+      @PathVariable Long noticeId,
+      HttpSession session
+  ) {
+    if (session.getAttribute("ADMIN_AUTH") == null) {
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+          .body(BaseResponse.error(401, "관리자 로그인이 필요합니다."));
+    }
+
+    noticeService.deleteNotice(noticeId);
+    return ResponseEntity.ok(BaseResponse.success(null));
   }
 }

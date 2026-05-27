@@ -27,6 +27,20 @@ public class NoticeService implements NoticeCommandUseCase, NoticeQueryUseCase {
 
   @Override
   @Transactional
+  public Notice updateNotice(Long noticeId, NoticeCommand command) {
+    Notice existing = noticeRepository.findById(noticeId);
+    Notice updated = Notice.of(existing.getId(), command.getTitle(), command.getContent(), existing.getCreatedAt());
+    return noticeRepository.save(updated);
+  }
+
+  @Override
+  @Transactional
+  public void deleteNotice(Long noticeId) {
+    noticeRepository.delete(noticeId);
+  }
+
+  @Override
+  @Transactional
   public void ignoreNotice(Long userId, Long noticeId) {
     Notice notice = noticeRepository.findById(noticeId);
     noticeRepository.ignore(userId, notice.getId());
