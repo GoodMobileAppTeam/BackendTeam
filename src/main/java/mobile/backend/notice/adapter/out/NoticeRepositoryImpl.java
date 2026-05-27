@@ -48,6 +48,14 @@ public class NoticeRepositoryImpl implements NoticeRepository {
   }
 
   @Override
+  public void delete(Long noticeId) {
+    if (!noticeJpaRepository.existsById(noticeId)) {
+      throw new CustomException(NoticeErrorCode.NOTICE_NOT_FOUND);
+    }
+    noticeJpaRepository.deleteById(noticeId);
+  }
+
+  @Override
   public boolean isIgnored(Long userId, Long noticeId) {
     return noticeUserJpaRepository.findByUserIdAndNoticeId(userId, noticeId)
         .map(NoticeUserEntity::isIgnored)

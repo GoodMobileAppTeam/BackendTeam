@@ -9,6 +9,7 @@ public interface NoticeRepository {
   Notice findById(Long noticeId);
   Page<Notice> findNotices(Pageable pageable);
   Notice findLatest();
+  void delete(Long noticeId);
   boolean isIgnored(Long userId, Long noticeId);
   void ignore(Long userId, Long noticeId);
 }
