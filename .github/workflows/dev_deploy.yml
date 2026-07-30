@@ -5,6 +5,8 @@ on:
     branches:
       - main
 
+  workflow_dispatch:
+
 jobs:
   # 1) 공통 빌드 (bootJar)
   build:
